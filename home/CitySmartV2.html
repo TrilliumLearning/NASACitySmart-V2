@@ -1,0 +1,1929 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <!--NOTE: Most Web WorldWind home use jquery, Bootstrap and requirejs but those technologies are NOT-->
+    <!--required by Web WorldWind. See SimplestExample.html for an example of using Web WorldWind without them.-->
+    <meta charset="utf-8"/>
+    <title>CitySmart - WorldWise v2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <link href="http://www.jqueryscript.net/css/jquerysctipttop.css" rel="stylesheet" type="text/css">
+    <link href='http://fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
+    <link rel="stylesheet" href="../css/menu.css"/>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js" type="text/javascript"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
+    <script data-main="Main" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.1.17/require.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            var parentmenu = document.getElementById("accordion");
+
+            var firstlayers = [];
+            var clean = [];
+            var secondlayer = [];
+            var clean2 = [];
+            var thirdlayer = [];
+            var clean3 = [];
+            var layername = [];
+            var clean4 = [];
+
+            $.ajax({
+                type: "GET",
+                url: "http://10.11.4.249:9090/firstlayer",
+                dataType: "json",
+                success: function (res) {
+                    console.log("first layer");
+                    console.log(res);
+                    $.each(res, function (index, value) {
+                        console.log(value.FirstLayer);
+                        if ($.inArray(value.FirstLayer, firstlayers) == -1) {
+                            firstlayers.push(value.FirstLayer);
+                            clean.push(value);
+                            console.log(clean);
+                        }
+                    });
+
+                },
+                error: function (jqXHR, exception) {
+                    var msg = '';
+                    if (jqXHR.status === 0) {
+                        msg = 'Not connect.\n Verify Network.';
+                    } else if (jqXHR.status == 404) {
+                        msg = 'Requested page not found. [404]';
+                    } else if (jqXHR.status == 500) {
+                        msg = 'Internal Server Error [500].';
+                    } else if (exception === 'parsererror') {
+                        msg = 'Requested JSON parse failed.';
+                    } else if (exception === 'timeout') {
+                        msg = 'Time out error.';
+                    } else if (exception === 'abort') {
+                        msg = 'Ajax request aborted.';
+                    } else {
+                        msg = 'Uncaught Error.\n' + jqXHR.responseText;
+                    }
+                    alert(msg);
+                    console.log(msg);
+
+                }
+            });
+
+            $.ajax({
+                type: "GET",
+                url: "http://10.11.4.249:9090/secondlayer",
+                dataType: "json",
+                success: function (res) {
+
+                    console.log("second layer");
+
+                    $.each(res, function (index, value) {
+                        if ($.inArray(value.SecondLayer, secondlayer) == -1) {
+                            secondlayer.push(value.SecondLayer);
+                            clean2.push(value);
+                        }
+                    });
+
+                },
+                error: function (jqXHR, exception) {
+                    var msg = '';
+                    if (jqXHR.status === 0) {
+                        msg = 'Not connect.\n Verify Network.';
+                    } else if (jqXHR.status == 404) {
+                        msg = 'Requested page not found. [404]';
+                    } else if (jqXHR.status == 500) {
+                        msg = 'Internal Server Error [500].';
+                    } else if (exception === 'parsererror') {
+                        msg = 'Requested JSON parse failed.';
+                    } else if (exception === 'timeout') {
+                        msg = 'Time out error.';
+                    } else if (exception === 'abort') {
+                        msg = 'Ajax request aborted.';
+                    } else {
+                        msg = 'Uncaught Error.\n' + jqXHR.responseText;
+                    }
+                    alert(msg);
+                    console.log("s" + msg);
+                }
+            });
+
+            $.ajax({
+                type: "GET",
+                url: "http://10.11.4.249:9090/thirdlayer",
+                dataType: "json",
+                success: function (res) {
+                    console.log("third layer");
+
+                    $.each(res, function (index, value) {
+                        if ($.inArray(value.ThirdLayer, thirdlayer) == -1) {
+                            thirdlayer.push(value.ThirdLayer);
+                            clean3.push(value);
+                        }
+                    });
+
+                },
+                error: function (jqXHR, exception) {
+                    var msg = '';
+                    if (jqXHR.status === 0) {
+                        msg = 'Not connect.\n Verify Network.';
+                    } else if (jqXHR.status == 404) {
+                        msg = 'Requested page not found. [404]';
+                    } else if (jqXHR.status == 500) {
+                        msg = 'Internal Server Error [500].';
+                    } else if (exception === 'parsererror') {
+                        msg = 'Requested JSON parse failed.';
+                    } else if (exception === 'timeout') {
+                        msg = 'Time out error.';
+                    } else if (exception === 'abort') {
+                        msg = 'Ajax request aborted.';
+                    } else {
+                        msg = 'Uncaught Error.\n' + jqXHR.responseText;
+                    }
+                    alert(msg);
+                    console.log("t" + msg);
+                }
+            });
+            $.ajax({
+                type: "GET",
+                url: "http://10.11.4.249:9090/layername",
+                dataType: "json",
+                success: function (res) {
+                    console.log("layername");
+
+
+                    $.each(res, function (index, value) {
+                        if ($.inArray(value.LayerName, layername) == -1) {
+                            layername.push(value.LayerName);
+                            clean4.push(value);
+                        }
+                    });
+
+                },
+                error: function (jqXHR, exception) {
+                    var msg = '';
+                    if (jqXHR.status === 0) {
+                        msg = 'Not connect.\n Verify Network.';
+                    } else if (jqXHR.status == 404) {
+                        msg = 'Requested page not found. [404]';
+                    } else if (jqXHR.status == 500) {
+                        msg = 'Internal Server Error [500].';
+                    } else if (exception === 'parsererror') {
+                        msg = 'Requested JSON parse failed.';
+                    } else if (exception === 'timeout') {
+                        msg = 'Time out error.';
+                    } else if (exception === 'abort') {
+                        msg = 'Ajax request aborted.';
+                    } else {
+                        msg = 'Uncaught Error.\n' + jqXHR.responseText;
+                    }
+                    alert(msg);
+                    console.log("sds" + msg)
+
+                }
+            });
+
+
+            $.ajax({
+                type: "GET",
+                url: "http://10.11.4.249:9090/createlayer",
+                dataType: "json",
+                success: function (res) {
+
+
+                    console.log("first layer");
+                    console.log(clean);
+                    console.log(clean2);
+                    console.log(clean3);
+                    console.log(clean4);
+                    console.log(firstlayers);
+                    console.log(secondlayer);
+                    console.log(thirdlayer);
+                    console.log(layername);
+
+
+                    $.each(res, function (index, value) {
+
+                        if ($.inArray(value[index] = firstlayers[index])) {
+                            var paneldefault1 = document.createElement("div");
+                            paneldefault1.className = "panel panel-default";
+                            paneldefault1.id = "exam";
+                            var panelheading1 = document.createElement("div");
+                            panelheading1.className = "panel-heading";
+                            var paneltitle1 = document.createElement("h4");
+                            paneltitle1.className = "panel-title";
+                            var collapsed1 = document.createElement("a");
+                            collapsed1.className = "collapsed";
+                            collapsed1.setAttribute("data-toggle", "collapse");
+                            collapsed1.setAttribute("data-parent", "#nested1");
+                            collapsed1.href = "#collapseOne";
+                            var firstlayername = document.createTextNode(clean[index].FirstLayer);
+                            collapsed1.appendChild(firstlayername);
+                            paneltitle1.appendChild(collapsed1);
+                            panelheading1.appendChild(paneltitle1);
+                            paneldefault1.appendChild(panelheading1);///create layer name for first layer ....
+                            parentmenu.appendChild(paneldefault1);
+                        } else {
+                            console.log("sssssss");
+                        }
+                        if ($.inArray(clean[index] = clean2[index])) {
+                            var collapseone = document.createElement("div");//secondlayer
+                            collapseone.className = "panel-collapse collapse";
+                            collapseone.id = "collapseOne";
+                            var panelbody1 = document.createElement("div");
+                            panelbody1.className = "panel-body";
+                            var panelgroup1 = document.createElement("div");
+                            panelgroup1.id = "nested1";
+                            panelgroup1.className = "panel-group";
+                            var paneldefault2 = document.createElement("div");
+                            paneldefault2.className = "panel panel-default";
+                            var panelheading2 = document.createElement("div");
+                            panelheading2.className = "panel-heading";
+                            var paneltitle2 = document.createElement("h4");
+                            paneltitle2.className = "panel-title";
+                            var collapsed2 = document.createElement("a");
+                            collapsed2.className = "collapsed";
+                            collapsed2.setAttribute("data-toggle", "collapse");
+                            collapsed2.setAttribute("data-parent", "#nested1");
+                            collapsed2.href = "#nested1-collapseOne";
+                            var secondlayername = document.createTextNode(clean2[index].SecondLayer);
+                            var panelbody2 = document.createElement("div");
+                            panelbody2.className = "panel-body";
+                            collapseone.appendChild(panelbody1);
+                            panelbody1.appendChild(panelgroup1);
+                            panelgroup1.appendChild(paneldefault2);
+                            paneldefault2.appendChild(panelheading2);
+                            panelheading2.appendChild(paneltitle2);
+                            collapsed2.appendChild(secondlayername);
+                            paneltitle2.appendChild(collapsed2);
+                            collapsed2.appendChild(panelbody2);
+                            paneldefault1.appendChild(collapseone);
+                            console.log(clean2[index].SecondLayer);
+                        }
+                    });
+
+
+                    // for(var a = 0; a < clean.length; a++) {
+                    //     var paneldefault1 = document.createElement("div");
+                    //     paneldefault1.className = "panel panel-default";
+                    //     paneldefault1.id = "exam";
+                    //     var panelheading1 = document.createElement("div");
+                    //     panelheading1.className = "panel-heading";
+                    //     var paneltitle1 = document.createElement("h4");
+                    //     paneltitle1.className = "panel-title";
+                    //     var collapsed1 = document.createElement("a");
+                    //     collapsed1.className = "collapsed";
+                    //     collapsed1.setAttribute("data-toggle", "collapse");
+                    //     collapsed1.setAttribute("data-parent", "#nested1");
+                    //     collapsed1.href = "#collapseOne";
+                    //     var firstlayername = document.createTextNode(clean[a].FirstLayer);
+                    //     collapsed1.appendChild(firstlayername);
+                    //     paneltitle1.appendChild(collapsed1);
+                    //     panelheading1.appendChild(paneltitle1);
+                    //     paneldefault1.appendChild(panelheading1);///create layer name for first layer ....
+                    //     parentmenu.appendChild(paneldefault1); //add first layer to main menu.
+                    //
+                    //     for(var b = 0; b < clean.length; b++) {
+                    //         var collapseone = document.createElement("div");//secondlayer
+                    //         collapseone.className = "panel-collapse collapse";
+                    //         collapseone.id = "collapseOne";
+                    //         var panelbody1 = document.createElement("div");
+                    //         panelbody1.className = "panel-body";
+                    //         var panelgroup1 = document.createElement("div");
+                    //         panelgroup1.id = "nested1";
+                    //         panelgroup1.className= "panel-group";
+                    //         var paneldefault2 = document.createElement("div");
+                    //         paneldefault2.className = "panel panel-default";
+                    //         var panelheading2 = document.createElement("div");
+                    //         panelheading2.className = "panel-heading";
+                    //         var paneltitle2 = document.createElement("h4");
+                    //         paneltitle2.className = "panel-title";
+                    //         var collapsed2 = document.createElement("a");
+                    //         collapsed2.className = "collapsed";
+                    //         collapsed2.setAttribute("data-toggle", "collapse");
+                    //         collapsed2.setAttribute("data-parent", "#nested1");
+                    //         collapsed2.href = "#nested1-collapseOne";
+                    //         var secondlayername = document.createTextNode(clean2[b].SecondLayer);
+                    //         var panelbody2 = document.createElement("div");
+                    //         panelbody2.className = "panel-body";
+                    //         collapseone.appendChild(panelbody1);
+                    //         panelbody1.appendChild(panelgroup1);
+                    //         panelgroup1.appendChild(paneldefault2);
+                    //         paneldefault2.appendChild(panelheading2);
+                    //         panelheading2.appendChild(paneltitle2);
+                    //         collapsed2.appendChild(secondlayername);
+                    //         paneltitle2.appendChild(collapsed2);
+                    //         collapsed2.appendChild(panelbody2);
+                    //         paneldefault1.appendChild(collapseone);
+                    //
+                    //         for(var c = 0; c < clean4.length; c++) {
+                    //             var checkboxdiv = document.createElement("div");
+                    //             var checkboxh5 = document.createElement("h5");
+                    //             var checkboxa = document.createElement("a");
+                    //             var checkaboxat = document.createTextNode(clean3[c].ThirdLayer);
+                    //             var checkboxlabel = document.createElement("label");
+                    //             checkboxlabel.className = "switch right";
+                    //             var checkboxinput = document.createElement("input");
+                    //             checkboxinput.type = "checkbox";
+                    //             checkboxinput.setAttribute("value", clean4[c].LayerName);
+                    //             var checkboxspan = document.createElement("span");
+                    //             checkboxspan.className = "slider round";
+                    //             checkboxdiv.appendChild(checkboxh5);
+                    //             checkboxa.appendChild(checkaboxat);
+                    //             checkboxh5.appendChild(checkboxa);
+                    //             checkboxh5.appendChild(checkboxlabel);
+                    //             checkboxlabel.appendChild(checkboxinput);
+                    //             checkboxlabel.appendChild(checkboxspan);
+                    //             panelbody2.appendChild(checkboxdiv);
+                    //
+                    //
+                    //
+                    //
+                    //         }
+                    //
+                    //
+                    //
+                    //     }
+                    // }
+
+
+                },
+                error: function (jqXHR, exception) {
+                    var msg = '';
+                    if (jqXHR.status === 0) {
+                        msg = 'Not connect.\n Verify Network.';
+                    } else if (jqXHR.status == 404) {
+                        msg = 'Requested page not found. [404]';
+                    } else if (jqXHR.status == 500) {
+                        msg = 'Internal Server Error [500].';
+                    } else if (exception === 'parsererror') {
+                        msg = 'Requested JSON parse failed.';
+                    } else if (exception === 'timeout') {
+                        msg = 'Time out error.';
+                    } else if (exception === 'abort') {
+                        msg = 'Ajax request aborted.';
+                    } else {
+                        msg = 'Uncaught Error.\n' + jqXHR.responseText;
+                    }
+                    alert(msg);
+
+                }
+            });
+        });
+    </script>
+</head>
+<body>
+<div class="container">
+    <div>
+        <img src="../images/TL_WB_Banner.jpg" align="middle" alt="Placeholder Image" />
+    </div>
+
+    <div>
+        <!-- Menu -->
+        <ul class="nav navbar-nav">
+            <li class="dropdown"><a href="#" title="Energy Production" class="dropdown-toggle disabled" data-toggle="dropdown">Energy Production<span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle" data-toggle="dropdown">2012</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/3pf2nmte3ddqfjb/summary%202012.xls?dl=0" target="_blank" title="SFile2012">Summary File</a></li>
+                            <li><a href="https://www.dropbox.com/s/2pan6s2urnn8ej0/2012.png?dl=0" target="_blank" title="Chart2012">Chart</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle">2013</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/8d20wicmlh8ra6q/summary%202013.xls?dl=0" target="_blank" title="SFile2013">Summary File</a></li>
+                            <li><a href="https://www.dropbox.com/s/ahl8nz2xngifwv5/2013.png?dl=0" target="_blank" title="Chart2013">Chart</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle">2014</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/62skykaejow2oix/Summary%202014.xls?dl=0" target="_blank" title="SFile2014">Summary File</a></li>
+                            <li><a href="https://www.dropbox.com/s/qdws7kbjxzod13w/2014.png?dl=0" target="_blank" title="Chart2014">Chart</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle">2015</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/60s91y69aft4qvb/Summary%202015.xls?dl=0" target="_blank" title="SFile2015">Summary File</a></li>
+                            <li><a href="https://www.dropbox.com/s/7pvrtga0b9h4r16/2015.png?dl=0" target="_blank" title="Chart2015">Chart</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle">2016</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/byudycgf2rbdubj/Summary%202016.xls?dl=0" target="_blank" title="SFile2016">Summary File</a></li>
+                            <li><a href="https://www.dropbox.com/s/lmmrl01qpakqlrw/2016.png?dl=0" target="_blank" title="Chart2016">Chart</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle">2017</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/5x578y6aibm1aku/Summary-%20January%2C%202017.pdf?dl=0" target="_blank" title="SFile2017">Summary File</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li class="dropdown"><a href="#" title="Energy Production" class="dropdown-toggle disabled" data-toggle="dropdown">Economics<span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle"><strong>Grant Application</strong></a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/ktkgty5bqtqvgau/KEA%20Renewable%20Energy%20Fund%20Grant%20Application.pdf?dl=0" target="_blank" title="SFile2016">PDF File</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle">Balance Sheet</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/d0nr0vhxnhgkd8x/KEA%20Balance%20Sheet.xlsx?dl=0" target="_blank" title="SFile2016">Excel File</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle">Sales Data</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/wewyxdhrkxdjwrh/KEA%20Historical%20Sales%20Data%202012-2016.xlsx?dl=0" target="_blank" title="2012-16">2012-2016</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle">Revenue Trends Data</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/mhr4mn2dbkgj0e4/KEA%205-Year%20Revenue%20Trend%20Charts.xlsx?dl=0" target="_blank" title="2012-2016">2012-2016</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            <li class="dropdown"><a href="#" title="Financials" class="dropdown-toggle disabled" data-toggle="dropdown">Financials<span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle">2012</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/fww6uoabf6r9xtv/KEA%20residential%20consumption%20data%202012%20%28ed1%29.xlsx?dl=0" target="_blank" title="RC2012">Residential Consumption Data</a></li>
+                            <li><a href="https://www.dropbox.com/s/4uictwnsxkcpee4/KEA%20commercial%20consumption%20data%202012%20%28ed1%29.xlsx?dl=0" target="_blank" title="CC2012">Commercial Consumption Data</a></li>
+                            <li><a href="https://www.dropbox.com/s/0h5z6gonaj7ye4m/KEA%20industrial%20consumption%20data%202012%20%28ed1%29.xlsx?dl=0" target="_blank" title="IC2012">Industrial Consumption Data</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle">2013</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/544qekzdg4fznky/KEA%20residential%20consumption%20data%202013%20%28ed1%29.xlsx?dl=0" target="_blank" title="RC2013">Residential Consumption Data</a></li>
+                            <li><a href="https://www.dropbox.com/s/nly46h6pk97cs6w/KEA%20commercial%20consumption%20data%202013%20%28ed1%29.xlsx?dl=0" target="_blank" title="CC2013">Commercial Consumption Data</a></li>
+                            <li><a href="https://www.dropbox.com/s/5df33491k24qj4k/KEA%20industrial%20consumption%20data%202013%20%28ed1%29.xlsx?dl=0" target="_blank" title="IC2013">Industrial Consumption Data</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle">2016</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/zumahy8t4e7f9sb/KEA%20residential%20consumption%20data%202016%20%28ed1%29.xlsx?dl=0" target="_blank" title="RC2016">Residential Consumption Data</a></li>
+                            <li><a href="https://www.dropbox.com/s/iwr5llvqinv1xsm/KEA%20commercial%20consumption%20data%202016%20%28ed1%29.xlsx?dl=0" target="_blank" title="CC2016">Commercial Consumption Data</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle">2017</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/l7oqh124o048cdz/January%202017%20Sales%20Revenues.xlsx?dl=0" target="_blank" title="CombinedJan">Combined, January</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle">Prediction Chart</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/d7ml3tnonhkhxah/Financials1.jpg?dl=0" target="_blank" title="predictionChart">Chart</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle">Savings Using Renewable Energy</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/ye2hkars63u2oce/Financials2.jpg?dl=0" target="_blank" title="SUREchart">Chart</a></li>
+                            <li><a href="https://www.dropbox.com/s/reg9oljpcm00h75/Payback.jpg?dl=0" target="_blank" title="SUREsimple">Simpler Chart</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle">Balance Sheet</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/41xpo5loeon8vri/KEABalanceSheet.jpg?dl=0" target="_blank" title="balanceChart">Chart</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li class="dropdown"><a href="#" title="Presentations" class="dropdown-toggle disabled" data-toggle="dropdown">Presentations<span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle">Annual Report</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/5o1u34nvvagl7xo/KEA%202015%20Annual%20Report.pdf?dl=0" target="_blank" title="AR2015">Residential Consumption Data</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle">Student Project</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/544qekzdg4fznky/KEA%20residential%20consumption%20data%202013%20%28ed1%29.xlsx?dl=0" target="_blank" title="TandPofWT">Tech & Progression of WT</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle">KEA Background</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/6gc69d04hhxbck4/Kodiak%20Electric%20Association%20Background.docx?dl=0" target="_blank" title="KEAback">WT Construction</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle">Wind Turbine</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/ofpgz7ncydrguqz/2013_REC_Pillar%20Mountain%20Phase%202%20Wind%20Turbines%20and%20Battery%20System_Darron%20Scott.pdf?dl=0" target="_blank" title="WTbattery">WT Battery System</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle">Positive Effects of the WT</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/9hvetutsifsw0wm/KEA%20AAMag2015.pdf?dl=0" target="_blank" title="PosEffWT">2015</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle">Renewable Energy Vision</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/g2q3zxky3pyd7rx/KEA%20Renewable%20Energy%20Vision.ppt-.ppt?dl=0" target="_blank" title="EnergyVision">Self Sustainability</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle">Presentations to Greenland Power Leaders</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/mqwd7mm371962xe/2016%20Development%20and%20Operation%2C%20Wind.pptx?dl=0" target="_blank" title="DevANDop">Development & Operation</a></li>
+                            <li><a href="https://www.dropbox.com/s/ujw0005fdk2ypbe/10.2016%20Role%20of%20Storage%20Transition%20to%20100%20%28002%29.pptx?dl=0" target="_blank" title="RoleOfStorage">Role of Storage Transition to 100</a></li>
+                            <li><a href="https://www.dropbox.com/s/3895fs5vrzng2fp/2016%20Energy%20Cooperative%27s%20Perspective%20%28003%29.pptx?dl=0" target="_blank" title="ECperspective">Energy Cooperative's Perspective</a></li>
+                            <li><a href="https://www.dropbox.com/s/o6358yz7xkh4679/2016%20Early%20Stage%20Planning.pptx?dl=0" target="_blank" title="ESplanning">Early Stage Planning</a></li>
+
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+            <li class="dropdown"><a href="#" title="TechInfo" class="dropdown-toggle disabled" data-toggle="dropdown">Technical Info<span class="caret"></span></a>
+                <ul class="dropdown-menu" role="menu">
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle">WT Generator Systems</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/df2r7h9opv677se/GE_Wind%20Turbine_Technical_Description.pdf?dl=0" target="_blank" title="WT_PDF">PDF</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle">Industrial WT</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/ucc9w5opc2iu8kz/Size%20specifications%20industrial%20wind%20turbines%C2%A0.docx?dl=0" target="_blank" title="IndustrialWT">Document</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle">Brochure of WT</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/4tjd8rn85p2erax/9AKK100580A2551_Powerstore_Brochure_EN_HR_%28Dic2013%29.pdf?dl=0" target="_blank" title="BrochurePDF">PDF</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle">Specifications of 1.5MW WT</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/31iupydoyryambl/GEA14954C15-MW-Broch.pdf?dl=0" target="_blank" title="SpecPDF">PDF</a></li>
+                        </ul>
+                    </li>
+                    <li class="dropdown-submenu">
+                        <a href="#" tabindex="-1" class="dropdown-toggle">Progress Report</a>
+                        <ul class="dropdown-menu">
+                            <li><a href="https://www.dropbox.com/s/9adoo9qtw9okpm9/KEA_progress_report_4.pdf?dl=0" target="_blank" title="ProgressPDF">PDF</a></li>
+                        </ul>
+                    </li>
+                </ul>
+            </li>
+        </ul>
+    </div>
+
+    <div class="row">
+
+        <div class="col-sm-3">
+            <div class="container">
+                <h4>Please Select Here First</h4>
+                <div>
+                    <p>
+                        <select id="myListCountry"  style="width:180px; height:21px; background:white" onchange="ChangeSelectList(this.value)">
+                            <option selected="selected">All Layer</option>
+                            <!--<option value="AL" selected="selected" class="a">All Layer</option>-->
+                            <option>United States of America</option>
+                        </select>
+                    </p>
+                </div>
+                <div>
+                    <p>
+                        <select id="myListCity"  style="width:180px; height:21px; background:lightgray" disabled onchange="ChangeLayerList(this.value)">
+                            <option selected="selected">All Layer</option>
+                        </select>
+                    </p>
+                </div>
+                <!--<button id="loadHeatmapBtn" type="button">Heatmap</button>-->
+            </div>
+            <br>
+            <h4>Menu</h4>
+            <div class="container">
+
+                <div class="panel-group medium-3" id="accordion">
+
+                    <div class="Menu panel panel-default Energy">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseOne">
+                                    Energy
+                                </a>
+                            </h4>
+                        </div><!--/.panel-heading -->
+                        <div id="collapseOne" class="panel-collapse collapse">
+                            <div class="panel-body">
+
+                                <!-- nested -->
+
+
+                                <div class="panel-group" id="nested1">
+
+                                    <div class="Menu panel panel-default Wind_Energy">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested1" href="#nested1-collapseOne">
+                                                    Wind Energy
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested1-collapseOne" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-KHS Wind Turbine</a>
+                                                        <label class="switch right">
+                                                            <input class="placemarkLayer" type="checkbox" >
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-KEA Wind Turbine</a>
+                                                        <label class="switch right">
+                                                            <input class="placemarkLayer" type="checkbox" >
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div>
+                                        </div><!--/.panel-collapse -->
+                                    </div><!-- /.panel -->
+
+                                    <div class="Menu panel panel-default Energy_Distribution">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested1" href="#nested1-collapseTwo">
+                                                    Energy Distribution
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested1-collapseTwo" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak Grid Map</a>
+                                                        <label class="switch right">
+                                                            <input class="wmsLayer" type="checkbox" value="City_Smart:KEAGridMap_Layer">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak Overhead Cables and Poles</a>
+                                                        <label class="switch right">
+                                                            <input class="wmsLayer" type="checkbox" value= "City_Smart:OHC_3,City_Smart:Overhead_Transformers,City_Smart:OHC_1,City_Smart:OHC_2,City_Smart:OHC_M" >
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak Underground Cables</a>
+                                                        <label class="switch right">
+                                                            <input class="wmsLayer" type="checkbox" value="City_Smart:UGC_1,City_Smart:UGC_2,City_Smart:UGC_3">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak Terror Lake Powerhouse Transmission Lines</a>
+                                                        <label class="switch right">
+                                                            <input class="wmsLayer" type="checkbox" value="City_Smart:Wire_Transmission_Kodiak">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak Large Transformers</a>
+                                                        <label class="switch right">
+                                                            <input class="wmsLayer" type="checkbox" value="City_Smart:Kodiak_Large_Transformers">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak Small Transformers</a>
+                                                        <label class="switch right">
+                                                            <input class="wmsLayer" type="checkbox" value="City_Smart:Kodiak_Small_Transformers">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak Substations</a>
+                                                        <label class="switch right">
+                                                            <input class="wmsLayer"  type="checkbox" value="City_Smart:Airport_Substation,City_Smart:Kodiak_Substations,City_Smart:K_Subs">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak Fuses</a>
+                                                        <label class="switch right">
+                                                            <input class="wmsLayer" type="checkbox" value="City_Smart:Kodiak_Substations">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak Poles With Guy Cable Support</a>
+                                                        <label class="switch right">
+                                                            <input class="wmsLayer" type="checkbox" value="City_Smart:FUSE_line_Kodiak">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu NY">
+                                                    <h5>
+                                                        <a>-Fei Tian Academy Energy Grid</a>
+                                                        <label class="switch right">
+                                                            <input class="wmsLayer" type="checkbox" value="City_Smart:power,City_Smart:power2">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                            </div>
+                                        </div><!--/.panel-collapse -->
+                                    </div><!-- /.panel -->
+
+                                    <div class="Menu panel panel-default Energy_Budgets">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested1" href="#nested1-collapseThree">
+                                                    Energy Budgets
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested1-collapseThree" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Tuluksak Energy Budget</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div>
+                                        </div><!--/.panel-collapse -->
+                                    </div><!-- /.panel -->
+
+                                    <div class="Menu panel panel-default Energy_Offices">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested1" href="#nested1-collapseFour">
+                                                    Energy Offices
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested1-collapseFour" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Main KEA Building</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div>
+                                        </div><!--/.panel-collapse -->
+                                    </div>
+
+                                    <div class="Menu panel panel-default Hydroelectric_Energy">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested1" href="#nested1-collapseFive">
+                                                    Hydroelectric Energy
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested1-collapseFive" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Terror Lake Dam</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div>
+                                        </div><!--/.panel-collapse -->
+                                    </div>
+
+                                </div><!-- /.panel-group -->
+
+
+                                <!-- nested -->
+
+
+                            </div><!--/.panel-body -->
+                        </div><!--/.panel-collapse -->
+                    </div>
+
+                    <div class="Menu panel panel-default Water">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseTwo">
+                                    Water
+                                </a>
+                            </h4>
+                        </div><!--/.panel-heading -->
+                        <div id="collapseTwo" class="panel-collapse collapse">
+                            <div class="panel-body">
+
+                                <!-- nested -->
+
+
+                                <div class="panel-group" id="nested2">
+
+                                    <div class="Menu panel panel-default Canneries">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested2" href="#nested2-collapseOne">
+                                                     Canneries
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested2-collapseOne" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak's Alaska Pacific Seafoods</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox" class="wmsLayer" value = "City_Smart:Polygon_WMS_Kodiak_Trident">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak's International Seafoods of Alaska</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak's Ocean Beauty Seafoods</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                            </div>
+                                        </div><!--/.panel-collapse -->
+                                    </div><!-- /.panel -->
+
+                                    <div class="Menu panel panel-default  Drainage_Systems">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested2" href="#nested2-collapseTwo">
+                                                    Drainage Systems
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested2-collapseTwo" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak Base and Airport Drainage System</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox" class= "wmsLayer" value = "City_Smart:MANHOLE_line,City_Smart:MANHOLE_polygon">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div>
+                                        </div><!--/.panel-collapse -->
+                                    </div><!-- /.panel -->
+
+                                    <div class="Menu panel panel-default  Water_Quality_Tests">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested2" href="#nested2-collapseThree">
+                                                    Water Quality Tests
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested2-collapseThree" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu NY">
+                                                    <h5>
+                                                        <a>-FTAA Water Tests</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div>
+                                        </div><!--/.panel-collapse -->
+                                    </div><!-- /.panel -->
+
+                                    <div class="Menu panel panel-default  Water_Grids">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested2" href="#nested2-collapseFour">
+                                                    Water Grids
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested2-collapseFour" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu NY">
+                                                    <h5>
+                                                        <a>-FTAA Water Grid</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox" class = "wmsLayer" value = "City_Smart:water2c_FTAA,City_Smart:water3_FTAA,City_Smart:water1c_FTAA,City_Smart:water2_FTAA,City_Smart:water3c_FTAA,City_Smart:water1_FTAA">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div>
+                                        </div><!--/.panel-collapse -->
+                                    </div>
+
+                                </div><!-- /.panel-group -->
+
+
+                                <!-- nested -->
+
+
+                            </div><!--/.panel-body -->
+                        </div><!--/.panel-collapse -->
+                    </div>
+
+                    <div class="Menu panel panel-default Agriculture">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseThree">
+                                    Agriculture
+                                </a>
+                            </h4>
+                        </div><!--/.panel-heading -->
+                        <div id="collapseThree" class="panel-collapse collapse">
+                            <div class="panel-body">
+
+                                <!-- nested -->
+
+
+                                <div class="panel-group" id="nested3">
+
+                                    <div class="Menu panel panel-default Soil_Testing">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested3" href="#nested3-collapseOne">
+                                                    Soil Testing
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested3-collapseOne" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Bear Valley Golf Course</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div>
+                                        </div><!--/.panel-collapse -->
+                                    </div><!-- /.panel -->
+
+                                </div><!-- /.panel-group -->
+
+
+                                <!-- nested -->
+
+
+                            </div><!--/.panel-body -->
+                        </div><!--/.panel-collapse -->
+                    </div>
+
+                    <div class="Menu panel panel-default Transportation">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseFour">
+                                    Transportation
+                                </a>
+                            </h4>
+                        </div><!--/.panel-heading -->
+                        <div id="collapseFour" class="panel-collapse collapse">
+                            <div class="panel-body">
+
+                                <!-- nested -->
+
+
+                                <div class="panel-group" id="nested4">
+
+                                    <div class="Menu panel panel-default Airports">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested4" href="#nested4-collapseOne">
+                                                    Airports
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested4-collapseOne" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak Benny Benson State Airport</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak Municipal Airport</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div>
+                                        </div><!--/.panel-collapse -->
+                                    </div><!-- /.panel -->
+
+                                    <div class="Menu panel panel-default Rental_Cars">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested4" href="#nested4-collapseTwo">
+                                                    Rental Cars
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested4-collapseTwo" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Budget Rent-a-Car</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div>
+                                        </div><!--/.panel-collapse -->
+                                    </div><!-- /.panel -->
+
+                                    <div class="Menu panel panel-default Harbors">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested4" href="#nested4-collapseThree">
+                                                    Harbors
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested4-collapseThree" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-St.Paul Harbor</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-St.Herman Harbor</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div>
+                                        </div><!--/.panel-collapse -->
+                                    </div><!-- /.panel -->
+
+                                    <div class="Menu panel panel-default Piers">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested4" href="#nested4-collapseFour">
+                                                    Piers
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested4-collapseFour" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak's Pier One</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak's Pier Two</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div>
+                                        </div><!--/.panel-collapse -->
+                                    </div>
+
+                                    <div class="Menu panel panel-default Roads">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested4" href="#nested4-collapseFive">
+                                                    Roads
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested4-collapseFive" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Base and Airport Roads</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox" value = "City_Smart:BaseRoad_Layer">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak Road System</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox" value = "City_Smart:Kodiak_Road_System">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div>
+                                        </div><!--/.panel-collapse -->
+                                    </div>
+
+                                </div><!-- /.panel-group -->
+
+
+                                <!-- nested -->
+
+
+                            </div><!--/.panel-body -->
+                        </div><!--/.panel-collapse -->
+                    </div>
+
+                    <div class="Menu panel panel-default Economics">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseFive">
+                                    Economics
+                                </a>
+                            </h4>
+                        </div><!--/.panel-heading -->
+                        <div id="collapseFive" class="panel-collapse collapse">
+                            <div class="panel-body">
+
+                                <!-- nested -->
+
+
+                                <div class="panel-group" id="nested5">
+
+                                    <div class="Menu panel panel-default Property">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested5" href="#nested5-collapseOne">
+                                                    Property
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested5-collapseOne" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak Parcel Map</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox" value = "City_Smart:KEAParcelMap_Layer">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                            </div><!--/.panel-body -->
+                                        </div><!--/.panel-collapse -->
+                                    </div><!-- /.panel -->
+
+                                    <div class="Menu panel panel-default Banks">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested5" href="#nested5-collapseTwo">
+                                                    Banks
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested5-collapseTwo" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak Wells Fargo</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak First National</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak Key Bank</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak Credit Union</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div><!--/.panel-body -->
+                                        </div><!--/.panel-collapse -->
+                                    </div><!-- /.panel -->
+
+                                    <div class="Menu panel panel-default Postal_Services">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested5" href="#nested5-collapseThree">
+                                                    Postal Services
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested5-collapseThree" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak Post Office</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div><!--/.panel-body -->
+                                        </div><!--/.panel-collapse -->
+                                    </div><!-- /.panel -->
+
+                                </div><!-- /.panel-group -->
+
+
+                                <!-- nested -->
+
+
+                            </div><!--/.panel-body -->
+                        </div><!--/.panel-collapse -->
+                    </div>
+
+                    <div class="Menu panel panel-default  Health_Services">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseSix">
+                                    Health Services
+                                </a>
+                            </h4>
+                        </div><!--/.panel-heading -->
+                        <div id="collapseSix" class="panel-collapse collapse">
+                            <div class="panel-body">
+
+                                <!-- nested -->
+
+
+                                <div class="panel-group" id="nested6">
+
+                                    <div class="Menu panel panel-default Hospital_and_Clinics">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested6" href="#nested6-collapseOne">
+                                                    Hospital and Clinics
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested6-collapseOne" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Providence Kodiak Island Medical Center</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-KIMA</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak Care Clinic</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div><!--/.panel-body -->
+                                        </div><!--/.panel-collapse -->
+                                    </div><!-- /.panel -->
+
+                                    <div class="Menu panel panel-default Health_Centers">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested6" href="#nested6-collapseTwo">
+                                                    Health Centers
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested6-collapseTwo" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak Public Health Center</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Mill Bay Health Center</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div><!--/.panel-body -->
+                                        </div><!--/.panel-collapse -->
+                                    </div><!-- /.panel -->
+
+                                    <div class="Menu panel panel-default Veterinary_Services">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested6" href="#nested6-collapseThree">
+                                                    Veterinary Services
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested6-collapseThree" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak Veterinary Clinic</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div><!--/.panel-body -->
+                                        </div><!--/.panel-collapse -->
+                                    </div><!-- /.panel -->
+
+                                    <div class="Menu panel panel-default Eye_Care">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested6" href="#nested6-collapseFour">
+                                                    Eye Care
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested6-collapseFour" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak Vision Clinic</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak Vision Source</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div><!--/.panel-body -->
+                                        </div><!--/.panel-collapse -->
+                                    </div>
+
+                                </div><!-- /.panel-group -->
+
+
+                                <!-- nested -->
+
+
+                            </div><!--/.panel-body -->
+                        </div><!--/.panel-collapse -->
+                    </div>
+
+                    <div class="Menu panel panel-default  Risk_Management">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseSeven">
+                                    Risk Management
+                                </a>
+                            </h4>
+                        </div><!--/.panel-heading -->
+                        <div id="collapseSeven" class="panel-collapse collapse">
+                            <div class="panel-body">
+
+                                <!-- nested -->
+
+
+                                <div class="panel-group" id="nested7">
+
+                                    <div class="Menu panel panel-default Fire_Stations">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested7" href="#nested7-collapseOne">
+                                                    Fire Stations
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested7-collapseOne" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak City Fire Department</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Bayside Volunteer Fire Department</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Base Fire Department</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div><!--/.panel-body -->
+                                        </div><!--/.panel-collapse -->
+                                    </div><!-- /.panel -->
+
+                                    <div class="Menu panel panel-default Police_Stations">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested7" href="#nested7-collapseTwo">
+                                                    Police Stations
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested7-collapseTwo" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak Police Department</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div><!--/.panel-body -->
+                                        </div><!--/.panel-collapse -->
+                                    </div><!-- /.panel -->
+
+                                    <div class="Menu panel panel-default ESP_System">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested7" href="#nested7-collapseThree">
+                                                    ESP System
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested7-collapseThree" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-ESP Sensors</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div><!--/.panel-collapse -->
+                                        </div><!--/.panel-body -->
+                                    </div><!--/.panel-collapse -->
+                                </div><!-- /.panel -->
+
+                            </div><!-- /.panel-group -->
+
+
+                            <!-- nested -->
+
+
+                        </div><!--/.panel-body -->
+                    </div>
+
+                    <div class="Menu panel panel-default Education">
+                        <div class="panel-heading">
+                            <h4 class="panel-title">
+                                <a class="collapsed" data-toggle="collapse" data-parent="#accordion" href="#collapseEight">
+                                    Education
+                                </a>
+                            </h4>
+                        </div><!--/.panel-heading -->
+                        <div id="collapseEight" class="panel-collapse collapse">
+                            <div class="panel-body">
+
+                                <!-- nested -->
+
+
+                                <div class="panel-group" id="nested8">
+
+                                    <div class="Menu panel panel-default A_World_Bridge_Sites">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested8" href="#nested8-collapseOne">
+                                                    A World Bridge Sites
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested8-collapseOne" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu NY">
+                                                    <h5>
+                                                        <a>-USA A World Bridge</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div><!--/.panel-body -->
+                                        </div><!--/.panel-collapse -->
+                                    </div><!-- /.panel -->
+
+                                    <div class="Menu panel panel-default UNESCO_WHS">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested8" href="#nested8-collapseTwo">
+                                                    UNESCO WHS
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested8-collapseTwo" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu NY">
+                                                    <h5>
+                                                        <a>-Fei Tian UNESCO Prototype</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div><!--/.panel-body -->
+                                        </div><!--/.panel-collapse -->
+                                    </div><!-- /.panel -->
+
+                                    <div class="Menu panel panel-default Academies">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested8" href="#nested8-collapseThree">
+                                                    Academies
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested8-collapseThree" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu NY">
+                                                    <h5>
+                                                        <a>-Fei Tian Academy of the Arts</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div><!--/.panel-body -->
+                                        </div><!--/.panel-collapse -->
+                                    </div><!-- /.panel -->
+
+                                    <div class="Menu panel panel-default Higher_Education">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested8" href="#nested8-collapseFour">
+                                                    Higher Education
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested8-collapseFour" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu NY">
+                                                    <h5>
+                                                        <a>-Fei Tian College</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak Community College</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div><!--/.panel-body -->
+                                        </div><!--/.panel-collapse -->
+                                    </div>
+
+                                    <div class="Menu panel panel-default Museums">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested8" href="#nested8-collapseFive">
+                                                    Museums
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested8-collapseFive" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Alutiq Museum</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-baranov Museum</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div><!--/.panel-body -->
+                                        </div><!--/.panel-collapse -->
+                                    </div>
+
+                                    <div class="Menu panel panel-default Libraries">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested8" href="#nested8-collapseSix">
+                                                    Libraries
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested8-collapseSix" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak Community Libarary</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div><!--/.panel-body -->
+                                        </div><!--/.panel-collapse -->
+                                    </div>
+
+                                    <div class="Menu panel panel-default Elementary_School ">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested8" href="#nested8-collapseSeven">
+                                                    Elementary School
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested8-collapseSeven" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-North Star Elementary</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Main Elementary</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-East Elementary</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Peterson Elementary</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div><!--/.panel-body -->
+                                        </div><!--/.panel-collapse -->
+                                    </div>
+
+                                    <div class="Menu panel panel-default Middle_School">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested8" href="#nested8-collapseEight">
+                                                    Middle School
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested8-collapseEight" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak Middle School</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div><!--/.panel-body -->
+                                        </div><!--/.panel-collapse -->
+                                    </div>
+
+                                    <div class="Menu panel panel-default High_School">
+                                        <div class="panel-heading">
+                                            <h4 class="panel-title">
+                                                <a class="collapsed" data-toggle="collapse" data-parent="#nested8" href="#nested8-collapseNine">
+                                                    High School
+                                                </a>
+                                            </h4>
+                                        </div><!--/.panel-heading -->
+                                        <div id="nested8-collapseNine" class="panel-collapse collapse">
+                                            <div class="panel-body">
+                                                <div class="Menu AK">
+                                                    <h5>
+                                                        <a>-Kodiak High School</a>
+                                                        <label class="switch right">
+                                                            <input type="checkbox">
+                                                            <span class="slider round"></span>
+                                                        </label>
+                                                    </h5>
+                                                </div>
+                                            </div><!--/.panel-body -->
+                                        </div><!--/.panel-collapse -->
+                                    </div>
+                                </div><!-- /.panel-group -->
+
+                                <!-- nested -->
+
+
+                            </div><!--/.panel-body -->
+                        </div><!--/.panel-collapse -->
+                    </div>
+
+                    <!--/.panel-collapse -->
+                     <!-- /.panel-group -->
+        </div>
+
+                </div><!-- /.panel-group -->
+
+        </div>
+
+    <div class="col-sm-9" id="globe">
+        <canvas id="canvasOne" width="1000" height="1000" style="width: 100%; height: auto;">
+            Your browser does not support HTML5 Canvas.
+        </canvas>
+    </div>
+
+</div>
+</div>
+</body>
+</html>
