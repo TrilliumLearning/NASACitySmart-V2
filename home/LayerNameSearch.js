@@ -1,0 +1,71 @@
+function getObjects(obj, key, val) {
+    var objects = [];
+    for (var i in obj) {
+        if (!obj.hasOwnProperty(i)) continue;
+        if (typeof obj[i] == 'object') {
+            objects = objects.concat(getObjects(obj[i], key, val));
+        } else
+        //if key matches and value matches or if key matches and value is not passed (eliminating the case where key matches but passed value does not)
+        if (i == key && obj[i] == val || i == key && val == '') { //
+            objects.push(obj);
+        } else if (obj[i] == val && key == '') {
+            //only add if the object is not already in the array
+            if (objects.lastIndexOf(obj) == -1) {
+                objects.push(obj);
+            }
+        }
+    }
+    return objects;
+}
+
+
+function SearchLayerName(value){
+    $.ajax({
+        url: "http://localhost:9090/SearchLayerName",
+        dataType:"json",
+        success: function (results) {
+            for(var i = 0; i < results.length; i++) {
+                if (value === results[i].ThirdLayer) {
+                    document.getElementById("LayerName1").innerHTML = "The LayerName has already been used";
+                    document.addEventListener("keyup", function (e) {
+                        if (event.keyCode === 8) {
+                            document.getElementById("LayerName1").innerHTML = "Please Enter the Layer Name, the Layer Name length at least 6 characters";
+                            }
+                        }, false);
+                    break;
+                } else{
+                    document.getElementById("LayerName1").innerHTML = "This Layer Name is available";
+                }
+            }
+               if(value.length === 0){
+                   document.getElementById("LayerName1").innerHTML = "Please Enter the Layer Name, the Layer Name length at least 6 characters";
+            }
+        },
+        error: function (jqXHR, exception) {
+            var msg = '';
+            if (jqXHR.status === 0) {
+                msg = 'Not connect.\n Verify Network.';
+            } else if (jqXHR.status == 404) {
+                msg = 'Requested page not found. [404]';
+            } else if (jqXHR.status == 500) {
+                msg = 'Internal Server Error [500].';
+            } else if (exception === 'parsererror') {
+                msg = 'Requested JSON parse failed.';
+            } else if (exception === 'timeout') {
+                msg = 'Time out error.';
+            } else if (exception === 'abort') {
+                msg = 'Ajax request aborted.';
+            } else {
+                msg = 'Uncaught Error.\n' + jqXHR.responseText;
+            }
+            console.log(msg);
+        }
+    })
+
+    //use if to check
+    //false replace the <p> to the Layer Name is duplicated
+    //ture --> nothing
+
+
+
+}
