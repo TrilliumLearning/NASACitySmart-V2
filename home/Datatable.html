@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Datatable</title>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+    <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/buttons/1.4.2/css/buttons.dataTables.min.css">
+    <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <!--<link rel="stylesheet" href="//unpkg.com/flatpickr/dist/flatpickr.min.css">-->
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+    <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+    <script src="//cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
+    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    <script src="//cdn.jsdelivr.net/npm/flatpickr"></script>
+</head>
+<style>
+    table{
+        overflow-x: auto;
+        width: 100%;
+        display: block;
+        margin-bottom: 20px;
+        border-collapse: collapse;
+    }
+    td, th {
+        border: 1px solid #dddddd;
+        text-align: left;
+        padding: 8px;
+    }
+    table, th, td{
+        border: 1px solid #cdcdcd;
+        text-align:center;
+    }
+    table th, table td{
+        padding: 10px;
+        text-align: left;
+    }
+    table::-webkit-scrollbar-thumb {
+        border-radius: 2px;
+        background-color: rgba(0, 0, 0, .5);
+        -webkit-box-shadow: 0 0 1px rgba(255, 255, 255, .5);
+    }
+    table::-webkit-scrollbar {
+        -webkit-appearance: none;
+        height: 7px;
+    }
+</style>
+<body>
+<div id="dvData">
+    <table id="dataDisplay" style="width:100%;">
+        <thead>
+        <tr>
+            <th>Full Name</th>
+            <th>Address Line1</th>
+            <th>Address Line2</th>
+            <th>City</th>
+            <th>State/Province/Region</th>
+            <th>Postal Code/ZIP</th>
+            <th>Country</th>
+            <th>Email</th>
+            <th>Phone Nmber</th>
+            <th>Layer Name</th>
+            <th>Layer Category</th>
+            <th>Layer Description</th>
+            <th>Layer Uploader</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+        <tfoot>
+        <tr>
+            <th>Full Name</th>
+            <th>Address Line1</th>
+            <th>Address Line2</th>
+            <th>City</th>
+            <th>State/Province/Region</th>
+            <th>Postal Code/ZIP</th>
+            <th>Country</th>
+            <th>Email</th>
+            <th>Phone Nmber</th>
+            <th>Layer Name</th>
+            <th>Layer Category</th>
+            <th>Layer Description</th>
+            <th>Layer Uploader</th>
+        </tr>
+        </tfoot>
+    </table>
+    <table id="trapDisplay" style="width:100%;">
+        <thead>
+        <tr>
+            <th>UserName</th>
+            <th>Full Name</th>
+            <th>Address Line1</th>
+            <th>Address Line2</th>
+            <th>City</th>
+            <th>State/Province/Region</th>
+            <th>Postal Code/ZIP</th>
+            <th>Country</th>
+            <th>Email</th>
+            <th>Phone Nmber</th>
+            <th>Layer Name</th>
+            <th>Layer Category</th>
+            <th>Layer Description</th>
+            <th>Layer Uploader</th>
+        </tr>
+        </thead>
+        <tbody>
+
+        </tbody>
+        <tfoot>
+        <tr>
+            <th>UserName</th>
+            <th>Full Name</th>
+            <th>Address Line1</th>
+            <th>Address Line2</th>
+            <th>City</th>
+            <th>State/Province/Region</th>
+            <th>Postal Code/ZIP</th>
+            <th>Country</th>
+            <th>Email</th>
+            <th>Phone Nmber</th>
+            <th>Layer Name</th>
+            <th>Layer Category</th>
+            <th>Layer Description</th>
+            <th>Layer Uploader</th>
+        </tr>
+        </tfoot>
+    </table>
+    <button id="editButton" class="btn btn-primary btn-sm" type="button">Edit</button>
+    <button id="deleteButton" class="btn btn-primary btn-sm" type="button">Delete</button>
+</div>
+<script>
+    var table = $("#dataDisplay").DataTable();
+    var trapTable = $("#trapDisplay").DataTable();
+    var scoutingRowSelected,trapRowSelected;
+    var scoutingTransactionID = [];
+    var trapTransactionID = [];
+    $(document).ready(function () {
+
+        $(function () {
+            flatpickr(".date", {
+                dateFormat: "Y-m-d",
+                time_24hr: true
+            });
+            // if (UserRole === "Admin") {
+            //     DropMenu = "<li><a href=\"/userprofile\">Profile</a></li>\n" +
+            //         "\t\t\t<li><a href=\"/userManagement\">User Management</a></li>\n" +
+            //         "\t\t\t<li><a href=\"/signout\">Sign Out</a></li>";
+            //     $("#userMenu").empty();
+            //     $("#userMenu").append(DropMenu)
+            // } else if ( UserRole === "Regular") {
+            //     DropMenu = "<li><a href=\"/userprofile\">Profile</a></li>\n" +
+            //         "\t\t\t<li><a href=\"/signout\">Sign Out</a></li>";
+            //     $("#userMenu").empty();
+            //     $("#userMenu").append(DropMenu)
+            // }
+            table.clear();
+            table.draw();
+            trapTable.clear();
+            trapTable.draw();
+            queryAndDisplay();
+        });
+
+        $('#dataDisplay tbody').on('click', 'tr', function () {
+            scoutingTransactionID = [];
+
+            $(this).toggleClass('selected');    //toggle class for the rows selected
+
+            scoutingRowSelected = table.rows('.selected').data();    //Store all the data for selected rows'
+
+            // $('#dataDisplay > thead > tr > th').each(function () {
+            //     thArray.push($(this).text())
+            // })
+
+            for (var i = 0; i < scoutingRowSelected.length; i ++) {
+        //            console.log("rowSelected[" + i + "][0]: " + rowSelected[i][0]);
+                scoutingTransactionID.push(scoutingRowSelected[i][0]);
+            }
+        });
+
+        $('#trapDisplay tbody').on('click', 'tr', function () {
+            trapTransactionID = [];
+
+            $(this).toggleClass('selected');    //toggle class for the rows selected
+
+            trapRowSelected = trapTable.rows('.selected').data();    //Store all the data for selected rows'
+
+            // $('#trapDisplay > thead > tr > th').each(function () {
+            //     thArray.push($(this).text())
+            // })
+
+            for (var i = 0; i < trapRowSelected.length; i ++) {
+//                console.log("rowSelected[" + i + "][0]: " + rowSelected[i][0]);
+                trapTransactionID.push(trapRowSelected[i][0]);
+            }
+        });
+
+        // $("#editButton").on("click", function () {
+        //     // var transactionID = scoutingTransactionID.concat(trapTransactionID);
+        //     // if (transactionID.length >= 2) {
+        //     //     confirm("Please make sure to only select ONE of the users to edit.")
+        //     // } else if (transactionID.length === 0) {
+        //     //     confirm("No rows have been selected---- please choose ONE.")
+        //     // } else {
+        //     //     var transactionIDStr = "transactionIDStr=" + transactionID.toString();
+        //
+        //     // }
+        // });
+        //
+        $("#deleteButton").on("click", function () {
+            if (confirm("Are you sure you would like to delete this row(s)?") === true) {
+                var transactionIDStr = "transactionIDStr=" + scoutingTransactionID.concat(trapTransactionID).toString();
+                console.log ("transactionIDStr: " + transactionIDStr);
+
+                // $.ajax({
+                //     url: '/deleteRow',
+                //     type: 'GET',
+                //     dataType: 'json',
+                //     async: false,
+                //     data: transactionIDStr,
+                //     success: function (result) {
+                        window.location.reload();
+                //     }
+                // })
+            } else { return false;}
+        });
+
+    });
+
+    var queryAndDisplay = function () {
+        $.ajax({
+            url: 'http://localhost:9090/EditData',
+            dataType: 'json',
+            success: function (results) {
+                if (!results[0].errMsg) {
+                    for (var i = 0; i < results.length; i++) {
+                        if (results[i].Full_Name === "Huaqi_Zhang") {
+                            table.row.add([
+                                results[i].Full_Name,
+                                results[i].Address_Line1,
+                                results[i].Address_Line2,
+                                results[i].City,
+                                results[i].State_Province_Region,
+                                results[i].PostalCode_ZIP,
+                                results[i].Country,
+                                results[i].Email,
+                                results[i].Phone_Number,
+                                results[i].Layer_Name,
+                                results[i].Layer_Category,
+                                results[i].Layer_Description,
+                                results[i].Layer_Uploader
+                            ]).draw(false);
+                        }
+                    }
+                } else {
+                    alert(results[0].errMsg);
+                }
+            }
+        });
+    }
+</script>
+</body>
+</html>
