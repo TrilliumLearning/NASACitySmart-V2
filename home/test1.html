@@ -114,10 +114,10 @@
 
     <style>
         body      { padding-top:80px; word-wrap:break-word; }
-        #hide { display: none; }
-        .FAW        { display: none; }
-        #stay, #cancel {  position: relative;  width: 20%;  left: 20%;  }
-        #leave, #clear {  position: relative;  width: 20%;  left: 60%;  }
+        /*#hide { display: none; }*/
+        /*.FAW        { display: none; }*/
+        /*#stay, #cancel {  position: relative;  width: 20%;  left: 20%;  }*/
+        /*#leave, #clear {  position: relative;  width: 20%;  left: 60%;  }*/
         .banner{
             position:relative;
             width:100%;
@@ -130,6 +130,13 @@
             margin-top:20px;
             margin-bottom:20px;
         }
+        .column {
+            float:right;
+            position:relative;
+            right:80px;
+            width:10%;
+            padding:10px 40px;
+        }
     </style>
 
 </head>
@@ -137,128 +144,130 @@
 
 <!-- Fine Uploader DOM Element
 ====================================================================== -->
-<div id="fine-uploader"></div>
+<!--<div id="fine-uploader"></div>-->
 
 <!-- Your code to create an instance of Fine Uploader and bind to the DOM/template
 ====================================================================== -->
-<script>
-    $('#fine-uploader').fineUploader({
-        template: 'qq-template',
-        request: {
-            endpoint: 'http://localhost:9090/upload'
-        },
-        thumbnails: {
-            placeholders: {
-                waitingPath: '/source/placeholders/waiting-generic.png',
-                notAvailablePath: '/source/placeholders/not_available-generic.png'
-            }
-        },
-        validation: {
-            allowedExtensions: ['jpeg', 'jpg', 'txt'],
-            itemLimit: 3,
-            sizeLimit: 51200 // 50 kB = 50 * 1024 bytes
-        }
-    });
-</script>
+<!--<script>-->
+    <!--$('#fine-uploader').fineUploader({-->
+        <!--template: 'qq-template',-->
+        <!--request: {-->
+            <!--endpoint: 'http://localhost:9090/upload'-->
+        <!--},-->
+        <!--thumbnails: {-->
+            <!--placeholders: {-->
+                <!--waitingPath: '/source/placeholders/waiting-generic.png',-->
+                <!--notAvailablePath: '/source/placeholders/not_available-generic.png'-->
+            <!--}-->
+        <!--},-->
+        <!--validation: {-->
+            <!--allowedExtensions: ['jpeg', 'jpg', 'txt'],-->
+            <!--itemLimit: 3,-->
+            <!--sizeLimit: 51200 // 50 kB = 50 * 1024 bytes-->
+        <!--}-->
+    <!--});-->
+
 <div class="container">
     <a href="//aworldbridge.com"><img class="banner" src="../home/NewWBBanner.jpg"/></a>
-    <div id="modal" class="modal">
-        <!-- Modal content -->
-        <div id="modal-content">
-            <div id="modal-header">
-                <span id="close"></span>
-                <h2 id="header"></h2>
-            </div>
-            <div id="modal-body">
-                <p id="body"></p>
-            </div>
-            <div id="modal-footer">
-            </div>
-        </div>
-    </div>
+    <!--<div id="modal" class="modal">-->
+        <!--&lt;!&ndash; Modal content &ndash;&gt;-->
+        <!--<div id="modal-content">-->
+            <!--<div id="modal-header">-->
+                <!--<span id="close"></span>-->
+                <!--<h2 id="header"></h2>-->
+            <!--</div>-->
+            <!--<div id="modal-body">-->
+                <!--<p id="body"></p>-->
+            <!--</div>-->
+            <!--<div id="modal-footer">-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
 
     <h1 id="title">General Form</h1>
 
     <div id="container">
+
         <h2 id="Binfo">Basic Info</h2>
         <div style="display: block;" class="generalForm">
-            <form class="well form-horizontal" action="">
+            <form class="well form-horizontal" id="basic" action="">
                 <fieldset>
                     <div class="form-group">
                         <label class="col-md-4 control-label">Full Name</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span><input id="fullName" name="fullName" placeholder="Full Name" class="form-control" required="true" value="" type="text"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span><input id="fullName" name="Full_Name" placeholder="Full Name" class="form-control" required value="" type="text"></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-4 control-label">Address Line 1</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="addressLine1" name="addressLine1" placeholder="Address Line 1" class="form-control" required="true" value="" type="text"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="addressLine1" name="Address_Line1" placeholder="Address Line 1" class="form-control" required value="" type="text"></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-4 control-label">Address Line 2</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="addressLine2" name="addressLine2" placeholder="Address Line 2" class="form-control" required="true" value="" type="text"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="addressLine2" name="Address_Line2" placeholder="Address Line 2" class="form-control" required value="" type="text"></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-4 control-label">City</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="city" name="city" placeholder="City" class="form-control" required="true" value="" type="text"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="city" name="City" placeholder="City" class="form-control" required value="" type="text"></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-4 control-label">State/Province/Region</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="state" name="state" placeholder="State/Province/Region" class="form-control" required="true" value="" type="text"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="state" name="State_Province_Region" placeholder="State/Province/Region" class="form-control" required value="" type="text"></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-4 control-label">Postal Code/ZIP</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="postcode" name="postcode" placeholder="Postal Code/ZIP" class="form-control" required="true" value="" type="text"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="postcode" name="PostalCode_ZIP" placeholder="Postal Code/ZIP" class="form-control" required value="" type="text"></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-4 control-label">Country</label>
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group">
-                                <span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="country" name="country" placeholder="Country" class="form-control" required="true" value="" type="text"></div>
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="country" name="Country" placeholder="Country" class="form-control" required value="" type="text"></div>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="col-md-4 control-label">Email</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span><input id="email" name="email" placeholder="Email" class="form-control" required="true" value="" type="text"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span><input id="email" name="Email" placeholder="Email" class="form-control" required value="" type="text"></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-4 control-label">Phone Number</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-earphone"></i></span><input id="phoneNumber" name="phoneNumber" placeholder="Phone Number" class="form-control" required="true" value="" type="text"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-earphone"></i></span><input id="phoneNumber" name="Phone_Number" placeholder="Phone Number" class="form-control" required value="" type="text"></div>
                         </div>
                     </div>
+
                 </fieldset>
             </form>
-
+        </div>
             <h2 id="Linfo">Layer Info</h2>
-            <div  class="generalForm">
-                <form class="well form-horizontal">
-                    <fieldset >
-                        <div class="form-group">
-                            <label class="col-md-4 control-label">Layer Name</label>
+        <div  class="generalForm">
+            <form class="well form-horizontal" id="layer">
+                <fieldset >
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Layer Name</label>
                             <div class="col-md-8 inputGroupContainer">
-                                <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span><input id="layerName" name="layerName" placeholder="Layer Name" class="form-control" required="true" value="" type="text"></div>
+                                <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span><input id="layerName" name="Layer_Name" placeholder="Layer Name" class="form-control" required value="" type="text"></div>
                             </div>
-                        </div>
-                        <div class="form-group">
-                            <label class="col-md-4 control-label">Layer Category</label>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Layer Category</label>
                             <div class="col-md-8 inputGroupContainer">
                                 <div class="input-group">
                                     <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-list"></i></span>
-                                    <select class="selectpicker form-control">
+                                    <select required class="selectpicker form-control" name="Layer_Category">
                                         <option value="">SELECT LAYER TYPE</option>
                                         <option>Energy</option>
                                         <option>Water</option>
@@ -274,24 +283,35 @@
                         </div>
                         <div class="form-group">
                             <label class="col-md-4 control-label">Layer Description</label>
-                            <textarea class="form-control" type="textarea" id="message" placeholder="Enter your description here..." maxlength="140" rows="7"></textarea>
+                            <textarea class="form-control" id="message" name="Layer_Description" placeholder="Enter your description here..." required maxlength="140" rows="7"></textarea>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-4 control-label">Layer Uploader</label>
+                            <label  class="col-md-4 control-label">Layer Uploader</label>
                             <div class="col-md-8 inputGroupContainer">
                                 <div id="uploader"></div>
                             </div>
                         </div>
+
                     </fieldset>
                 </form>
             </div>
-        </div>
+            <div class="row">
+                <div class="column">
+                    <button id="submit" type="submit" value="Submit" form="layer">Submit</button>
+                </div>
+                <div class="column">
+                    <button type="reset" onclick="clearForm()" value="  Clear  ">Clear</button>
+                </div>
+            </div>
+
+    </div>
+
         <script>
             var uploader = new qq.FineUploader({
                 element: document.getElementById("uploader"),
                 // debug: true,
                 request: {
-                    endpoint: 'http://localhost:9090/upload'
+                    endpoint: 'http://localhost:9086/upload'
                 },
                 cors: {
                     //all requests are expected to be cross-domain requests
@@ -302,7 +322,7 @@
                 },
                 deleteFile: {
                     enabled: true, // defaults to false
-                    endpoint: 'http://localhost:9090/deleteFiles'
+                    endpoint: 'http://localhost:9086/deleteFiles'
                 },
                 callbacks: {
                     onComplete: function (id, name, responseJSON) {
@@ -326,77 +346,56 @@
                     }
                 }
             });
-            // var uploaderPest = new qq.FineUploader({
-            //     element: document.getElementById("uploaderPest"),
-            //     request: {
-            //         endpoint: '/upload'
-            //     },
-            //     deleteFile: {
-            //         enabled: true, // defaults to false
-            //         endpoint: '/deleteFiles'
-            //     },
-            //     callbacks: {
-            //         onComplete: function (id, name, responseJSON) {
-            //             // alert(responseJSON.newuuid2);
-            //             // alert(id + "      " + name);
-            //             uploaderPest.setUuid(id, responseJSON.newuuid2);
-            //             // $.ajax({
-            //             //     url: '/submit',
-            //             //     type: 'POST',
-            //             //     dataType: 'json',
-            //             //     async: false,
-            //             //     success: function (product) {
-            //             //         if (!product.error) {
-            //             //             globalPaths = product;
-            //             //             console.log("results: " + globalPaths[0].Damage_photo);
-            //             //         } else {
-            //             //             console.log("you're gonna have a bad time");
-            //             //         }
-            //             //     }
-            //             // })
-            //         }
-            //     }
-            // });
-            // var options = {
-            //     url: '/upload',    // override for form's 'action' attribute
-            //     type: 'post',        // 'get' or 'post', override for form's 'method' attribute
-            //     dataType: 'json',        // 'xml', 'script', or 'json' (expected server response type)
-            //     clearForm: true,        // clear all form fields after successful submit
-            //     // beforeSubmit:  showRequest,  // pre-submit callback
-            //     success:       showResponse  // post-submit callback
-            //
-            //     //target:        '#output2',   // target element(s) to be updated with server response
-            //     // other available options:
-            //     //resetForm: true        // reset the form after successful submit
-            //     // $.ajax options can be used here too, for example:
-            //     //timeout:   3000
-            // };
-            //
-            // $('#upload').submit(function(e) {
-            //     // $("#upload").ajaxSubmit(options);
-            //     // Prevent form submission
-            //     e.preventDefault();
-            //     //alert("This button has actually been selected and this can't possibly be the issue. FIRST");
-            //
-            //     $("#hide").click();
-            //     //
-            //     // console.log("This button has actually been selected and this can't possibly be the issue.");
-            //     // showResponse();
-            // });
 
-            // $('#detailedScouting').submit(function(e) {
-            //     // Prevent form submission
-            //     e.preventDefault();
-            //     // $.ajax({
-            //     //     url: '/upload',    // override for form's 'action' attribute
-            //     //     type: 'post',        // 'get' or 'post', override for form's 'method' attribute
-            //     //     dataType: 'json',        // 'xml', 'script', or 'json' (expected server response type)
-            //     //     clearForm: true,        // clear all form fields after successful submit
-            //     //     // beforeSubmit:  showRequest,  // pre-submit callback
-            //     //     success: showResponse  // post-submit callback
-            //     // })
-            //     //alert("This button has actually been selected and this can't possibly be the issue.");
-            // });
+
+            $('#layer').submit(function(e) {
+                // Prevent form submission
+                e.preventDefault();
+                // $.ajax({
+                //     url: '/upload',    // override for form's 'action' attribute
+                //     type: 'post',        // 'get' or 'post', override for form's 'method' attribute
+                //     dataType: 'json',        // 'xml', 'script', or 'json' (expected server response type)
+                //     clearForm: true,        // clear all form fields after successful submit
+                //     // beforeSubmit:  showRequest,  // pre-submit callback
+                //     success: showResponse  // post-submit callback
+                // })
+                //alert("This button has actually been selected and this can't possibly be the issue.");
+                $.ajax({
+                    type: "post",
+                    url: "/basicForm",
+                    dataType: 'json',
+                    data: $("#basic").serialize(),
+                    success: function (result) {
+                        if (!result.error) {
+                            $.ajax({
+                                type: "post",
+                                url: "/detailedFormScouting",
+                                dataType: 'json',
+                                data: $("#detailedScouting").serialize(),
+                                success: function (result) {
+                                    if (!result.error) {
+                                        document.getElementById("modal-footer").style.display = "none";
+
+                                        document.getElementById("modal-header").style.backgroundColor = "#5cb85c";
+                                        document.getElementById("close").innerHTML = "<a href='/userhome'>&times</a>";
+
+                                        document.getElementById("header").innerHTML = "Congratulations, Your Data Entry is Successfully Complete !";
+                                        document.getElementById("body").innerHTML = "<br>Click X to return to the Home Page.<br>";
+
+                                        document.getElementById("modal").style.display = "block";
+                                    } else {
+                                        alert(result.message);
+                                    }
+                                }
+                            })
+                        } else {
+                            alert(result.message);
+                        }
+                    }
+                })
+            });
+
+
             // function showResponse(responseText, statusText, xhr, $form) {
             //     if (!responseText.error) {
             //         alert(responseText.message);
@@ -439,10 +438,91 @@
             //         alert(responseText.message);
             //     }
             // }
+            function clearForm(){
+                if (confirm("Are you sure to clear this page? All the data will be cleared accordingly!") === true) {
+                    document.getElementById("layer").reset();
+                    document.getElementById("basic").reset();
+                }
+            }
+
+            // $(function(){
+                // $('#upload').submit(function(e) {
+                //     // $("#upload").ajaxSubmit(options);
+                //     // Prevent form submission
+                //     e.preventDefault();
+                //     //alert("This button has actually been selected and this can't possibly be the issue. FIRST");
+                //
+                //     $("#hide").click();
+                //     //
+                //     // console.log("This button has actually been selected and this can't possibly be the issue.");
+                //     // showResponse();
+                // });
+                // $('#submit').onclick(function(e) {
+                //     // Prevent form submission
+                //     // e.preventDefault();
+                //     var binformation = $("#basic").serialize();
+                //     console.log(binformation)
+                    // $.ajax({
+                    //     url: '/upload',    // override for form's 'action' attribute
+                    //     type: 'post',        // 'get' or 'post', override for form's 'method' attribute
+                    //     dataType: 'json',        // 'xml', 'script', or 'json' (expected server response type)
+                    //     clearForm: true,        // clear all form fields after successful submit
+                    //     // beforeSubmit:  showRequest,  // pre-submit callback
+                    //     success: showResponse  // post-submit callback
+                    // })
+                    //alert("This button has actually been selected and this can't possibly be the issue.");
+                    // $.ajax({
+                    //     type: "post",
+                    //     url: "/generalForm",
+                    //     dataType: 'jsonp',
+                    //     data: $("#layer").serialize(),
+                    //     success: function (result) {
+                    //         if (!result.error) {
+                    //             $.ajax({
+                    //                 type: "post",
+                    //                 url: "/generalForm",
+                    //                 dataType: 'jsonp',
+                    //                 data: $("#basic").serialize(),
+                    //                 success: function (result) {
+                    //                     if (!result.error) {
+                    //                         document.getElementById("modal-footer").style.display = "none";
+                    //
+                    //                         document.getElementById("modal-header").style.backgroundColor = "#5cb85c";
+                    //                         document.getElementById("close").innerHTML = "<a href='/userhome'>&times</a>";
+                    //
+                    //                         document.getElementById("header").innerHTML = "Congratulations, Your Data Entry is Successfully Complete !";
+                    //                         document.getElementById("body").innerHTML = "<br>Click X to return to the Home Page.<br>";
+                    //
+                    //                         document.getElementById("modal").style.display = "block";
+                    //                     } else {
+                    //                         alert(result.message);
+                    //                     }
+                    //                 }
+                    //             })
+                    //         } else {
+                    //             alert(result.message);
+                    //         }
+                    //     }
+                    // })
+
+            //     });
+            // });
+            $("#submit").on("click", function(){
+
+                var data = $("#basic").serialize() + "&" + $("#layer").serialize();
+                console.log($("#basic").serialize());
+                $.ajax({
+                    url  : 'http://localhost:9086/submit',
+                    method : "post",
+                    data : data,
+                    success : function(d){
+                        alert(d);
+                    }
+                });
+            });
+
+
         </script>
-
-
     </div>
-</div>
 </body>
 </html>
