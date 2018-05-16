@@ -1,0 +1,349 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <style>
+        body 		{ padding-left:80px; word-wrap:break-word; }
+
+        #chartContainer, #chartContainer2 {
+            width: 1000px;
+            height: 370px;
+            position: relative;
+        }
+        #myBar {
+            width: 0.1%;
+            height: 72.5%;
+            background-color: #4CAF50;
+            position: relative;
+            top: 12%;
+        }
+        #g1, #g2, #g3 {
+            width:320px; height:320px;
+            display: inline-block;
+            margin: 1em;
+        }
+        .floatingBox {
+            display: inline-block;
+        }
+        .inputBoxDate {
+            width: 10%;
+        }
+
+    </style>
+</head>
+<body>
+<div id="g1"></div>
+<div id="g2"></div>
+<div id="g3"></div>
+
+<div id="chartContainer"></div>
+
+<div id="demo"></div>
+<button onclick="chartDisplay();">Initializing...</button>
+
+<div id="buttonContainer" class="floatingBox">
+</div>
+
+<div class="row">
+    <h4 class="floatingBox"><strong>Selected Date:</strong></h4>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <h6 class="floatingBox">From:</h6>&nbsp;&nbsp;&nbsp;
+    <input class="inputBoxDate datePicker date" type="text" id="dateCreatedFrom" placeholder="Select Date">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+    <h6 class="floatingBox">To:</h6>&nbsp;&nbsp;&nbsp;
+    <input class="inputBoxDate datePicker date" type="text" id="dateCreatedTo" placeholder="Select Date">&nbsp;&nbsp;&nbsp;
+    <input type="submit" onclick="query()" id="Filter" class="btn btn-default" style="color: #ffffff; background-color: #a7cb9f" value="Filter">
+</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/justgage/1.2.9/justgage.min.js"></script>
+<script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="//cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<link rel="stylesheet" href="//cdn.datatables.net/buttons/1.4.2/css/buttons.dataTables.min.css">
+<link rel="stylesheet" href="//unpkg.com/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+<script>
+
+    var g1, g2, g3,
+        chart, chart2, Hum_Out = [],
+        barPace = 0.1,
+        barPos = BeginBarPos = 8.4,
+        firstDataBarPos = 8.4,
+        lastDataBarPos = 100,
+        EndBarPos = 100,
+        FirstDataX,
+        LastDataX,
+        minXValue = InitialminXValue = FirstDataX,
+        maxXValue = InitialmaxXValue = LastDataX,
+        barX = InitialbarX = InitialminXValue,
+        xPace = (maxXValue - minXValue) * barPace / (lastDataBarPos - firstDataBarPos);
+
+    var querystr = "";
+
+    window.onload = function () {
+
+        $.ajax({
+            url: 'http://localhost:3000/all',
+            type: 'GET',
+            dataType: 'json',
+            async: true,
+            data: querystr,
+            success: function (result) {
+                var j = 0;
+                for (var i = 0; i < result.length; i++) {
+                    if (i === result.length - 1) {
+                        if (!!result[i].time) {
+                            if (j === 0) {
+                                Hum_Out.push({ x: new Date(result[i].time), y: result[i].Hum_Out});
+                                j = 1;
+                            } else {
+                                Hum_Out.push({ x: new Date(result[i].time), y: result[i].Hum_Out});
+                            }
+                        }
+                    } else {
+                        if (!!result[i].time) {
+                            if (j === 0) {
+                                Hum_Out.push({ x: new Date(result[i].time), y: result[i].Hum_Out});
+                                j = 1;
+                            } else {
+                                Hum_Out.push({ x: new Date(result[i].time), y: result[i].Hum_Out});
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        g1 = new JustGage({
+            id: "g1",
+            min: 0,
+            max: 100,
+            title: "Myrtle Beach",
+            label: "Temperature"
+        });
+
+        g2 = new JustGage({
+            id: "g2",
+            min: 18,
+            max: 28,
+            title: "Martha Vineyard",
+            label: "Temperature"
+        });
+
+        g3 = new JustGage({
+            id: "g3",
+            min: 18,
+            max: 25,
+            title: "Nantucket",
+            label: "Temperature"
+        });
+
+        flatpickr(".date", {
+            dateFormat: "Z",
+            time_24hr: true
+        });
+    };
+
+    function chartDisplay() {
+        $("#buttonContainer").empty();
+        $("#buttonContainer").append("<button onclick='barMove();'>Click Me</button>");
+
+        console.log(Hum_Out);
+        FirstDataX = Hum_Out[0].x.getTime();
+        LastDataX = Hum_Out[Hum_Out.length-1].x.getTime();
+        minXValue = InitialminXValue = FirstDataX;
+        maxXValue = InitialmaxXValue = LastDataX;
+        barX = InitialbarX = InitialminXValue;
+        xPace = (maxXValue - minXValue) * barPace / (lastDataBarPos - firstDataBarPos);
+
+        chart = new CanvasJS.Chart("chartContainer", {
+            animationEnabled: true,
+            zoomEnabled: true,
+            zoomType: "xy",
+            rangeChanged: function(e) {
+                if(e.trigger !== "reset") {
+                    minXValue = new Date(e.axisX[0].viewportMinimum).getTime();
+                    maxXValue = new Date(e.axisX[0].viewportMaximum).getTime();
+                    minYValue = e.axisY[0].viewportMinimum;
+                    maxYValue = e.axisY[0].viewportMaximum;
+
+                    barPos = firstDataBarPos = BeginBarPos;
+                    lastDataBarPos = EndBarPos;
+                    barX = InitialbarX = minXValue;
+                    xPace = (maxXValue - minXValue) * barPace / (lastDataBarPos - firstDataBarPos);
+
+                    barMove();
+
+                } else {
+                    minXValue = InitialminXValue;
+                    maxXValue = InitialmaxXValue;
+                    minYValue = "";
+                    maxYValue = "";
+
+                    barPos = BeginBarPos;
+                    firstDataBarPos = 8.4;
+                    lastDataBarPos = 100;
+                    barX = InitialbarX = minXValue;
+                    xPace = (maxXValue - minXValue) * barPace / (lastDataBarPos - firstDataBarPos);
+
+                    barMove();
+
+                }
+            },
+            title:{
+                text: "Daily High Temperature at Different Beaches"
+            },
+            axisX: {
+                valueFormatString: "DD MMM,YY"
+            },
+            axisY: {
+                title: "Temperature (in °C)",
+                includeZero: false,
+                suffix: " °C"
+            },
+            legend:{
+                cursor: "pointer",
+                fontSize: 16,
+                itemclick: toggleDataSeries
+            },
+            toolTip:{
+                shared: true
+            },
+            data: [{
+                name: "Myrtle Beach",
+                type: "spline",
+                yValueFormatString: "#0.## °C",
+                showInLegend: true,
+                dataPoints: Hum_Out
+            }]
+        });
+
+        chart.render();
+
+
+        function toggleDataSeries(e){
+            if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+                e.dataSeries.visible = false;
+            }
+            else{
+                e.dataSeries.visible = true;
+            }
+            chart.render();
+        }
+    }
+
+
+
+    function barMove() {
+        $("#myBar").remove();
+        $("#chartContainer").append($("<div id=\"myBar\"></div>"));
+        var elem = document.getElementById("myBar");
+        var v1;
+        var id = setInterval(frame, 25);
+
+        console.log(barX);
+
+        function frame() {
+            if (barPos >= EndBarPos) {
+                barPos = BeginBarPos;
+                elem.style.left = barPos + '%';
+                barX = InitialbarX;
+
+            } else {
+                if (barPos < firstDataBarPos) {
+                    barPos = Math.round((barPos + barPace) * 10) / 10;
+                    elem.style.left = barPos + '%';
+
+                    v1 = 0;
+
+                    g1.refresh(v1);
+
+                } else {
+                    barPos = Math.round((barPos + barPace) * 10) / 10;
+                    elem.style.left = barPos + '%';
+
+                    barX += xPace;
+
+                    if (barX < FirstDataX) {
+                        v1 = 0;
+
+                    } else if (barX >= LastDataX){
+                        v1 = Hum_Out[Hum_Out.length-1].y;
+
+                    } else {
+                        for (var i = 1; i < Hum_Out.length; i++) {
+                            if (barX >= Hum_Out[i-1].x.getTime() && barX < Hum_Out[i].x.getTime()) {
+                                v1 = Hum_Out[i-1].y;
+                            }
+                        }
+                    }
+                    g1.refresh(v1);
+                }
+            }
+        }
+    }
+
+    function query() {
+        var timeFrom = document.getElementsByClassName("datePicker")[0].value;
+        var timeTo = document.getElementsByClassName("datePicker")[1].value;
+
+        querystr = "timeFrom=" + timeFrom + "&timeTo=" + timeTo;
+
+        if (timeFrom || timeTo) {
+            queryAndDisplay(querystr);
+        } else {
+            queryAndDisplay(querystr);
+        }
+    }
+
+    var queryAndDisplay = function (querystr) {
+        $("<button onclick='barMove();'>Click Me</button>").remove();
+
+        alert(querystr);
+
+        $.ajax({
+            url: 'http://localhost:3000/filterUser',
+            type: 'GET',
+            dataType: 'json',
+            async: true,
+            data: querystr,
+            success: function (result) {
+                Hum_Out = [];
+                var j = 0;
+                for (var i = 0; i < result.length; i++) {
+                    // for (var i = 0; i < result.length; i++) {
+                    if (i === result.length - 1) {
+                        if (!!result[i].time) {
+                            if (j === 0) {
+                                Hum_Out.push({ x: new Date(result[i].time), y: result[i].Hum_Out});
+                                j = 1;
+                            } else {
+                                Hum_Out.push({ x: new Date(result[i].time), y: result[i].Hum_Out});
+                            }
+                        }
+                    } else {
+                        if (!!result[i].time) {
+                            if (j === 0) {
+                                Hum_Out.push({ x: new Date(result[i].time), y: result[i].Hum_Out});
+                                j = 1;
+                            } else {
+                                Hum_Out.push({ x: new Date(result[i].time), y: result[i].Hum_Out});
+                            }
+                        }
+
+                    }
+                }
+
+                chartDisplay();
+
+            }
+        });
+    }
+
+</script>
+</body>
+</html>
