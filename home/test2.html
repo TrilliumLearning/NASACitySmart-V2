@@ -288,6 +288,9 @@
                 </form>
             </div>
         </div>
+        <button>Cancle</button>
+        <button>Clear</button>
+        <button>Submit</button>
         <script>
             // document.getElementsByName('fullName')[0].value='new text for email';
             // document.getElementsByName('addressLine1')[0].value = '123';
@@ -443,6 +446,20 @@
             //         alert(responseText.message);
             //     }
             // }
+            var getvalue = JSON.parse(localStorage.getItem("getvalue"));
+            console.log(getvalue);
+            document.getElementById('fullName').value = getvalue[0];
+            document.getElementById('addressLine1').value = getvalue[1];
+            document.getElementById('addressLine2').value = getvalue[2];
+            document.getElementById('city').value = getvalue[3];
+            document.getElementById('state').value = getvalue[4];
+            document.getElementById('postcode').value = getvalue[5];
+            document.getElementById('country').value = getvalue[6];
+            document.getElementById('email').value = getvalue[7];
+            document.getElementById('phoneNumber').value = getvalue[8];
+            document.getElementById('LayerNameInput').value = getvalue[9];
+            document.getElementById('select').value = getvalue[10];
+            document.getElementById('message').value = getvalue[11];
 
         </script>
     </div>

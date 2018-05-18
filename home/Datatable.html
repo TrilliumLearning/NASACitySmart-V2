@@ -64,6 +64,7 @@
             <th>Layer Category</th>
             <th>Layer Description</th>
             <th>Layer Uploader</th>
+            <th>Layer Uploader Name</th>
         </tr>
         </thead>
         <tbody>
@@ -84,13 +85,13 @@
             <th>Layer Category</th>
             <th>Layer Description</th>
             <th>Layer Uploader</th>
+            <th>Layer Uploader Name</th>
         </tr>
         </tfoot>
     </table>
     <table id="trapDisplay" style="width:100%;">
         <thead>
         <tr>
-            <th>UserName</th>
             <th>Full Name</th>
             <th>Address Line1</th>
             <th>Address Line2</th>
@@ -104,6 +105,7 @@
             <th>Layer Category</th>
             <th>Layer Description</th>
             <th>Layer Uploader</th>
+            <th>Layer Uploader Name</th>
         </tr>
         </thead>
         <tbody>
@@ -111,7 +113,6 @@
         </tbody>
         <tfoot>
         <tr>
-            <th>UserName</th>
             <th>Full Name</th>
             <th>Address Line1</th>
             <th>Address Line2</th>
@@ -125,6 +126,7 @@
             <th>Layer Category</th>
             <th>Layer Description</th>
             <th>Layer Uploader</th>
+            <th>Layer Uploader Name</th>
         </tr>
         </tfoot>
     </table>
@@ -174,8 +176,8 @@
             //     thArray.push($(this).text())
             // })
 
-            for (var i = 0; i < scoutingRowSelected.length; i ++) {
-        //            console.log("rowSelected[" + i + "][0]: " + rowSelected[i][0]);
+            for (var i = 0; i < scoutingRowSelected.length; i++) {
+                //            console.log("rowSelected[" + i + "][0]: " + rowSelected[i][0]);
                 scoutingTransactionID.push(scoutingRowSelected[i][0]);
             }
         });
@@ -191,75 +193,84 @@
             //     thArray.push($(this).text())
             // })
 
-            for (var i = 0; i < trapRowSelected.length; i ++) {
+            for (var i = 0; i < trapRowSelected.length; i++) {
 //                console.log("rowSelected[" + i + "][0]: " + rowSelected[i][0]);
                 trapTransactionID.push(trapRowSelected[i][0]);
             }
         });
 
-        // $("#editButton").on("click", function () {
-        //     // var transactionID = scoutingTransactionID.concat(trapTransactionID);
-        //     // if (transactionID.length >= 2) {
-        //     //     confirm("Please make sure to only select ONE of the users to edit.")
-        //     // } else if (transactionID.length === 0) {
-        //     //     confirm("No rows have been selected---- please choose ONE.")
-        //     // } else {
-        //     //     var transactionIDStr = "transactionIDStr=" + transactionID.toString();
-        //
-        //     // }
-        // });
-        //
-        $("#deleteButton").on("click", function () {
-            if (confirm("Are you sure you would like to delete this row(s)?") === true) {
-                var transactionIDStr = "transactionIDStr=" + scoutingTransactionID.concat(trapTransactionID).toString();
-                console.log ("transactionIDStr: " + transactionIDStr);
+        $("#editButton").on("click", function () {
+            var transactionID = scoutingTransactionID.concat(trapTransactionID);
+            // console.log(transactionID);
+            if (transactionID.length >= 2) {
+                confirm("Please make sure to only select ONE of the users to edit.")
+            } else if (transactionID.length === 0) {
+                confirm("No rows have been selected---- please choose ONE.")
+            } else {
+                // var transactionIDStr = "transactionIDStr=" + transactionID.toString();
+                var getvalue = table.rows('.selected').data();
+                console.log(getvalue);
+                localStorage.setItem("getvalue",JSON.stringify(getvalue[0]));
+                    // alert(getvalue[i][0]);
+                    // alert(getvalue[i][4]);
+                window.location.replace('test2.html');
+                console.log(localStorage.getItem("getvalue"));
 
-                // $.ajax({
-                //     url: '/deleteRow',
-                //     type: 'GET',
-                //     dataType: 'json',
-                //     async: false,
-                //     data: transactionIDStr,
-                //     success: function (result) {
-                        window.location.reload();
-                //     }
-                // })
-            } else { return false;}
-        });
-
-    });
-
-    var queryAndDisplay = function () {
-        $.ajax({
-            url: 'http://localhost:9090/EditData',
-            dataType: 'json',
-            success: function (results) {
-                if (!results[0].errMsg) {
-                    for (var i = 0; i < results.length; i++) {
-                        if (results[i].Full_Name === "Huaqi_Zhang") {
-                            table.row.add([
-                                results[i].Full_Name,
-                                results[i].Address_Line1,
-                                results[i].Address_Line2,
-                                results[i].City,
-                                results[i].State_Province_Region,
-                                results[i].PostalCode_ZIP,
-                                results[i].Country,
-                                results[i].Email,
-                                results[i].Phone_Number,
-                                results[i].Layer_Name,
-                                results[i].Layer_Category,
-                                results[i].Layer_Description,
-                                results[i].Layer_Uploader
-                            ]).draw(false);
-                        }
-                    }
-                } else {
-                    alert(results[0].errMsg);
-                }
             }
         });
-    }
+
+        //     $("#deleteButton").on("click", function () {
+        //         if (confirm("Are you sure you would like to delete this row(s)?") === true) {
+        //             var transactionIDStr = "transactionIDStr=" + scoutingTransactionID.concat(trapTransactionID).toString();
+        //             console.log ("transactionIDStr: " + transactionIDStr);
+        //
+        //             // $.ajax({
+        //             //     url: '/deleteRow',
+        //             //     type: 'GET',
+        //             //     dataType: 'json',
+        //             //     async: false,
+        //             //     data: transactionIDStr,
+        //             //     success: function (result) {
+        //                     window.location.reload();
+        //             //     }
+        //             // })
+        //         } else { return false;}
+        //     });
+        //
+        // });
+
+        var queryAndDisplay = function () {
+            $.ajax({
+                url: 'http://localhost:9090/AddData',
+                dataType: 'json',
+                success: function (results) {
+                    if (!results[0].errMsg) {
+                        for (var i = 0; i < results.length; i++) {
+                                table.row.add([
+                                    results[i].Full_Name,
+                                    results[i].Address_Line1,
+                                    results[i].Address_Line2,
+                                    results[i].City,
+                                    results[i].State_Province_Region,
+                                    results[i].PostalCode_ZIP,
+                                    results[i].Country,
+                                    results[i].Email,
+                                    results[i].Phone_Number,
+                                    results[i].Layer_Name,
+                                    results[i].Layer_Category,
+                                    results[i].Layer_Description,
+                                    results[i].Layer_Uploader,
+                                    results[i].Layer_Uploader_name
+                                ]).draw(false);
+
+                        }
+                    } else {
+                        alert(results[0].errMsg);
+                    }
+                }
+            });
+        }
+    });
 </script>
 </body>
 </html>
