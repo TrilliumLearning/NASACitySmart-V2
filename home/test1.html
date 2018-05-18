@@ -12,6 +12,7 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/file-uploader/5.15.5/fine-uploader-gallery.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/file-uploader/5.16.2/all.fine-uploader/all.fine-uploader.min.js"></script>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script type = "text/javascript" src="LayerNameSearch.js"></script>
     <script src="../src/jquery.form.min.js"></script>
     <script src="../src/jquery.multi-select.js"></script>
     <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>-->
@@ -259,11 +260,13 @@
                     <div class="form-group">
                         <label class="col-md-4 control-label">Layer Name</label>
                             <div class="col-md-8 inputGroupContainer">
-                                <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span><input id="layerName" name="Layer_Name" placeholder="Layer Name" class="form-control" required value="" type="text"></div>
+                                <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
+                                    <input id="LayerNameInput" name="layerName" placeholder="Layer Name" class="form-control" required="true" value="" type="text" onchange="SearchLayerName(this.value)"></div>
                             </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label">Layer Category</label>
+                        </div>
+                        <p id="LayerName1" style="color: palevioletred; margin-left:270px;">Please Enter the Layer Name, the Layer Name length at least 6 characters</p>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">Layer Category</label>
                             <div class="col-md-8 inputGroupContainer">
                                 <div class="input-group">
                                     <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-list"></i></span>
