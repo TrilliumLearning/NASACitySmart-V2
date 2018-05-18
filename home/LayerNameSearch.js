@@ -5,7 +5,7 @@ function SearchLayerName(value){
         success: function (results) {
             for(var i = 0; i < results.length; i++) {
                 if (value === results[i].ThirdLayer) {
-                    document.getElementById("LayerName1").innerHTML = "The LayerName has already been used";
+                    document.getElementById("LayerName1").innerHTML = "The Layer Name has already been used";
                     document.addEventListener("keyup", function (e) {
                         if (event.keyCode === 8) {
                             document.getElementById("LayerName1").innerHTML = "Please Enter the Layer Name, the Layer Name length at least 6 characters";
