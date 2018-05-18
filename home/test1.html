@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="../css/multi-select.css" media="screen" type="text/css">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../jquery-validation-1.17.0/demo/css/screen.css">
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/file-uploader/5.15.5/fine-uploader-gallery.css" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/file-uploader/5.16.2/all.fine-uploader/all.fine-uploader.min.js"></script>
@@ -15,6 +16,11 @@
     <script type = "text/javascript" src="LayerNameSearch.js"></script>
     <script src="../src/jquery.form.min.js"></script>
     <script src="../src/jquery.multi-select.js"></script>
+    <!-- Change the "src" attribute according to your installation path -->
+    <!--<script src="https://cdn.jsdelivr.net/jquery.validation/1.15.1/jquery.validate.min.js"></script>-->
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.17.0/dist/jquery.validate.min.js"></script>
+    <script src="../jquery-validation-1.17.0/dist/jquery.validate.js"></script>
+
     <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>-->
     <!--<script src="fineUploader_copy/fine-uploader/fine-uploader.js"></script>-->
     <!--<script src="fineUploader_copy/fine-uploader/jquery.fine-uploader.js"></script>-->
@@ -123,6 +129,7 @@
             position:relative;
             width:100%;
         }
+
         #Binfo{
             margin-bottom:20px;
             margin-top:-20px;
@@ -137,6 +144,32 @@
             right:80px;
             width:10%;
             padding:10px 40px;
+        }
+        #clear{
+            background-color: #31a0ba;
+            border-radius:4px;
+            font-size:16px;
+            padding:3px 10px 3px 10px;
+            -webkit-transition-duration: 0.4s;
+            transition-duration: 0.4s;
+            color:white;
+        }
+        #clear:hover {
+            background-color: #ff758f;
+            color: white;
+        }
+        #submit{
+            background-color: #31a0ba;
+            border-radius:4px;
+            font-size:16px;
+            padding:3px 10px 3px 10px;
+            -webkit-transition-duration: 0.4s;
+            transition-duration: 0.4s;
+            color:white;
+        }
+        #submit:hover{
+            background-color: #ff758f;
+            color:white;
         }
     </style>
 
@@ -191,14 +224,19 @@
 
         <h2 id="Binfo">Basic Info</h2>
         <div style="display: block;" class="generalForm">
-            <form class="well form-horizontal" id="basic" action="">
+            <form class="well form-horizontal" id="basic" >
                 <fieldset>
                     <div class="form-group">
                         <label class="col-md-4 control-label">Full Name</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span><input id="fullName" name="Full_Name" placeholder="Full Name" class="form-control" required value="" type="text"></div>
+                            <div class="input-group">
+                                <div style="float:left; display:inline"><span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span></div>
+                                <div><input id="fullName" name="Full_Name" placeholder="Full Name" class="form-control" required value="" type="text"></div>
+                            <label> Please enter your full name.</label>
+                            </div>
                         </div>
                     </div>
+
                     <div class="form-group">
                         <label class="col-md-4 control-label">Address Line 1</label>
                         <div class="col-md-8 inputGroupContainer">
@@ -208,7 +246,7 @@
                     <div class="form-group">
                         <label class="col-md-4 control-label">Address Line 2</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="addressLine2" name="Address_Line2" placeholder="Address Line 2" class="form-control" required value="" type="text"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="addressLine2" name="Address_Line2" placeholder="Address Line 2" class="form-control" value="" type="text"></div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -232,15 +270,14 @@
                     <div class="form-group">
                         <label class="col-md-4 control-label">Country</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group">
-                                <span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="country" name="Country" placeholder="Country" class="form-control" required value="" type="text"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="country" name="Country" placeholder="Country" class="form-control" required value="" type="text"></div>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="col-md-4 control-label">Email</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span><input id="email" name="Email" placeholder="Email" class="form-control" required value="" type="text"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span><input id="email" name="Email" placeholder="Email" class="form-control" required value="" type="email"></div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -249,6 +286,7 @@
                             <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-earphone"></i></span><input id="phoneNumber" name="Phone_Number" placeholder="Phone Number" class="form-control" required value="" type="text"></div>
                         </div>
                     </div>
+
 
                 </fieldset>
             </form>
@@ -261,10 +299,10 @@
                         <label class="col-md-4 control-label">Layer Name</label>
                             <div class="col-md-8 inputGroupContainer">
                                 <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                                    <input id="LayerNameInput" name="layerName" placeholder="Layer Name" class="form-control" required="true" value="" type="text" onchange="SearchLayerName(this.value)"></div>
+                                    <input id="LayerNameInput" name="Layer_Name" placeholder="Layer Name" class="form-control" required value="" type="text" onchange="SearchLayerName(this.value)"></div>
                             </div>
                         </div>
-                        <p id="LayerName1" style="color: palevioletred; margin-left:270px;">Please Enter the Layer Name, the Layer Name length at least 6 characters</p>
+                        <p id="LayerName1" style="color: palevioletred; margin-left:270px;">Please Enter the Layer Name, the Layer Name must be at least 6 characters</p>
                         <div class="form-group">
                             <label class="col-md-4 control-label">Layer Category</label>
                             <div class="col-md-8 inputGroupContainer">
@@ -294,16 +332,19 @@
                                 <div id="uploader"></div>
                             </div>
                         </div>
+                    <div class="column">
+
+                    </div>
 
                     </fieldset>
                 </form>
             </div>
             <div class="row">
                 <div class="column">
-                    <button id="submit" type="submit" value="Submit" form="layer">Submit</button>
+                    <button id="submit" type="submit" value="Submit" form = "basic" form ="layer" >Submit</button>
                 </div>
                 <div class="column">
-                    <button type="reset" onclick="clearForm()" value="  Clear  ">Clear</button>
+                    <button id="clear" type="reset" onclick="clearForm()" value="  Clear  ">Clear</button>
                 </div>
             </div>
 
@@ -350,166 +391,6 @@
                 }
             });
 
-
-            $('#layer').submit(function(e) {
-                // Prevent form submission
-                e.preventDefault();
-                // $.ajax({
-                //     url: '/upload',    // override for form's 'action' attribute
-                //     type: 'post',        // 'get' or 'post', override for form's 'method' attribute
-                //     dataType: 'json',        // 'xml', 'script', or 'json' (expected server response type)
-                //     clearForm: true,        // clear all form fields after successful submit
-                //     // beforeSubmit:  showRequest,  // pre-submit callback
-                //     success: showResponse  // post-submit callback
-                // })
-                //alert("This button has actually been selected and this can't possibly be the issue.");
-                $.ajax({
-                    type: "post",
-                    url: "/basicForm",
-                    dataType: 'json',
-                    data: $("#basic").serialize(),
-                    success: function (result) {
-                        if (!result.error) {
-                            $.ajax({
-                                type: "post",
-                                url: "/detailedFormScouting",
-                                dataType: 'json',
-                                data: $("#detailedScouting").serialize(),
-                                success: function (result) {
-                                    if (!result.error) {
-                                        document.getElementById("modal-footer").style.display = "none";
-
-                                        document.getElementById("modal-header").style.backgroundColor = "#5cb85c";
-                                        document.getElementById("close").innerHTML = "<a href='/userhome'>&times</a>";
-
-                                        document.getElementById("header").innerHTML = "Congratulations, Your Data Entry is Successfully Complete !";
-                                        document.getElementById("body").innerHTML = "<br>Click X to return to the Home Page.<br>";
-
-                                        document.getElementById("modal").style.display = "block";
-                                    } else {
-                                        alert(result.message);
-                                    }
-                                }
-                            })
-                        } else {
-                            alert(result.message);
-                        }
-                    }
-                })
-            });
-
-
-            // function showResponse(responseText, statusText, xhr, $form) {
-            //     if (!responseText.error) {
-            //         alert(responseText.message);
-            //         //alert("A");
-            //         $.ajax({
-            //             type: "post",
-            //             url: "/generalForm",
-            //             dataType: 'json',
-            //             data: $("#general").serialize(),
-            //             success: function (result) {
-            //                 if (!result.error) {
-            //                     $.ajax({
-            //                         type: "post",
-            //                         url: "/detailedFormScouting",
-            //                         dataType: 'json',
-            //                         data: $("#detailedScouting").serialize(),
-            //                         success: function (result) {
-            //                             if (!result.error) {
-            //                                 document.getElementById("modal-footer").style.display = "none";
-            //
-            //                                 document.getElementById("modal-header").style.backgroundColor = "#5cb85c";
-            //                                 // document.getElementById("close").innerHTML = "<a href='/userhome'>&times</a>";
-            //
-            //                                 document.getElementById("header").innerHTML = "Congratulations, your Data Entry has been successfully completed!";
-            //                                 document.getElementById("body").innerHTML = "<br>Click X to return to the Home Page.<br>";
-            //
-            //                                 document.getElementById("modal").style.display = "block";
-            //                             } else {
-            //                                 alert(result.message);
-            //                             }
-            //                         }
-            //                     })
-            //                 } else {
-            //                     alert(result.message);
-            //                 }
-            //             }
-            //         })
-            //     } else {
-            //         // error
-            //         alert(responseText.message);
-            //     }
-            // }
-            function clearForm(){
-                if (confirm("Are you sure to clear this page? All the data will be cleared accordingly!") === true) {
-                    document.getElementById("layer").reset();
-                    document.getElementById("basic").reset();
-                }
-            }
-
-            // $(function(){
-                // $('#upload').submit(function(e) {
-                //     // $("#upload").ajaxSubmit(options);
-                //     // Prevent form submission
-                //     e.preventDefault();
-                //     //alert("This button has actually been selected and this can't possibly be the issue. FIRST");
-                //
-                //     $("#hide").click();
-                //     //
-                //     // console.log("This button has actually been selected and this can't possibly be the issue.");
-                //     // showResponse();
-                // });
-                // $('#submit').onclick(function(e) {
-                //     // Prevent form submission
-                //     // e.preventDefault();
-                //     var binformation = $("#basic").serialize();
-                //     console.log(binformation)
-                    // $.ajax({
-                    //     url: '/upload',    // override for form's 'action' attribute
-                    //     type: 'post',        // 'get' or 'post', override for form's 'method' attribute
-                    //     dataType: 'json',        // 'xml', 'script', or 'json' (expected server response type)
-                    //     clearForm: true,        // clear all form fields after successful submit
-                    //     // beforeSubmit:  showRequest,  // pre-submit callback
-                    //     success: showResponse  // post-submit callback
-                    // })
-                    //alert("This button has actually been selected and this can't possibly be the issue.");
-                    // $.ajax({
-                    //     type: "post",
-                    //     url: "/generalForm",
-                    //     dataType: 'jsonp',
-                    //     data: $("#layer").serialize(),
-                    //     success: function (result) {
-                    //         if (!result.error) {
-                    //             $.ajax({
-                    //                 type: "post",
-                    //                 url: "/generalForm",
-                    //                 dataType: 'jsonp',
-                    //                 data: $("#basic").serialize(),
-                    //                 success: function (result) {
-                    //                     if (!result.error) {
-                    //                         document.getElementById("modal-footer").style.display = "none";
-                    //
-                    //                         document.getElementById("modal-header").style.backgroundColor = "#5cb85c";
-                    //                         document.getElementById("close").innerHTML = "<a href='/userhome'>&times</a>";
-                    //
-                    //                         document.getElementById("header").innerHTML = "Congratulations, Your Data Entry is Successfully Complete !";
-                    //                         document.getElementById("body").innerHTML = "<br>Click X to return to the Home Page.<br>";
-                    //
-                    //                         document.getElementById("modal").style.display = "block";
-                    //                     } else {
-                    //                         alert(result.message);
-                    //                     }
-                    //                 }
-                    //             })
-                    //         } else {
-                    //             alert(result.message);
-                    //         }
-                    //     }
-                    // })
-
-            //     });
-            // });
             $("#submit").on("click", function(){
 
                 var data = $("#basic").serialize() + "&" + $("#layer").serialize();
@@ -518,11 +399,70 @@
                     url  : 'http://localhost:9086/submit',
                     method : "post",
                     data : data,
+                    dataType: 'json',
                     success : function(d){
-                        alert(d);
+                        console.log(d);
                     }
                 });
             });
+
+            function clearForm(){
+                if (confirm("Are you sure to clear this page? All the data will be cleared accordingly!") === true) {
+                    document.getElementById("layer").reset();
+                    document.getElementById("basic").reset();
+                }
+            }
+
+            // Wait for the DOM to be ready
+            $(function(){
+                // Initialize form validation on the registration form.
+                // It has the name attribute "registration"
+                $("form[id='basic' ]").validate({
+                    // Specify validation rules
+                    rules: {
+                        // The key name on the left side is the name attribute
+                        // of an input field. Validation rules are defined
+                        // on the right side
+                        Full_Name: "required",
+                        Address_Line1: "required",
+                        City: "required",
+                        State_Province_Region: "required",
+                        PostalCode_ZIP: "required",
+                        Country: "required",
+                        Email: {
+                            required: true,
+                            // Specify that email should be validated
+                            // by the built-in "email" rule
+                            email: true
+                        },
+                        Phone_Number: "required"
+                    },
+                    // Specify validation error messages
+                    messages: {
+                        Full_Name: "Please enter your full name",
+                        Address_Line1: "Please enter your address",
+                        City: "Please enter your city",
+                        State_Province_Region: "Please enter your state/province/state",
+                        PostalCode_ZIP: "Please enter your postal code/ZIP",
+                        Country: "Please enter your country",
+                        Email: "Please enter a valid email address",
+                        Phone_Number: "Please enter your phone number"
+                    },
+
+                    invalidHandler: function(event) {
+                        $(".error").css("color", "red");
+                    },
+
+                    // Make sure the form is submitted to the destination defined
+                    // in the "action" attribute of the form when valid
+                    submitHandler: function (form) {
+                        form.submit();
+                    }
+                });
+
+            });
+
+
 
 
         </script>
