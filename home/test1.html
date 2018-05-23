@@ -4,6 +4,7 @@
 <head>
     <title>WMS Layer Customized Request</title>
     <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+
     <link rel="stylesheet" href="../css/style_final.css" type="text/css">
     <link rel="stylesheet" href="../css/multi-select.css" media="screen" type="text/css">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
@@ -11,15 +12,17 @@
     <link rel="stylesheet" href="../jquery-validation-1.17.0/demo/css/screen.css">
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/file-uploader/5.15.5/fine-uploader-gallery.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/file-uploader/5.16.2/all.fine-uploader/all.fine-uploader.min.js"></script>
+
     <script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/file-uploader/5.16.2/all.fine-uploader/all.fine-uploader.min.js"></script>
     <script type = "text/javascript" src="LayerNameSearch.js"></script>
-    <script src="../src/jquery.form.min.js"></script>
     <script src="../src/jquery.multi-select.js"></script>
+    <!--<script src="../src/jquery.form.min.js"></script>-->
     <!-- Change the "src" attribute according to your installation path -->
     <!--<script src="https://cdn.jsdelivr.net/jquery.validation/1.15.1/jquery.validate.min.js"></script>-->
-    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.17.0/dist/jquery.validate.min.js"></script>
+    <!--<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.17.0/dist/jquery.validate.min.js"></script>-->
     <script src="../jquery-validation-1.17.0/dist/jquery.validate.js"></script>
+    <!--<script src="http://malsup.github.com/jquery.form.js"></script>-->
 
     <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>-->
     <!--<script src="fineUploader_copy/fine-uploader/fine-uploader.js"></script>-->
@@ -171,6 +174,10 @@
             background-color: #ff758f;
             color:white;
         }
+        .name{
+            float:left;
+
+        }
     </style>
 
 </head>
@@ -230,12 +237,10 @@
                         <label class="col-md-4 control-label">Full Name</label>
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group">
-                                <div style="float:left; display:inline"><span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span></div>
-                                <div><input id="fullName" name="Full_Name" placeholder="Full Name" class="form-control" required value="" type="text"></div>
-                            <label> Please enter your full name.</label>
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span><input id="fullName" name="Full_Name" placeholder="Full Name" class="form-control" required value="" type="text"></div>
                             </div>
                         </div>
-                    </div>
+
 
                     <div class="form-group">
                         <label class="col-md-4 control-label">Address Line 1</label>
@@ -277,7 +282,7 @@
                     <div class="form-group">
                         <label class="col-md-4 control-label">Email</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span><input id="email" name="Email" placeholder="Email" class="form-control" required value="" type="email"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span><input id="email" name="Email" placeholder="Email" class="form-control" required value="" type="text"></div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -324,33 +329,30 @@
                         </div>
                         <div class="form-group">
                             <label class="col-md-4 control-label">Layer Description</label>
-                            <textarea class="form-control" id="message" name="Layer_Description" placeholder="Enter your description here..." required maxlength="140" rows="7"></textarea>
+                            <input class="form-control" id="message" name="Layer_Description" placeholder="Enter your description here..." required type="text">
                         </div>
                         <div class="form-group">
                             <label  class="col-md-4 control-label">Layer Uploader</label>
                             <div class="col-md-8 inputGroupContainer">
-                                <div id="uploader"></div>
+                                <div id="uploader" ></div>
                             </div>
                         </div>
-                    <div class="column">
-
-                    </div>
-
                     </fieldset>
                 </form>
             </div>
             <div class="row">
                 <div class="column">
-                    <button id="submit" type="submit" value="Submit" form = "basic" form ="layer" >Submit</button>
+                    <button id="submit" type="submit" value="Submit" form="basic" >Submit</button>
                 </div>
                 <div class="column">
-                    <button id="clear" type="reset" onclick="clearForm()" value="  Clear  ">Clear</button>
+                    <button id="clear" type="reset" onclick="window.location.reload()" value="  Clear  ">Clear</button>
                 </div>
             </div>
 
     </div>
 
         <script>
+
             var uploader = new qq.FineUploader({
                 element: document.getElementById("uploader"),
                 // debug: true,
@@ -391,33 +393,38 @@
                 }
             });
 
-            $("#submit").on("click", function(){
-
-                var data = $("#basic").serialize() + "&" + $("#layer").serialize();
-                console.log($("#basic").serialize());
-                $.ajax({
-                    url  : 'http://localhost:9086/submit',
-                    method : "post",
-                    data : data,
-                    dataType: 'json',
-                    success : function(d){
-                        console.log(d);
-                    }
-                });
-            });
-
-            function clearForm(){
-                if (confirm("Are you sure to clear this page? All the data will be cleared accordingly!") === true) {
-                    document.getElementById("layer").reset();
-                    document.getElementById("basic").reset();
-                }
+            function submitsecondForm() {
+                $('#layer').submit();
             }
+
+            function submitForm () {
+                    var data = $("#basic").serialize() + "&" + $("#layer").serialize();
+                    console.log($("#basic").serialize());
+                    $.ajax({
+                        url  : 'http://localhost:9086/submit',
+                        method : "post",
+                        data : data,
+                        dataType: 'json',
+                        success : function(d){
+                            console.log(d);
+                        }
+                    });
+
+
+            }
+
+            // function clearForm(){
+            //     if (confirm("Are you sure to clear this page? All the data will be cleared accordingly!") === true) {
+            //         document.getElementById("layer").reset();
+            //         document.getElementById("basic").reset();
+            //     }
+            // }
 
             // Wait for the DOM to be ready
             $(function(){
                 // Initialize form validation on the registration form.
                 // It has the name attribute "registration"
-                $("form[id='basic' ]").validate({
+                $('#basic').validate({
                     // Specify validation rules
                     rules: {
                         // The key name on the left side is the name attribute
@@ -435,7 +442,11 @@
                             // by the built-in "email" rule
                             email: true
                         },
-                        Phone_Number: "required"
+                        Phone_Number: "required",
+                        Layer_Name:"required",
+                        Layer_Category:"required",
+                        Layer_Description:"required",
+                        Layer_Uploader:"required"
                     },
                     // Specify validation error messages
                     messages: {
@@ -446,17 +457,70 @@
                         PostalCode_ZIP: "Please enter your postal code/ZIP",
                         Country: "Please enter your country",
                         Email: "Please enter a valid email address",
-                        Phone_Number: "Please enter your phone number"
+                        Phone_Number: "Please enter your phone number",
+                        Layer_Name:"Please enter the layer name",
+                        Layer_Category:"Please select the layer category",
+                        Layer_Description:"Please write the description of the layer",
+                        Layer_Uploader:"Please upload the layer files"
                     },
 
                     invalidHandler: function(event) {
+                        console.log("1234");
+                        $(".error").css("color", "blue");
+                    },
+
+                    // Make sure the form is submitted to the destination defined
+                    // in the "action" attribute of the form when valid
+                    submitHandler: function (form) {
+                        console.log("123");
+                        submitsecondForm()
+                        // secondValidation()
+                    }
+                });
+                $('#layer').validate({
+                    // Specify validation rules
+                    rules: {
+                        // The key name on the left side is the name attribute
+                        // of an input field. Validation rules are defined
+                        // on the right side
+                        Layer_Name: "required",
+                        Layer_Category: "required",
+                        Layer_Description: "required",
+                        Layer_Uploader:"required"
+                    },
+                    // Specify validation error messages
+                    messages: {
+                        Layer_Name: "Please enter the layer name",
+                        Layer_Category: "Please enter the layer category",
+                        Layer_Description: "Please enter the description",
+                        Layer_Uploader:"Please upload your layer"
+                    },
+
+                    invalidHandler: function(event) {
+                        console.log("5678");
                         $(".error").css("color", "red");
                     },
 
                     // Make sure the form is submitted to the destination defined
                     // in the "action" attribute of the form when valid
                     submitHandler: function (form) {
-                        form.submit();
+                        console.log("456");
+                        submitForm()
+                        // form.ajaxSubmit(function(e){
+                        //     console.log("456");
+                        //     //
+                        //     // var data = $("#basic").formSerialize() + "&" + $("#layer").formSerialize();
+                        //     // console.log($("#basic").formSerialize());
+                        //     // $.ajax({
+                        //     //     url  : 'http://localhost:9086/submit',
+                        //     //     method : "post",
+                        //     //     data : data,
+                        //     //     dataType: 'json',
+                        //     //     success : function(d){
+                        //     //         console.log(d);
+                        //     //     }
+                        //     // });
+                        // })
                     }
                 });
 
