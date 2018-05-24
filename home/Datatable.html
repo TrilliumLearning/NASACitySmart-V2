@@ -51,6 +51,7 @@
     <table id="dataDisplay" style="width:100%;">
         <thead>
         <tr>
+            <th>transactionID</th>
             <th>Full Name</th>
             <th>Address Line1</th>
             <th>Address Line2</th>
@@ -72,6 +73,7 @@
         </tbody>
         <tfoot>
         <tr>
+            <th>transactionID</th>
             <th>Full Name</th>
             <th>Address Line1</th>
             <th>Address Line2</th>
@@ -92,6 +94,7 @@
     <table id="trapDisplay" style="width:100%;">
         <thead>
         <tr>
+            <th>transactionID</th>
             <th>Full Name</th>
             <th>Address Line1</th>
             <th>Address Line2</th>
@@ -113,6 +116,7 @@
         </tbody>
         <tfoot>
         <tr>
+            <th>transactionID</th>
             <th>Full Name</th>
             <th>Address Line1</th>
             <th>Address Line2</th>
@@ -219,34 +223,32 @@
             }
         });
 
-        //     $("#deleteButton").on("click", function () {
-        //         if (confirm("Are you sure you would like to delete this row(s)?") === true) {
-        //             var transactionIDStr = "transactionIDStr=" + scoutingTransactionID.concat(trapTransactionID).toString();
-        //             console.log ("transactionIDStr: " + transactionIDStr);
-        //
-        //             // $.ajax({
-        //             //     url: '/deleteRow',
-        //             //     type: 'GET',
-        //             //     dataType: 'json',
-        //             //     async: false,
-        //             //     data: transactionIDStr,
-        //             //     success: function (result) {
-        //                     window.location.reload();
-        //             //     }
-        //             // })
-        //         } else { return false;}
-        //     });
-        //
-        // });
+            $("#deleteButton").on("click", function () {
+                if (confirm("Are you sure you would like to delete this row(s)?") === true) {
+                    var transactionIDStr = "transactionIDStr=" + scoutingTransactionID.concat(trapTransactionID).toString();
+                    console.log ("transactionIDStr: " + transactionIDStr);
+                    $.ajax({
+                        url:'http://localhost:9090/deleteData',
+                        type:"GET",
+                        dataType:'json',
+                        data:transactionIDStr
+                    });
+                    window.location.reload();
+                } else {
+                    return false;
+                }
+            });
+
 
         var queryAndDisplay = function () {
             $.ajax({
                 url: 'http://localhost:9090/AddData',
                 dataType: 'json',
                 success: function (results) {
-                    if (!results[0].errMsg) {
                         for (var i = 0; i < results.length; i++) {
+                            if (results[i].Status === "Active") {
                                 table.row.add([
+                                    results[i].ID,
                                     results[i].Full_Name,
                                     results[i].Address_Line1,
                                     results[i].Address_Line2,
@@ -262,11 +264,8 @@
                                     results[i].Layer_Uploader,
                                     results[i].Layer_Uploader_name
                                 ]).draw(false);
-
+                            }
                         }
-                    } else {
-                        alert(results[0].errMsg);
-                    }
                 }
             });
         }

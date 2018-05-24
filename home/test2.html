@@ -115,14 +115,15 @@
 
     <style>
         body      { padding-top:80px; word-wrap:break-word; }
-        #hide { display: none; }
-        .FAW        { display: none; }
-        #stay, #cancel {  position: relative;  width: 20%;  left: 20%;  }
-        #leave, #clear {  position: relative;  width: 20%;  left: 60%;  }
+        /*#hide { display: none; }*/
+        /*.FAW        { display: none; }*/
+        /*#stay, #cancel {  position: relative;  width: 20%;  left: 20%;  }*/
+        /*#leave, #clear {  position: relative;  width: 20%;  left: 60%;  }*/
         .banner{
             position:relative;
             width:100%;
         }
+
         #Binfo{
             margin-bottom:20px;
             margin-top:-20px;
@@ -131,6 +132,54 @@
             margin-top:20px;
             margin-bottom:20px;
         }
+        .column {
+            float:right;
+            position:relative;
+            right:80px;
+            width:10%;
+            padding:10px 40px;
+        }
+        #clear{
+            background-color: #31a0ba;
+            border-radius:4px;
+            font-size:16px;
+            padding:3px 10px 3px 10px;
+            -webkit-transition-duration: 0.4s;
+            transition-duration: 0.4s;
+            color:white;
+        }
+        #clear:hover {
+            background-color: #ff758f;
+            color: white;
+        }
+        #submit{
+            background-color: #31a0ba;
+            border-radius:4px;
+            font-size:16px;
+            padding:3px 10px 3px 10px;
+            -webkit-transition-duration: 0.4s;
+            transition-duration: 0.4s;
+            color:white;
+        }
+        #submit:hover{
+            background-color: #ff758f;
+            color:white;
+        }
+        #cancel{
+            background-color: #31a0ba;
+            border-radius:4px;
+            font-size:16px;
+            padding:3px 10px 3px 10px;
+            -webkit-transition-duration: 0.4s;
+            transition-duration: 0.4s;
+            color:white;
+            margin-left:385px;
+            margin-top: 10px;
+        }
+        #cancel:hover{
+            background-color: #ff758f;
+            color:white;
+        }
     </style>
 
 </head>
@@ -138,51 +187,52 @@
 
 <!-- Fine Uploader DOM Element
 ====================================================================== -->
-<div id="fine-uploader"></div>
+<!--<div id="fine-uploader"></div>-->
 
 <!-- Your code to create an instance of Fine Uploader and bind to the DOM/template
 ====================================================================== -->
-<script>
-    $('#fine-uploader').fineUploader({
-        template: 'qq-template',
-        request: {
-            endpoint: 'http://localhost:9090/upload'
-        },
-        thumbnails: {
-            placeholders: {
-                waitingPath: '/source/placeholders/waiting-generic.png',
-                notAvailablePath: '/source/placeholders/not_available-generic.png'
-            }
-        },
-        validation: {
-            allowedExtensions: ['jpeg', 'jpg', 'txt'],
-            itemLimit: 3,
-            sizeLimit: 51200 // 50 kB = 50 * 1024 bytes
-        }
-    });
-</script>
+<!--<script>-->
+    <!--$('#fine-uploader').fineUploader({-->
+        <!--template: 'qq-template',-->
+        <!--request: {-->
+            <!--endpoint: 'http://localhost:9090/upload'-->
+        <!--},-->
+        <!--thumbnails: {-->
+            <!--placeholders: {-->
+                <!--waitingPath: '/source/placeholders/waiting-generic.png',-->
+                <!--notAvailablePath: '/source/placeholders/not_available-generic.png'-->
+            <!--}-->
+        <!--},-->
+        <!--validation: {-->
+            <!--allowedExtensions: ['jpeg', 'jpg', 'txt'],-->
+            <!--itemLimit: 3,-->
+            <!--sizeLimit: 51200 // 50 kB = 50 * 1024 bytes-->
+        <!--}-->
+    <!--});-->
+
 <div class="container">
-    <a href="//aworldbridge.com"><img class="banner" src="NewWBBanner.jpg"/></a>
-    <div id="modal" class="modal">
-        <!-- Modal content -->
-        <div id="modal-content">
-            <div id="modal-header">
-                <span id="close"></span>
-                <h2 id="header"></h2>
-            </div>
-            <div id="modal-body">
-                <p id="body"></p>
-            </div>
-            <div id="modal-footer">
-            </div>
-        </div>
-    </div>
+    <a href="//aworldbridge.com"><img class="banner" src="../home/NewWBBanner.jpg"/></a>
+    <!--<div id="modal" class="modal">-->
+        <!--&lt;!&ndash; Modal content &ndash;&gt;-->
+        <!--<div id="modal-content">-->
+            <!--<div id="modal-header">-->
+                <!--<span id="close"></span>-->
+                <!--<h2 id="header"></h2>-->
+            <!--</div>-->
+            <!--<div id="modal-body">-->
+                <!--<p id="body"></p>-->
+            <!--</div>-->
+            <!--<div id="modal-footer">-->
+            <!--</div>-->
+        <!--</div>-->
+    <!--</div>-->
 
     <h1 id="title">General Form</h1>
     <div id="container">
+
         <h2 id="Binfo">Basic Info</h2>
         <div style="display: block;" class="generalForm">
-            <form class="well form-horizontal" action="" id="basic">
+            <form class="well form-horizontal" id="basic" >
                 <fieldset>
                     <div class="form-group">
                         <label class="col-md-4 control-label">Full Name</label>
@@ -190,77 +240,79 @@
                             <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span><input id="fullName" name="fullName" placeholder="Full Name" class="form-control" required value="" type="text"></div>
                         </div>
                     </div>
+
                     <div class="form-group">
                         <label class="col-md-4 control-label">Address Line 1</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="addressLine1" name="addressLine1" placeholder="Address Line 1" class="form-control" required="true" value="" type="text"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="addressLine1" name="Address_Line1" placeholder="Address Line 1" class="form-control" required value="" type="text"></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-4 control-label">Address Line 2</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="addressLine2" name="addressLine2" placeholder="Address Line 2" class="form-control" required="true" value="" type="text"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="addressLine2" name="Address_Line2" placeholder="Address Line 2" class="form-control" value="" type="text"></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-4 control-label">City</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="city" name="city" placeholder="City" class="form-control" required="true" value="" type="text"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="city" name="City" placeholder="City" class="form-control" required value="" type="text"></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-4 control-label">State/Province/Region</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="state" name="state" placeholder="State/Province/Region" class="form-control" required="true" value="" type="text"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="state" name="State_Province_Region" placeholder="State/Province/Region" class="form-control" required value="" type="text"></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-4 control-label">Postal Code/ZIP</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="postcode" name="postcode" placeholder="Postal Code/ZIP" class="form-control" required="true" value="" type="text"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="postcode" name="PostalCode_ZIP" placeholder="Postal Code/ZIP" class="form-control" required value="" type="text"></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-4 control-label">Country</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group">
-                                <span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="country" name="country" placeholder="Country" class="form-control" required="true" value="" type="text"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="country" name="Country" placeholder="Country" class="form-control" required value="" type="text"></div>
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label class="col-md-4 control-label">Email</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span><input id="email" name="email" placeholder="Email" class="form-control" required="true" value="" type="text"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span><input id="email" name="Email" placeholder="Email" class="form-control" required value="" type="email"></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-4 control-label">Phone Number</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-earphone"></i></span><input id="phoneNumber" name="phoneNumber" placeholder="Phone Number" class="form-control" required="true" value="" type="text"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-earphone"></i></span><input id="phoneNumber" name="Phone_Number" placeholder="Phone Number" class="form-control" required value="" type="text"></div>
                         </div>
                     </div>
+
+
                 </fieldset>
             </form>
-
+        </div>
             <h2 id="Linfo">Layer Info</h2>
-            <div  class="generalForm">
-                <form class="well form-horizontal">
-                    <fieldset >
-                        <div class="form-group">
-                            <label class="col-md-4 control-label">Layer Name</label>
+        <div  class="generalForm">
+            <form class="well form-horizontal" id="layer">
+                <fieldset >
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Layer Name</label>
                             <div class="col-md-8 inputGroupContainer">
                                 <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                                    <input id="LayerNameInput" name="layerName" placeholder="Layer Name" class="form-control" required="true" value="" type="text" onchange="SearchLayerName(this.value)"></div>
+                                    <input id="LayerNameInput" name="Layer_Name" placeholder="Layer Name" class="form-control" required value="" type="text" onchange="SearchLayerName(this.value)"></div>
                             </div>
                         </div>
-                        <p id="LayerName1" style="color: palevioletred; margin-left:270px;">Please Enter the Layer Name, the Layer Name length at least 6 characters</p>
+                        <p id="LayerName1" style="color: palevioletred; margin-left:270px;">Please Enter the Layer Name, the Layer Name must be at least 6 characters</p>
                         <div class="form-group">
                             <label class="col-md-4 control-label">Layer Category</label>
                             <div class="col-md-8 inputGroupContainer">
                                 <div class="input-group">
                                     <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-list"></i></span>
-                                    <select class="selectpicker form-control" id="select">
+                                    <select required class="selectpicker form-control" id="select" name="Layer_Category">
                                         <option value="">SELECT LAYER TYPE</option>
                                         <option>Energy</option>
                                         <option>Water</option>
@@ -276,21 +328,35 @@
                         </div>
                         <div class="form-group">
                             <label class="col-md-4 control-label">Layer Description</label>
-                            <textarea class="form-control" type="textarea" id="message" placeholder="Enter your description here..." maxlength="140" rows="7"></textarea>
+                            <textarea class="form-control" id="message" name="Layer_Description" placeholder="Enter your description here..." required maxlength="140" rows="7"></textarea>
                         </div>
                         <div class="form-group">
-                            <label class="col-md-4 control-label">Layer Uploader</label>
+                            <label  class="col-md-4 control-label">Layer Uploader</label>
                             <div class="col-md-8 inputGroupContainer">
                                 <div id="uploader"></div>
                             </div>
                         </div>
+                    <div class="column">
+
+                    </div>
+
                     </fieldset>
                 </form>
             </div>
-        </div>
-        <button>Cancle</button>
-        <button>Clear</button>
-        <button>Submit</button>
+            <div class="row">
+                <div class="column">
+                    <button id="submit" type="submit" value="Submit" form = "basic" form ="layer" >Submit</button>
+                </div>
+                <div class="column">
+                    <button id="clear" type="reset" onclick="clearForm()" value="  Clear  ">Clear</button>
+                </div>
+                <div class="colum">
+                    <button id="cancel" type="button" onclick="goback()" value=" Cancel ">Cancel</button>
+                </div>
+            </div>
+
+    </div>
+
         <script>
             // document.getElementsByName('fullName')[0].value='new text for email';
             // document.getElementsByName('addressLine1')[0].value = '123';
@@ -333,136 +399,108 @@
                     }
                 }
             });
-            // var uploaderPest = new qq.FineUploader({
-            //     element: document.getElementById("uploaderPest"),
-            //     request: {
-            //         endpoint: '/upload'
-            //     },
-            //     deleteFile: {
-            //         enabled: true, // defaults to false
-            //         endpoint: '/deleteFiles'
-            //     },
-            //     callbacks: {
-            //         onComplete: function (id, name, responseJSON) {
-            //             // alert(responseJSON.newuuid2);
-            //             // alert(id + "      " + name);
-            //             uploaderPest.setUuid(id, responseJSON.newuuid2);
-            //             // $.ajax({
-            //             //     url: '/submit',
-            //             //     type: 'POST',
-            //             //     dataType: 'json',
-            //             //     async: false,
-            //             //     success: function (product) {
-            //             //         if (!product.error) {
-            //             //             globalPaths = product;
-            //             //             console.log("results: " + globalPaths[0].Damage_photo);
-            //             //         } else {
-            //             //             console.log("you're gonna have a bad time");
-            //             //         }
-            //             //     }
-            //             // })
+
+            // $("#submit").on("click", function(){
+            //
+            //     var data = $("#basic").serialize() + "&" + $("#layer").serialize();
+            //     console.log($("#basic").serialize());
+            //     $.ajax({
+            //         url  : 'http://localhost:9086/submit',
+            //         method : "post",
+            //         data : data,
+            //         dataType: 'json',
+            //         success : function(d){
+            //             console.log(d);
             //         }
-            //     }
-            // });
-            // var options = {
-            //     url: '/upload',    // override for form's 'action' attribute
-            //     type: 'post',        // 'get' or 'post', override for form's 'method' attribute
-            //     dataType: 'json',        // 'xml', 'script', or 'json' (expected server response type)
-            //     clearForm: true,        // clear all form fields after successful submit
-            //     // beforeSubmit:  showRequest,  // pre-submit callback
-            //     success:       showResponse  // post-submit callback
-            //
-            //     //target:        '#output2',   // target element(s) to be updated with server response
-            //     // other available options:
-            //     //resetForm: true        // reset the form after successful submit
-            //     // $.ajax options can be used here too, for example:
-            //     //timeout:   3000
-            // };
-            //
-            // $('#upload').submit(function(e) {
-            //     // $("#upload").ajaxSubmit(options);
-            //     // Prevent form submission
-            //     e.preventDefault();
-            //     //alert("This button has actually been selected and this can't possibly be the issue. FIRST");
-            //
-            //     $("#hide").click();
-            //     //
-            //     // console.log("This button has actually been selected and this can't possibly be the issue.");
-            //     // showResponse();
+            //     });
             // });
 
-            // $('#detailedScouting').submit(function(e) {
-            //     // Prevent form submission
-            //     e.preventDefault();
-            //     // $.ajax({
-            //     //     url: '/upload',    // override for form's 'action' attribute
-            //     //     type: 'post',        // 'get' or 'post', override for form's 'method' attribute
-            //     //     dataType: 'json',        // 'xml', 'script', or 'json' (expected server response type)
-            //     //     clearForm: true,        // clear all form fields after successful submit
-            //     //     // beforeSubmit:  showRequest,  // pre-submit callback
-            //     //     success: showResponse  // post-submit callback
-            //     // })
-            //     //alert("This button has actually been selected and this can't possibly be the issue.");
+            function clearForm(){
+                if (confirm("Are you sure to clear this page? All the data will be cleared accordingly!") === true) {
+                    document.getElementById("layer").reset();
+                    document.getElementById("basic").reset();
+                }
+            }
+            function goback(){
+                if(confirm("Are you sure to leave this page? All the change will be cleared accordingly!") === true){
+                    window.location.replace("Datatable.html");
+                }
+            }
+
+            // // Wait for the DOM to be ready
+            // $(function(){
+            //     // Initialize form validation on the registration form.
+            //     // It has the name attribute "registration"
+            //     $("form[id='basic' ]").validate({
+            //         // Specify validation rules
+            //         rules: {
+            //             // The key name on the left side is the name attribute
+            //             // of an input field. Validation rules are defined
+            //             // on the right side
+            //             Full_Name: "required",
+            //             Address_Line1: "required",
+            //             City: "required",
+            //             State_Province_Region: "required",
+            //             PostalCode_ZIP: "required",
+            //             Country: "required",
+            //             Email: {
+            //                 required: true,
+            //                 // Specify that email should be validated
+            //                 // by the built-in "email" rule
+            //                 email: true
+            //             },
+            //             Phone_Number: "required"
+            //         },
+            //         // Specify validation error messages
+            //         messages: {
+            //             Full_Name: "Please enter your full name",
+            //             Address_Line1: "Please enter your address",
+            //             City: "Please enter your city",
+            //             State_Province_Region: "Please enter your state/province/state",
+            //             PostalCode_ZIP: "Please enter your postal code/ZIP",
+            //             Country: "Please enter your country",
+            //             Email: "Please enter a valid email address",
+            //             Phone_Number: "Please enter your phone number"
+            //         },
+            //
+            //         invalidHandler: function(event) {
+            //             $(".error").css("color", "red");
+            //         },
+            //
+            //         // Make sure the form is submitted to the destination defined
+            //         // in the "action" attribute of the form when valid
+            //         submitHandler: function (form) {
+            //             form.submit();
+            //         }
+            //     });
+            //
             // });
-            // function showResponse(responseText, statusText, xhr, $form) {
-            //     if (!responseText.error) {
-            //         alert(responseText.message);
-            //         //alert("A");
-            //         $.ajax({
-            //             type: "post",
-            //             url: "/generalForm",
-            //             dataType: 'json',
-            //             data: $("#general").serialize(),
-            //             success: function (result) {
-            //                 if (!result.error) {
-            //                     $.ajax({
-            //                         type: "post",
-            //                         url: "/detailedFormScouting",
-            //                         dataType: 'json',
-            //                         data: $("#detailedScouting").serialize(),
-            //                         success: function (result) {
-            //                             if (!result.error) {
-            //                                 document.getElementById("modal-footer").style.display = "none";
-            //
-            //                                 document.getElementById("modal-header").style.backgroundColor = "#5cb85c";
-            //                                 // document.getElementById("close").innerHTML = "<a href='/userhome'>&times</a>";
-            //
-            //                                 document.getElementById("header").innerHTML = "Congratulations, your Data Entry has been successfully completed!";
-            //                                 document.getElementById("body").innerHTML = "<br>Click X to return to the Home Page.<br>";
-            //
-            //                                 document.getElementById("modal").style.display = "block";
-            //                             } else {
-            //                                 alert(result.message);
-            //                             }
-            //                         }
-            //                     })
-            //                 } else {
-            //                     alert(result.message);
-            //                 }
-            //             }
-            //         })
-            //     } else {
-            //         // error
-            //         alert(responseText.message);
-            //     }
-            // }
+
             var getvalue = JSON.parse(localStorage.getItem("getvalue"));
             console.log(getvalue);
-            document.getElementById('fullName').value = getvalue[0];
-            document.getElementById('addressLine1').value = getvalue[1];
-            document.getElementById('addressLine2').value = getvalue[2];
-            document.getElementById('city').value = getvalue[3];
-            document.getElementById('state').value = getvalue[4];
-            document.getElementById('postcode').value = getvalue[5];
-            document.getElementById('country').value = getvalue[6];
-            document.getElementById('email').value = getvalue[7];
-            document.getElementById('phoneNumber').value = getvalue[8];
-            document.getElementById('LayerNameInput').value = getvalue[9];
-            document.getElementById('select').value = getvalue[10];
-            document.getElementById('message').value = getvalue[11];
+            document.getElementById('fullName').value = getvalue[1];
+            document.getElementById('addressLine1').value = getvalue[2];
+            document.getElementById('addressLine2').value = getvalue[3];
+            document.getElementById('city').value = getvalue[4];
+            document.getElementById('state').value = getvalue[5];
+            document.getElementById('postcode').value = getvalue[6];
+            document.getElementById('country').value = getvalue[7];
+            document.getElementById('email').value = getvalue[8];
+            document.getElementById('phoneNumber').value = getvalue[9];
+            document.getElementById('LayerNameInput').value = getvalue[10];
+            document.getElementById('select').value = getvalue[11];
+            document.getElementById('message').value = getvalue[12];
+
+            if(getvalue[13] = "/Users/imac06/WebstormProjects/Node_Shared/temporany_uploadfiles"){
+                fetch(getvalue[13]).then(function (response) {
+                    console.log(response);
+                }).catch(function (err) {
+                    //Error:(
+                });
+
+            }
 
         </script>
     </div>
-</div>
 </body>
 </html>
