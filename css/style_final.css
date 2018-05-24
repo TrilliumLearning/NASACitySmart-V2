@@ -145,6 +145,8 @@ input[type='text'], select, .inputNumber {
 .glyphicon-upload{
     width:10%;
 }
+
+
 #characterLeft{
     margin-left: 280px;
     margin-top:-100px;
@@ -336,3 +338,4 @@ select {
 input[type='text']::placeholder {
     color: #c6c6c6;
 }
+
