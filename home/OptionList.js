@@ -24,7 +24,7 @@ function ChangeSelectList(countrylevel) {
         cityList.remove(0);
     }
     $.ajax({
-        url: "http://localhost:9086/ChangeSelectList",
+        url: "http://localhost:9090/ChangeSelectList",
         dataType: 'json',
         success: function (results) {
             var option;
@@ -67,7 +67,7 @@ function ChangeSelectList(countrylevel) {
 
 function ChangeLayerList(citylevel) {
     $.ajax({
-        url: "http://localhost:9086/ChangeLayerList",
+        url: "http://localhost:9090/ChangeLayerList",
         dataType:"json",
         success: function (res) {
             var returnCityObj = getObjects(res,'CityName',citylevel);

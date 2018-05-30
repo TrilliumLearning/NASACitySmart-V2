@@ -4,17 +4,26 @@
 <head>
     <title>WMS Layer Customized Request</title>
     <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
+
     <link rel="stylesheet" href="../css/style_final.css" type="text/css">
     <link rel="stylesheet" href="../css/multi-select.css" media="screen" type="text/css">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+    <link rel="stylesheet" href="../jquery-validation-1.17.0/demo/css/screen.css">
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/file-uploader/5.15.5/fine-uploader-gallery.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/file-uploader/5.16.2/all.fine-uploader/all.fine-uploader.min.js"></script>
+
     <script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/file-uploader/5.16.2/all.fine-uploader/all.fine-uploader.min.js"></script>
     <script type = "text/javascript" src="LayerNameSearch.js"></script>
-    <script src="../src/jquery.form.min.js"></script>
     <script src="../src/jquery.multi-select.js"></script>
+    <!--<script src="../src/jquery.form.min.js"></script>-->
+    <!-- Change the "src" attribute according to your installation path -->
+    <!--<script src="https://cdn.jsdelivr.net/jquery.validation/1.15.1/jquery.validate.min.js"></script>-->
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.17.0/dist/jquery.validate.min.js"></script>
+    <!--<script src="../jquery-validation-1.17.0/dist/jquery.validate.js"></script>-->
+    <!--<script src="http://malsup.github.com/jquery.form.js"></script>-->
+
     <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>-->
     <!--<script src="fineUploader_copy/fine-uploader/fine-uploader.js"></script>-->
     <!--<script src="fineUploader_copy/fine-uploader/jquery.fine-uploader.js"></script>-->
@@ -358,47 +367,96 @@
     </div>
 
         <script>
-            // document.getElementsByName('fullName')[0].value='new text for email';
-            // document.getElementsByName('addressLine1')[0].value = '123';
-            var uploader = new qq.FineUploader({
-                element: document.getElementById("uploader"),
-                // debug: true,
-                request: {
-                    endpoint: 'http://localhost:9090/upload'
-                },
-                cors: {
-                    //all requests are expected to be cross-domain requests
-                    expected: true
 
-                    // //if you want cookies to be sent along with the request
-                    // sendCredentials: true
-                },
-                deleteFile: {
-                    enabled: true, // defaults to false
-                    endpoint: 'http://localhost:9090/deleteFiles'
-                },
-                callbacks: {
-                    onComplete: function (id, name, responseJSON) {
-                        // alert(responseJSON.newuuid);
-                        // alert(id + "      " + name);
-                        uploader.setUuid(id, responseJSON.newuuid);
-                        // $.ajax({
-                        //     url: '/submit',
-                        //     type: 'POST',
-                        //     dataType: 'json',
-                        //     async: false,
-                        //     success: function (product) {
-                        //         if (!product.error) {
-                        //             globalPaths = product;
-                        //             console.log("results: " + globalPaths[0].Damage_photo);
-                        //         } else {
-                        //             console.log("you're gonna have a bad time");
-                        //         }
-                        //     }
-                        // })
+            var getvalue = JSON.parse(localStorage.getItem("getvalue"));
+            console.log(getvalue);
+            document.getElementById('fullName').value = getvalue[1];
+            document.getElementById('addressLine1').value = getvalue[2];
+            document.getElementById('addressLine2').value = getvalue[3];
+            document.getElementById('city').value = getvalue[4];
+            document.getElementById('state').value = getvalue[5];
+            document.getElementById('postcode').value = getvalue[6];
+            document.getElementById('country').value = getvalue[7];
+            document.getElementById('email').value = getvalue[8];
+            document.getElementById('phoneNumber').value = getvalue[9];
+            document.getElementById('LayerNameInput').value = getvalue[10];
+            document.getElementById('select').value = getvalue[11];
+            document.getElementById('message').value = getvalue[12];
+
+            var photoDiv = $("#photo");
+                photoDiv.empty();
+                var editIDSr = "editIDSr=" + getvalue[0];
+                console.log(editIDSr);
+                $.ajax({
+                    url: 'http://localhost:9090/edit',
+                    type: 'GET',
+                    dataType: 'json',
+                    data: editIDSr,
+                    success: function (results) {
+                        if (!results.error) {
+                            globalResults = results;
+                            console.log("results: " + globalResults[0].Layer_Uploader);
+
+                            var list = [];
+                            for (var i = 0; i < globalResults.length; i++) {
+                                var first = {
+                                    id: i,
+                                    size: 561276,
+                                    thumbnailUrl: globalResults[i].Layer_Uploader,
+                                    name: globalResults[i].Layer_Uploader_name
+                                };
+
+                                list.push(first);
+                            }
+                            // console.log("afwefwe: " + qq.supportedFeatures.imagePreviews === true);
+                            console.log("json object array: " + list[0].thumbnailUrl);
+
+                            uploaderPest.addInitialFiles(list);
+                        } else {
+                            console.log("didn't work :(");
+                        }
                     }
-                }
-            });
+                });
+
+                var uploaderPest = new qq.FineUploader({
+                    element: document.getElementById("uploader"),
+                    // debug: true,
+                    request: {
+                        endpoint: 'http://localhost:9090/upload'
+                    },
+                    cors: {
+                        //all requests are expected to be cross-domain requests
+                        expected: true
+
+                        // //if you want cookies to be sent along with the request
+                        // sendCredentials: true
+                    },
+                    deleteFile: {
+                        enabled: true, // defaults to false
+                        endpoint: 'http://localhost:9090/deleteFiles/:uuid'
+                    },
+                    callbacks: {
+                        onComplete: function (id, name, responseJSON) {
+                            console.log(responseJSON.newuuid);
+                            console.log(id + "      " + name);
+                            uploader.setUuid(id, responseJSON.newuuid);
+                            // $.ajax({
+                            //     url: '/submit',
+                            //     type: 'POST',
+                            //     dataType: 'json',
+                            //     async: false,
+                            //     success: function (product) {
+                            //         if (!product.error) {
+                            //             globalPaths = product;
+                            //             console.log("results: " + globalPaths[0].Damage_photo);
+                            //         } else {
+                            //             console.log("you're gonna have a bad time");
+                            //         }
+                            //     }
+                            // })
+                        }
+                    }
+                });
 
             // $("#submit").on("click", function(){
             //
@@ -475,30 +533,6 @@
             //     });
             //
             // });
-
-            var getvalue = JSON.parse(localStorage.getItem("getvalue"));
-            console.log(getvalue);
-            document.getElementById('fullName').value = getvalue[1];
-            document.getElementById('addressLine1').value = getvalue[2];
-            document.getElementById('addressLine2').value = getvalue[3];
-            document.getElementById('city').value = getvalue[4];
-            document.getElementById('state').value = getvalue[5];
-            document.getElementById('postcode').value = getvalue[6];
-            document.getElementById('country').value = getvalue[7];
-            document.getElementById('email').value = getvalue[8];
-            document.getElementById('phoneNumber').value = getvalue[9];
-            document.getElementById('LayerNameInput').value = getvalue[10];
-            document.getElementById('select').value = getvalue[11];
-            document.getElementById('message').value = getvalue[12];
-
-            if(getvalue[13] = "/Users/imac06/WebstormProjects/Node_Shared/temporany_uploadfiles"){
-                fetch(getvalue[13]).then(function (response) {
-                    console.log(response);
-                }).catch(function (err) {
-                    //Error:(
-                });
-
-            }
 
         </script>
     </div>

@@ -20,8 +20,8 @@
     <!--<script src="../src/jquery.form.min.js"></script>-->
     <!-- Change the "src" attribute according to your installation path -->
     <!--<script src="https://cdn.jsdelivr.net/jquery.validation/1.15.1/jquery.validate.min.js"></script>-->
-    <!--<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.17.0/dist/jquery.validate.min.js"></script>-->
-    <script src="../jquery-validation-1.17.0/dist/jquery.validate.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.17.0/dist/jquery.validate.min.js"></script>
+    <!--<script src="../jquery-validation-1.17.0/dist/jquery.validate.js"></script>-->
     <!--<script src="http://malsup.github.com/jquery.form.js"></script>-->
 
     <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>-->
@@ -400,7 +400,7 @@
                 var data = $("#basic").serialize() + "&" + $("#layer").serialize();
                 console.log($("#basic").serialize());
                 $.ajax({
-                    url  : 'http://localhost:9086/submit',
+                    url  : 'http://localhost:9090/submit',
                     method : "post",
                     data : data,
                     dataType: 'json',
@@ -408,7 +408,7 @@
                         console.log(d);
                     }
                 });
-                var frm ="document.getElementsById('form-name')"
+                var frm ="document.getElementsById('form-name')";
                 frm.reset();
             }
 
