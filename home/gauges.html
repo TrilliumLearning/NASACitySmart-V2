@@ -1,0 +1,1271 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <style>
+        body { padding-left:80px; padding-bottom: 300px; word-wrap:break-word;}
+
+        #humidityChart, #temperatureChart, #windspeedChart, #humGraph, #tempGraph, #windGraph {
+            width: 1300px;
+            height: 500px;
+            position: relative;
+        }
+        #myBar {
+            width: 0.1%;
+            height: 76%;
+            background-color: #4CAF50;
+            position: relative;
+            top: 12%;
+            /*left: 6.8%;*/
+        }
+        #g1, #g2, #g3 {
+            width:320px; height:320px;
+            display: inline-block;
+            margin: 1em;
+        }
+        .floatingBox {
+            display: inline-block;
+            /*width:350px;*/
+        }
+        .inputBoxDate {
+            width: 255px;
+            height: 35px;
+        }
+        .button {
+            background-color: #ffffff;
+            border: 2px solid #008CBA;
+            color: #000000;
+            padding: 10px 24px;
+            text-align: center;
+            text-decoration: none;
+            display: inline-block;
+            font-size: 16px;
+            margin: 4px 2px;
+            -webkit-transition-duration: 0.4s;
+            transition-duration: 0.4s;
+            cursor: pointer;
+            border-radius: 4px;
+        }
+        .button:hover {
+            background-color: #008CBA;
+            color: white;
+        }
+        .button1 {
+            background-color: white;
+            color: black;
+            border: 2px solid #b1b1b1;
+        }
+        .button1:hover {
+            background-color: #b1b1b1;
+        }
+        .button2 {
+            background-color: #a7cb9f;
+            border: 2px solid #a7cb9f;
+            color: white;
+        }
+        .button2:hover {
+            background-color: white;
+            color: black;
+            border: 2px solid #a7cb9f;
+        }
+        ::placeholder {
+            font-size: 16px;
+            color: #bbbbbb;
+        }
+        .form-style-8{
+            font-family: 'Helvetica', sans-serif;
+            width: 78%;
+            padding: 30px;
+            background: #FFFFFF;
+            margin: 50px auto;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.22);
+            -moz-box-shadow: 0 0 15px rgba(0, 0, 0, 0.22);
+            -webkit-box-shadow:  0 0 15px rgba(0, 0, 0, 0.22);
+
+        }
+        .form-style-8 h2 {
+            background: #4D4D4D;
+            text-transform: uppercase;
+            font-family: 'Open Sans Condensed', sans-serif;
+            color: #797979;
+            font-size: 18px;
+            font-weight: 100;
+            padding: 20px;
+            margin: -30px -30px 30px -30px;
+        }
+        .form-style-8 h4 {
+            color: #7f7f7f;
+            font-family: 'Helvetica', sans-serif;
+            padding-right: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+<script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/justgage/1.2.9/justgage.min.js"></script>
+<script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script src="//cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<link rel="stylesheet" href="//cdn.datatables.net/buttons/1.4.2/css/buttons.dataTables.min.css">
+<link rel="stylesheet" href="//unpkg.com/flatpickr/dist/flatpickr.min.css">
+<link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
+<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
+<link rel="stylesheet" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+<div id="g1"></div>
+<div id="g2"></div>
+<div id="g3"></div>
+
+<select id="chartMenu">
+    <option value="default">SELECT THE CHART DATA TYPE</option>
+    <option value="humidityChart">HUMIDITY</option>
+    <option value="temperatureChart">TEMPERATURE</option>
+    <option value="windspeedChart">WINDSPEED</option>
+</select>
+
+<div id="default"></div>
+
+<div id="humidityChart" class="group">
+    <div class="form-style-8">
+        <h2>Date Range</h2>
+        <form>
+            <h4 class="floatingBox">Select Start Date:</h4>
+            <input type="date" class="inputBoxDate datePicker date" placeholder="Select Date" />
+            <h4 class="floatingBox">Select End Date:</h4>
+            <input type="date" class="inputBoxDate datePicker date" placeholder="Select Date" />
+            <input type="submit" onclick="enabled = false; query(barType = 'hum');" class="button button2" value="Filter">
+        </form>
+    </div>
+
+    <div class="full"></div>
+
+    <div id="humGraph"></div>
+
+    <div id="humidityFull" class="floatingBox"></div>
+    <div class="floatingBox progressBar">
+        <button class='floatingBox' onclick='enabled = true; barMove();'>Start</button>
+        <button class='floatingBox' onclick='enabled = false; barMove();'>Stop</button>
+    </div>
+
+</div>
+<div id="temperatureChart" class="group">
+    <div class="form-style-8">
+        <h2>Date Range</h2>
+        <form>
+            <h4 class="floatingBox">Select Start Date:</h4>
+            <input type="date" class="inputBoxDate datePicker date" placeholder="Select Date" />
+            <h4 class="floatingBox">Select End Date:</h4>
+            <input type="date" class="inputBoxDate datePicker date" placeholder="Select Date" />
+            <input type="submit" onclick="enabled = false; query(barType = 'temp');" class="button button2" value="Filter">
+        </form>
+    </div>
+
+    <div class="full"></div>
+
+    <div id="tempGraph"></div>
+
+    <div id="temperatureFull" class="floatingBox"></div>
+    <div class="floatingBox progressBar">
+        <button class='floatingBox' onclick='enabled = true; barMove();'>Start</button>
+        <button class='floatingBox' onclick='enabled = false; barMove();'>Stop</button>
+    </div>
+
+</div>
+<div id="windspeedChart" class="group">
+    <div class="form-style-8">
+        <h2>Date Range</h2>
+        <form>
+            <h4 class="floatingBox">Select Start Date:</h4>
+            <input type="date" class="inputBoxDate datePicker date" placeholder="Select Date" />
+            <h4 class="floatingBox">Select End Date:</h4>
+            <input type="date" class="inputBoxDate datePicker date" placeholder="Select Date" />
+            <input type="submit" onclick="enabled = false; query(barType = 'wind');" class="button button2" value="Filter">
+        </form>
+    </div>
+
+    <div class="full"></div>
+
+    <div id="windGraph"></div>
+
+    <div id="windspeedFull" class="floatingBox"></div>
+    <div class="floatingBox progressBar">
+        <button class='floatingBox' onclick='enabled = true; barMove();'>Start</button>
+        <button class='floatingBox' onclick='enabled = false; barMove();'>Stop</button>
+    </div>
+</div>
+
+<div id="demo"></div>
+
+<script>
+    var g1, g2, g3,
+        humidityChart, humidityChart2,
+        temperatureChart, temperatureChart2,
+        windspeedChart, windspeedChart2,
+        barType,
+        Hum_Out = [], Hum_Out2 = [],
+        Temp_Out = [], Temp_Out2 = [],
+        Wind_Speed = [], Wind_Speed2 = [],
+        barPace = 0.1,
+        barPos = BeginBarPos = 6,
+        firstDataBarPos = 6.8,
+        lastDataBarPos = 100,
+        EndBarPos = 100,
+        FirstDataX,
+        LastDataX,
+        minXValue = InitialminXValue = FirstDataX,
+        maxXValue = InitialmaxXValue = LastDataX,
+        barX = InitialbarX = InitialminXValue,
+        xPace = (maxXValue - minXValue) * barPace / (lastDataBarPos - firstDataBarPos),
+        enabled = false,
+        all = true;
+
+    var querystr = "";
+
+    window.onload = function () {
+        $(document).ready(function () {
+            $('.group').hide();
+            $('#default').show();
+            $('#chartMenu').change(function () {
+                $('.group').hide();
+                $('#' + $(this).val()).show();
+
+                if ($(this).val() === "humidityChart") {
+                    barType = 'hum';
+                    enabled = false;
+
+                    $(".full").empty();
+                    humidityChartDisplay();
+                } else if ($(this).val() === "temperatureChart") {
+                    barType = 'temp';
+                    enabled = false;
+
+                    $(".full").empty();
+                    temperatureChartDisplay();
+                } else if ($(this).val() === "windspeedChart") {
+                    barType = 'wind';
+                    enabled = false;
+
+                    $(".full").empty();
+                    windspeedChartDisplay();
+                }
+            })
+        });
+
+        fullDataHum();
+        fullDataTemp();
+        fullDataWind();
+
+        g1 = new JustGage({
+            id: "g1",
+            min: 0,
+            max: 100,
+            title: "Humidity",
+            label: "Percentage"
+        });
+
+        g2 = new JustGage({
+            id: "g2",
+            min: 0,
+            max: 100,
+            title: "Temperature",
+            label: "Degrees Fahrenheit"
+        });
+
+        g3 = new JustGage({
+            id: "g3",
+            min: 0,
+            max: 20,
+            title: "Windspeed",
+            label: "Miles per Hour"
+        });
+
+        flatpickr(".date", {
+            dateFormat: "Z",
+            time_24hr: true
+        });
+
+    };
+
+    function fullDataHum() {
+        $.ajax({
+            url: 'http://localhost:3000/allHum',
+            type: 'GET',
+            dataType: 'json',
+            async: true,
+            data: querystr,
+            success: function (result) {
+                var j = 0;
+                for (var i = 0; i < result.length; i++) {
+                    if (i === result.length - 1) {
+                        if (!!result[i].time) {
+                            if (j === 0) {
+                                Hum_Out.push({ x: new Date(result[i].time), y: result[i].Hum_Out});
+                                j = 1;
+                            } else {
+                                Hum_Out.push({ x: new Date(result[i].time), y: result[i].Hum_Out});
+                            }
+                        }
+                    } else {
+                        if (!!result[i].time) {
+                            if (j === 0) {
+                                Hum_Out.push({ x: new Date(result[i].time), y: result[i].Hum_Out});
+                                j = 1;
+                            } else {
+                                Hum_Out.push({ x: new Date(result[i].time), y: result[i].Hum_Out});
+                            }
+                        }
+
+                    }
+                }
+
+
+
+            }
+        });
+    }
+
+    function fullDataTemp() {
+        $.ajax({
+            url: 'http://localhost:3000/allTemp',
+            type: 'GET',
+            dataType: 'json',
+            async: true,
+            data: querystr,
+            success: function (result) {
+                var j = 0;
+                for (var i = 0; i < result.length; i++) {
+                    if (i === result.length - 1) {
+                        if (!!result[i].time) {
+                            if (j === 0) {
+                                Temp_Out.push({ x: new Date(result[i].time), y: result[i].Temp_Out});
+                                j = 1;
+                            } else {
+                                Temp_Out.push({ x: new Date(result[i].time), y: result[i].Temp_Out});
+                            }
+                        }
+                    } else {
+                        if (!!result[i].time) {
+                            if (j === 0) {
+                                Temp_Out.push({ x: new Date(result[i].time), y: result[i].Temp_Out});
+                                j = 1;
+                            } else {
+                                Temp_Out.push({ x: new Date(result[i].time), y: result[i].Temp_Out});
+                            }
+                        }
+
+                    }
+                }
+
+
+
+            }
+        });
+    }
+
+    function fullDataWind() {
+        $.ajax({
+            url: 'http://localhost:3000/allWind',
+            type: 'GET',
+            dataType: 'json',
+            async: true,
+            data: querystr,
+            success: function (result) {
+                var j = 0;
+                for (var i = 0; i < result.length; i++) {
+                    if (i === result.length - 1) {
+                        if (!!result[i].time) {
+                            if (j === 0) {
+                                Wind_Speed.push({ x: new Date(result[i].time), y: result[i].Wind_Speed});
+                                j = 1;
+                            } else {
+                                Wind_Speed.push({ x: new Date(result[i].time), y: result[i].Wind_Speed});
+                            }
+                        }
+                    } else {
+                        if (!!result[i].time) {
+                            if (j === 0) {
+                                Wind_Speed.push({ x: new Date(result[i].time), y: result[i].Wind_Speed});
+                                j = 1;
+                            } else {
+                                Wind_Speed.push({ x: new Date(result[i].time), y: result[i].Wind_Speed});
+                            }
+                        }
+
+                    }
+                }
+
+
+
+            }
+        });
+    }
+
+    function humidityChartDisplay() {
+        $(".full").empty();
+        $("#humidityFull").empty();
+        $("#humidityFull").append("<button id='humidityFull' class='button' onclick='enabled = false; humidityChartDisplay();'>Full Data Results</button>");
+
+        $(".progressBar").empty();
+        $(".progressBar").append("<button class='floatingBox button button1' onclick='enabled = true; barMove();'>Start</button><button class='floatingBox button button1' onclick='enabled = false; barMove();'>Stop</button>");
+
+        flatpickr(".date", {
+            dateFormat: "Z",
+            time_24hr: true
+        });
+
+        console.log(Hum_Out);
+        barType = 'hum';
+        FirstDataX = Hum_Out[0].x.getTime();
+        LastDataX = Hum_Out[Hum_Out.length-1].x.getTime();
+        minXValue = InitialminXValue = FirstDataX;
+        maxXValue = InitialmaxXValue = LastDataX;
+        barX = InitialbarX = InitialminXValue;
+        xPace = (maxXValue - minXValue) * barPace / (lastDataBarPos - firstDataBarPos);
+
+        humidityChart = new CanvasJS.Chart("humGraph", {
+            animationEnabled: true,
+            zoomEnabled: true,
+            zoomType: "xy",
+            rangeChanged: function(e) {
+                if(e.trigger !== "reset") {
+                    minXValue = new Date(e.axisX[0].viewportMinimum).getTime();
+                    maxXValue = new Date(e.axisX[0].viewportMaximum).getTime();
+                    minYValue = e.axisY[0].viewportMinimum;
+                    maxYValue = e.axisY[0].viewportMaximum;
+
+                    barPos = firstDataBarPos = BeginBarPos;
+                    lastDataBarPos = EndBarPos;
+                    barX = InitialbarX = minXValue;
+                    xPace = (maxXValue - minXValue) * barPace / (lastDataBarPos - firstDataBarPos);
+                    enabled = true;
+
+                    barMove();
+
+                } else {
+                    minXValue = InitialminXValue;
+                    maxXValue = InitialmaxXValue;
+                    minYValue = "";
+                    maxYValue = "";
+
+                    barPos = BeginBarPos;
+                    firstDataBarPos = 6.8;
+                    lastDataBarPos = 100;
+                    barX = InitialbarX = minXValue;
+                    xPace = (maxXValue - minXValue) * barPace / (lastDataBarPos - firstDataBarPos);
+                    enabled = true;
+
+                    barMove();
+
+                }
+            },
+            title:{
+                text: "Minutely Humidity Percentage at Northern Academy of the Arts"
+            },
+            axisX: {
+                valueFormatString: "DD MMM,YY",
+                labelFontSize: 15
+            },
+            axisY: {
+                title: "Humidity (in %)",
+                includeZero: false,
+                suffix: "%",
+                labelFontSize: 15
+            },
+            legend:{
+                cursor: "pointer",
+                fontSize: 16,
+                itemclick: toggleDataSeries
+            },
+            toolTip:{
+                shared: true
+            },
+            data: [{
+                name: "Humidity",
+                type: "line",
+                connectNullData: true,
+                yValueFormatString: "#'%'",
+                showInLegend: true,
+                dataPoints: Hum_Out
+            }]
+        });
+
+        humidityChart.render();
+
+
+        function toggleDataSeries(e){
+            if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+                e.dataSeries.visible = false;
+            }
+            else{
+                e.dataSeries.visible = true;
+            }
+            humidityChart.render();
+        }
+    }
+
+    function temperatureChartDisplay() {
+        $(".full").empty();
+        $("#temperatureFull").empty();
+        $("#temperatureFull").append("<button id='temperatureFull'class='button' onclick='enabled = false; temperatureChartDisplay();'>Full Data Results</button>");
+
+        $(".progressBar").empty();
+        $(".progressBar").append("<button class='floatingBox button button1' onclick='enabled = true; barMove();'>Start</button><button class='floatingBox button button1' onclick='enabled = false; barMove();'>Stop</button>");
+
+        flatpickr(".date", {
+            dateFormat: "Z",
+            time_24hr: true
+        });
+
+        console.log(Temp_Out);
+        barType = 'temp';
+        FirstDataX = Temp_Out[0].x.getTime();
+        LastDataX = Temp_Out[Temp_Out.length-1].x.getTime();
+        minXValue = InitialminXValue = FirstDataX;
+        maxXValue = InitialmaxXValue = LastDataX;
+        barX = InitialbarX = InitialminXValue;
+        xPace = (maxXValue - minXValue) * barPace / (lastDataBarPos - firstDataBarPos);
+
+        temperatureChart = new CanvasJS.Chart("tempGraph", {
+            animationEnabled: true,
+            zoomEnabled: true,
+            zoomType: "xy",
+            rangeChanged: function(e) {
+                if(e.trigger !== "reset") {
+                    minXValue = new Date(e.axisX[0].viewportMinimum).getTime();
+                    maxXValue = new Date(e.axisX[0].viewportMaximum).getTime();
+                    minYValue = e.axisY[0].viewportMinimum;
+                    maxYValue = e.axisY[0].viewportMaximum;
+
+                    barPos = firstDataBarPos = BeginBarPos;
+                    lastDataBarPos = EndBarPos;
+                    barX = InitialbarX = minXValue;
+                    xPace = (maxXValue - minXValue) * barPace / (lastDataBarPos - firstDataBarPos);
+                    enabled = true;
+
+                    barMove();
+
+                } else {
+                    minXValue = InitialminXValue;
+                    maxXValue = InitialmaxXValue;
+                    minYValue = "";
+                    maxYValue = "";
+
+                    barPos = BeginBarPos;
+                    firstDataBarPos = 6.8;
+                    lastDataBarPos = 100;
+                    barX = InitialbarX = minXValue;
+                    xPace = (maxXValue - minXValue) * barPace / (lastDataBarPos - firstDataBarPos);
+                    enabled = true;
+
+                    barMove();
+
+                }
+            },
+            title:{
+                text: "Minutely Temperature at Northern Academy of the Arts"
+            },
+            axisX: {
+                valueFormatString: "DD MMM,YY",
+                labelFontSize: 15
+            },
+            axisY: {
+                title: "Temperature (in °F)",
+                includeZero: false,
+                suffix: "°F",
+                labelFontSize: 15
+            },
+            legend:{
+                cursor: "pointer",
+                fontSize: 16,
+                itemclick: toggleDataSeries
+            },
+            toolTip:{
+                shared: true
+            },
+            data: [{
+                name: "Temperature",
+                type: "line",
+                connectNullData: true,
+                yValueFormatString: "0.00 °F",
+                showInLegend: true,
+                dataPoints: Temp_Out
+            }]
+        });
+
+        temperatureChart.render();
+
+
+        function toggleDataSeries(e){
+            if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+                e.dataSeries.visible = false;
+            }
+            else{
+                e.dataSeries.visible = true;
+            }
+            temperatureChart.render();
+        }
+    }
+
+    function windspeedChartDisplay() {
+        $(".full").empty();
+        $("#windspeedFull").empty();
+        $("#windspeedFull").append("<button id='windspeedFull'class='button' onclick='enabled = false; windspeedChartDisplay();'>Full Data Results</button>");
+
+        $(".progressBar").empty();
+        $(".progressBar").append("<button class='floatingBox button button1' onclick='enabled = true; barMove();'>Start</button><button class='floatingBox button button1' onclick='enabled = false; barMove();'>Stop</button>");
+
+        flatpickr(".date", {
+            dateFormat: "Z",
+            time_24hr: true
+        });
+
+        console.log(Wind_Speed);
+        barType = 'wind';
+        FirstDataX = Wind_Speed[0].x.getTime();
+        LastDataX = Wind_Speed[Wind_Speed.length-1].x.getTime();
+        minXValue = InitialminXValue = FirstDataX;
+        maxXValue = InitialmaxXValue = LastDataX;
+        barX = InitialbarX = InitialminXValue;
+        xPace = (maxXValue - minXValue) * barPace / (lastDataBarPos - firstDataBarPos);
+
+        windspeedChart = new CanvasJS.Chart("windGraph", {
+            animationEnabled: true,
+            zoomEnabled: true,
+            zoomType: "xy",
+            rangeChanged: function(e) {
+                if(e.trigger !== "reset") {
+                    minXValue = new Date(e.axisX[0].viewportMinimum).getTime();
+                    maxXValue = new Date(e.axisX[0].viewportMaximum).getTime();
+                    minYValue = e.axisY[0].viewportMinimum;
+                    maxYValue = e.axisY[0].viewportMaximum;
+
+                    barPos = firstDataBarPos = BeginBarPos;
+                    lastDataBarPos = EndBarPos;
+                    barX = InitialbarX = minXValue;
+                    xPace = (maxXValue - minXValue) * barPace / (lastDataBarPos - firstDataBarPos);
+                    enabled = true;
+
+                    barMove();
+
+                } else {
+                    minXValue = InitialminXValue;
+                    maxXValue = InitialmaxXValue;
+                    minYValue = "";
+                    maxYValue = "";
+
+                    barPos = BeginBarPos;
+                    firstDataBarPos = 6.8;
+                    lastDataBarPos = 100;
+                    barX = InitialbarX = minXValue;
+                    xPace = (maxXValue - minXValue) * barPace / (lastDataBarPos - firstDataBarPos);
+                    enabled = true;
+
+                    barMove();
+
+                }
+            },
+            title:{
+                text: "Minutely Windspeed at Northern Academy of the Arts"
+            },
+            axisX: {
+                valueFormatString: "DD MMM,YY",
+                labelFontSize: 15
+            },
+            axisY: {
+                title: "Windspeed (in miles per hour)",
+                includeZero: false,
+                suffix: " mph",
+                labelFontSize: 15
+            },
+            legend:{
+                cursor: "pointer",
+                fontSize: 16,
+                itemclick: toggleDataSeries
+            },
+            toolTip:{
+                shared: true
+            },
+            data: [{
+                name: "Windspeed",
+                type: "line",
+                connectNullData: true,
+                yValueFormatString: "#' mph'",
+                showInLegend: true,
+                dataPoints: Wind_Speed
+            }]
+        });
+
+        windspeedChart.render();
+
+
+        function toggleDataSeries(e){
+            if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+                e.dataSeries.visible = false;
+            }
+            else{
+                e.dataSeries.visible = true;
+            }
+            windspeedChart.render();
+        }
+    }
+
+    function humidityChartDisplay2() {
+        $(".full").remove();
+        $("#humidityFull").empty();
+        $("#humidityFull").append("<button id='humidityFull'class='button' onclick='enabled = false; humidityChartDisplay();'>Full Data Results</button>");
+
+        $(".progressBar").empty();
+        $(".progressBar").append("<button class='floatingBox button button1' onclick='enabled = true; barMove();'>Start</button><button class='floatingBox button button1' onclick='enabled = false; barMove();'>Stop</button>");
+
+
+        flatpickr(".date", {
+            dateFormat: "Z",
+            time_24hr: true
+        });
+
+        console.log(Hum_Out2);
+        barType = "hum";
+        FirstDataX = Hum_Out2[0].x.getTime();
+        LastDataX = Hum_Out2[Hum_Out2.length-1].x.getTime();
+        minXValue = InitialminXValue = FirstDataX;
+        maxXValue = InitialmaxXValue = LastDataX;
+        barX = InitialbarX = InitialminXValue;
+        xPace = (maxXValue - minXValue) * barPace / (lastDataBarPos - firstDataBarPos);
+
+        humidityChart2 = new CanvasJS.Chart("humGraph", {
+            animationEnabled: true,
+            zoomEnabled: true,
+            zoomType: "xy",
+            rangeChanged: function(e) {
+                if(e.trigger !== "reset") {
+                    minXValue = new Date(e.axisX[0].viewportMinimum).getTime();
+                    maxXValue = new Date(e.axisX[0].viewportMaximum).getTime();
+                    minYValue = e.axisY[0].viewportMinimum;
+                    maxYValue = e.axisY[0].viewportMaximum;
+
+                    barPos = firstDataBarPos = BeginBarPos;
+                    lastDataBarPos = EndBarPos;
+                    barX = InitialbarX = minXValue;
+                    xPace = (maxXValue - minXValue) * barPace / (lastDataBarPos - firstDataBarPos);
+                    enabled = true;
+
+                    barMove();
+
+                } else {
+                    minXValue = InitialminXValue;
+                    maxXValue = InitialmaxXValue;
+                    minYValue = "";
+                    maxYValue = "";
+
+                    barPos = BeginBarPos;
+                    firstDataBarPos = 6.8;
+                    lastDataBarPos = 100;
+                    barX = InitialbarX = minXValue;
+                    xPace = (maxXValue - minXValue) * barPace / (lastDataBarPos - firstDataBarPos);
+                    enabled = true;
+
+                    barMove();
+
+                }
+            },
+            title:{
+                text: "Minutely Humidity Percentage at Northern Academy of the Arts"
+            },
+            axisX: {
+                valueFormatString: "DD MMM,YY",
+                labelFontSize: 15
+            },
+            axisY: {
+                title: "Humidity (in %)",
+                includeZero: false,
+                suffix: "%",
+                labelFontSize: 15
+            },
+            legend:{
+                cursor: "pointer",
+                fontSize: 16,
+                itemclick: toggleDataSeries
+            },
+            toolTip:{
+                shared: true
+            },
+            data: [{
+                name: "Humidity",
+                type: "line",
+                yValueFormatString: "#'%'",
+                showInLegend: true,
+                dataPoints: Hum_Out2
+            }]
+        });
+
+        humidityChart2.render();
+
+
+        function toggleDataSeries(e){
+            if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+                e.dataSeries.visible = false;
+            }
+            else{
+                e.dataSeries.visible = true;
+            }
+            humidityChart2.render();
+        }
+    }
+
+    function temperatureChartDisplay2() {
+        $(".full").remove();
+        $("#temperatureFull").empty();
+        $("#temperatureFull").append("<button id='temperatureFull'class='button' onclick='enabled = false; temperatureChartDisplay();'>Full Data Results</button>");
+
+        $(".progressBar").empty();
+        $(".progressBar").append("<button class='floatingBox button button1' onclick='enabled = true; barMove();'>Start</button><button class='floatingBox button button1' onclick='enabled = false; barMove();'>Stop</button>");
+
+        flatpickr(".date", {
+            dateFormat: "Z",
+            time_24hr: true
+        });
+
+        console.log(Temp_Out2);
+        barType = 'temp';
+        FirstDataX = Temp_Out2[0].x.getTime();
+        LastDataX = Temp_Out2[Temp_Out2.length-1].x.getTime();
+        minXValue = InitialminXValue = FirstDataX;
+        maxXValue = InitialmaxXValue = LastDataX;
+        barX = InitialbarX = InitialminXValue;
+        xPace = (maxXValue - minXValue) * barPace / (lastDataBarPos - firstDataBarPos);
+
+        temperatureChart2 = new CanvasJS.Chart("tempGraph", {
+            animationEnabled: true,
+            zoomEnabled: true,
+            zoomType: "xy",
+            rangeChanged: function(e) {
+                if(e.trigger !== "reset") {
+                    minXValue = new Date(e.axisX[0].viewportMinimum).getTime();
+                    maxXValue = new Date(e.axisX[0].viewportMaximum).getTime();
+                    minYValue = e.axisY[0].viewportMinimum;
+                    maxYValue = e.axisY[0].viewportMaximum;
+
+                    barPos = firstDataBarPos = BeginBarPos;
+                    lastDataBarPos = EndBarPos;
+                    barX = InitialbarX = minXValue;
+                    xPace = (maxXValue - minXValue) * barPace / (lastDataBarPos - firstDataBarPos);
+                    enabled = true;
+
+                    barMove();
+
+                } else {
+                    minXValue = InitialminXValue;
+                    maxXValue = InitialmaxXValue;
+                    minYValue = "";
+                    maxYValue = "";
+
+                    barPos = BeginBarPos;
+                    firstDataBarPos = 6.8;
+                    lastDataBarPos = 100;
+                    barX = InitialbarX = minXValue;
+                    xPace = (maxXValue - minXValue) * barPace / (lastDataBarPos - firstDataBarPos);
+                    enabled = true;
+
+                    barMove();
+
+                }
+            },
+            title:{
+                text: "Minutely Temperature at Northern Academy of the Arts"
+            },
+            axisX: {
+                valueFormatString: "DD MMM,YY",
+                labelFontSize: 15
+            },
+            axisY: {
+                title: "Temperature (in °F)",
+                includeZero: false,
+                suffix: "°F",
+                labelFontSize: 15
+            },
+            legend:{
+                cursor: "pointer",
+                fontSize: 16,
+                itemclick: toggleDataSeries
+            },
+            toolTip:{
+                shared: true
+            },
+            data: [{
+                name: "Temperature",
+                type: "line",
+                yValueFormatString: "0.00 °F",
+                showInLegend: true,
+                dataPoints: Temp_Out2
+            }]
+        });
+
+        temperatureChart2.render();
+
+
+        function toggleDataSeries(e){
+            if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+                e.dataSeries.visible = false;
+            }
+            else{
+                e.dataSeries.visible = true;
+            }
+            temperatureChart2.render();
+        }
+    }
+
+    function windspeedChartDisplay2() {
+        $(".full").empty();
+        $("#windspeedFull").empty();
+        $("#windspeedFull").append("<button id='windspeedFull'class='button' onclick='enabled = false; windspeedChartDisplay();'>Full Data Results</button>");
+
+        $(".progressBar").empty();
+        $(".progressBar").append("<button class='floatingBox button button1' onclick='enabled = true; barMove();'>Start</button><button class='floatingBox button button1' onclick='enabled = false; barMove();'>Stop</button>");
+
+        flatpickr(".date", {
+            dateFormat: "Z",
+            time_24hr: true
+        });
+
+        console.log(Wind_Speed2);
+        barType = 'wind';
+        FirstDataX = Wind_Speed2[0].x.getTime();
+        LastDataX = Wind_Speed2[Wind_Speed2.length-1].x.getTime();
+        minXValue = InitialminXValue = FirstDataX;
+        maxXValue = InitialmaxXValue = LastDataX;
+        barX = InitialbarX = InitialminXValue;
+        xPace = (maxXValue - minXValue) * barPace / (lastDataBarPos - firstDataBarPos);
+
+
+        windspeedChart2 = new CanvasJS.Chart("windGraph", {
+            animationEnabled: true,
+            zoomEnabled: true,
+            zoomType: "xy",
+            rangeChanged: function(e) {
+                if(e.trigger !== "reset") {
+                    minXValue = new Date(e.axisX[0].viewportMinimum).getTime();
+                    maxXValue = new Date(e.axisX[0].viewportMaximum).getTime();
+                    minYValue = e.axisY[0].viewportMinimum;
+                    maxYValue = e.axisY[0].viewportMaximum;
+
+                    barPos = firstDataBarPos = BeginBarPos;
+                    lastDataBarPos = EndBarPos;
+                    barX = InitialbarX = minXValue;
+                    xPace = (maxXValue - minXValue) * barPace / (lastDataBarPos - firstDataBarPos);
+                    enabled = true;
+
+                    barMove();
+
+                } else {
+                    minXValue = InitialminXValue;
+                    maxXValue = InitialmaxXValue;
+                    minYValue = "";
+                    maxYValue = "";
+
+                    barPos = BeginBarPos;
+                    firstDataBarPos = 6.8;
+                    lastDataBarPos = 100;
+                    barX = InitialbarX = minXValue;
+                    xPace = (maxXValue - minXValue) * barPace / (lastDataBarPos - firstDataBarPos);
+                    enabled = true;
+
+                    barMove();
+
+                }
+            },
+            title:{
+                text: "Minutely Windspeed at Northern Academy of the Arts"
+            },
+            axisX: {
+                valueFormatString: "DD MMM,YY",
+                labelFontSize: 15
+            },
+            axisY: {
+                title: "Windspeed (in miles per hour)",
+                includeZero: false,
+                suffix: " mph",
+                labelFontSize: 15
+            },
+            legend:{
+                cursor: "pointer",
+                fontSize: 16,
+                itemclick: toggleDataSeries
+            },
+            toolTip:{
+                shared: true
+            },
+            data: [{
+                name: "Windspeed",
+                type: "line",
+                connectNullData: true,
+                yValueFormatString: "#' mph'",
+                showInLegend: true,
+                dataPoints: Wind_Speed2
+            }]
+        });
+
+        windspeedChart2.render();
+
+
+        function toggleDataSeries(e){
+            if (typeof(e.dataSeries.visible) === "undefined" || e.dataSeries.visible) {
+                e.dataSeries.visible = false;
+            }
+            else{
+                e.dataSeries.visible = true;
+            }
+            windspeedChart2.render();
+        }
+    }
+
+    function barMove() {
+
+        $("#myBar").remove();
+        if (barType === "hum") {
+            $("#humGraph").append($("<div id='myBar'></div>"));
+        } else if (barType === "temp") {
+            $("#tempGraph").append($("<div id='myBar'></div>"));
+        } else {
+            $("#windGraph").append($("<div id='myBar'></div>"));
+        }
+        var elem = document.getElementById("myBar");
+        var v1, v2, v3;
+        var id = setInterval(frame, 25);
+
+        console.log(barX);
+
+        function frame() {
+            if (enabled === true) {
+                if (barPos >= EndBarPos) {
+                    barPos = BeginBarPos;
+                    elem.style.left = barPos + '%';
+                    barX = InitialbarX;
+
+                } else {
+                    if (barPos < firstDataBarPos) {
+                        barPos = Math.round((barPos + barPace) * 10) / 10;
+                        elem.style.left = barPos + '%';
+
+                        v1 = 0;
+                        v2 = 0;
+                        v3 = 0;
+
+                        g1.refresh(v1);
+                        g2.refresh(v2);
+                        g3.refresh(v3);
+
+                    } else {
+                        barPos = Math.round((barPos + barPace) * 10) / 10;
+                        elem.style.left = barPos + '%';
+
+                        barX += xPace;
+
+                        if (barType === "hum") {
+                            if (barX < FirstDataX) {
+                                v1 = 0;
+                            } else if (barX >= LastDataX) {
+                                v1 = Hum_Out[Hum_Out.length - 1].y;
+                            } else {
+                                for (var i = 1; i < Hum_Out.length; i++) {
+                                    if (barX >= Hum_Out[i - 1].x.getTime() && barX < Hum_Out[i].x.getTime()) {
+                                        v1 = Hum_Out[i - 1].y;
+                                    }
+                                }
+                            }
+                            g1.refresh(v1);
+
+                        } else if (barType === "temp") {
+                            if (barX < FirstDataX) {
+                                v2 = 0;
+
+                            } else if (barX >= LastDataX) {
+                                v2 = Temp_Out[Temp_Out.length - 1].y;
+
+                            } else {
+                                for (var i = 1; i < Temp_Out.length; i++) {
+                                    if (barX >= Temp_Out[i - 1].x.getTime() && barX < Temp_Out[i].x.getTime()) {
+                                        v2 = Temp_Out[i - 1].y;
+                                    }
+                                }
+                            }
+                            g2.refresh(v2);
+
+                        } else {
+                            if (barX < FirstDataX) {
+                                v3 = 0;
+
+                            } else if (barX >= LastDataX) {
+                                v3 = Wind_Speed[WindSpeed.length - 1].y;
+
+                            } else {
+                                for (var i = 1; i < Wind_Speed.length; i++) {
+                                    if (barX >= Wind_Speed[i - 1].x.getTime() && barX < Wind_Speed[i].x.getTime()) {
+                                        v3 = Wind_Speed[i - 1].y;
+                                    }
+                                }
+                            }
+                            g3.refresh(v3);
+
+                        }
+
+                    }
+                }
+            } else {
+                barPos = firstDataBarPos = BeginBarPos;
+                lastDataBarPos = EndBarPos;
+                elem.style.left = barPos + '%';
+                barX = InitialbarX;xPace = (maxXValue - minXValue) * barPace / (lastDataBarPos - firstDataBarPos);
+                g1.refresh(0);
+                g2.refresh(0);
+                g3.refresh(0);
+            }
+        }
+    }
+
+    function query() {
+        if (barType === 'hum') {
+            var timeFrom = document.getElementsByClassName("datePicker")[0].value;
+            var timeTo = document.getElementsByClassName("datePicker")[1].value;
+        } else if (barType === 'temp') {
+            timeFrom = document.getElementsByClassName("datePicker")[2].value;
+            timeTo = document.getElementsByClassName("datePicker")[3].value;
+        } else {
+            timeFrom = document.getElementsByClassName("datePicker")[4].value;
+            timeTo = document.getElementsByClassName("datePicker")[5].value;
+        }
+
+        querystr = "timeFrom=" + timeFrom + "&timeTo=" + timeTo;
+
+        if (timeFrom && timeTo) {
+            queryAndDisplay(querystr);
+        } else {
+            confirm("Please select BOTH dates.");
+        }
+    }
+
+    var queryAndDisplay = function (querystr) {
+        $("<button onclick='enabled = true; barMove();'>Start</button>").remove();
+
+        if (barType === "hum"){
+            $.ajax({
+                url: 'http://localhost:3000/newHum',
+                type: 'GET',
+                dataType: 'json',
+                async: true,
+                data: querystr,
+                success: function (result) {
+                    Hum_Out2 = [];
+                    var j = 0;
+                    for (var i = 0; i < result.length; i++) {
+                        if (i === result.length - 1) {
+                            if (!!result[i].time) {
+                                if (j === 0) {
+                                    Hum_Out2.push({ x: new Date(result[i].time), y: result[i].Hum_Out});
+                                    j = 1;
+                                } else {
+                                    Hum_Out2.push({ x: new Date(result[i].time), y: result[i].Hum_Out});
+                                }
+                            }
+                        } else {
+                            if (!!result[i].time) {
+                                if (j === 0) {
+                                    Hum_Out2.push({ x: new Date(result[i].time), y: result[i].Hum_Out});
+                                    j = 1;
+                                } else {
+                                    Hum_Out2.push({ x: new Date(result[i].time), y: result[i].Hum_Out});
+                                }
+                            }
+
+                        }
+                    }
+
+                    humidityChartDisplay2();
+
+                }
+            });
+
+        } else if (barType === "temp") {
+            $.ajax({
+                url: 'http://localhost:3000/newTemp',
+                type: 'GET',
+                dataType: 'json',
+                async: true,
+                data: querystr,
+                success: function (result) {
+                    Temp_Out2 = [];
+                    var j = 0;
+                    for (var i = 0; i < result.length; i++) {
+                        if (i === result.length - 1) {
+                            if (!!result[i].time) {
+                                if (j === 0) {
+                                    Temp_Out2.push({ x: new Date(result[i].time), y: result[i].Temp_Out});
+                                    j = 1;
+                                } else {
+                                    Temp_Out2.push({ x: new Date(result[i].time), y: result[i].Temp_Out});
+                                }
+                            }
+                        } else {
+                            if (!!result[i].time) {
+                                if (j === 0) {
+                                    Temp_Out2.push({ x: new Date(result[i].time), y: result[i].Temp_Out});
+                                    j = 1;
+                                } else {
+                                    Temp_Out2.push({ x: new Date(result[i].time), y: result[i].Temp_Out});
+                                }
+                            }
+
+                        }
+                    }
+
+                    temperatureChartDisplay2();
+
+                }
+            });
+        } else {
+            $.ajax({
+                url: 'http://localhost:3000/newWind',
+                type: 'GET',
+                dataType: 'json',
+                async: true,
+                data: querystr,
+                success: function (result) {
+                    Wind_Speed2 = [];
+                    var j = 0;
+                    for (var i = 0; i < result.length; i++) {
+                        if (i === result.length - 1) {
+                            if (!!result[i].time) {
+                                if (j === 0) {
+                                    Wind_Speed2.push({ x: new Date(result[i].time), y: result[i].Wind_Speed});
+                                    j = 1;
+                                } else {
+                                    Wind_Speed2.push({ x: new Date(result[i].time), y: result[i].Wind_Speed});
+                                }
+                            }
+                        } else {
+                            if (!!result[i].time) {
+                                if (j === 0) {
+                                    Wind_Speed2.push({ x: new Date(result[i].time), y: result[i].Wind_Speed});
+                                    j = 1;
+                                } else {
+                                    Wind_Speed2.push({ x: new Date(result[i].time), y: result[i].Wind_Speed});
+                                }
+                            }
+
+                        }
+                    }
+
+                    windspeedChartDisplay2();
+
+                }
+            });
+        }
+    }
+
+</script>
+</body>
+</html>
