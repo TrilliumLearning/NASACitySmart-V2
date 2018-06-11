@@ -5,6 +5,7 @@ $(document).ready(function () {
         url: "http://localhost:9090/CountryList",
         dataType: 'json',
         success: function (results) {
+            console.log(results);
             for (i = 0; i < results.length; i++) {
                 option.text = results[i].CountryName;
                 x.add(option);
@@ -50,6 +51,7 @@ $(document).ready(function () {
 // // }
 //
 function ChangeSelectList(countrylevel) {
+    console.log(countrylevel);
     var stateList = document.getElementById("myListState");
     while (stateList.options.length) {
         stateList.remove(0);
@@ -62,17 +64,17 @@ function ChangeSelectList(countrylevel) {
             console.log(results);
             var option;
             for (var i = 0; i < Array.length; i++) {
-                if (countrylevel === Array[i].Country) {
-                    for(var j = 5; j < Array.length; j++) {
-                        option = new Option(Array[j].State, Array[j].State);
+                if (countrylevel === Array[i].CountryName) {
+                    for(var j = 1; j < Array.length; j++) {
+                        option = new Option(Array[j].StateName, Array[j].StateName);
                         stateList.add(option);
                         $('.Menu').hide();
                         document.getElementById("myListState").disabled = false;
                         document.getElementById("myListState").style.backgroundColor = "white";
                     }
-                    if (countrylevel === "All Layer") {
+                    if (countrylevel === "AL") {
                         $('.Menu').show();
-                        document.getElementById("myListStat").disabled = true;
+                        document.getElementById("myListState").disabled = true;
                         document.getElementById("myListState").style.backgroundColor = "lightgray";
                         document.getElementById("myListCity").disabled = true;
                         document.getElementById("myListCity").style.backgroundColor = "lightgray";
