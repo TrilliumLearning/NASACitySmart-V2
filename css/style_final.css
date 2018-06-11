@@ -133,13 +133,11 @@ input[type='text'], select, .inputNumber {
 }
 
 #message{
-    width:63%;
+    /*width:226%;*/
     /*padding: 5px 20px 60px;*/
-
-    margin-left: 35%;
     border: 1px solid GREY;
     font:inherit;
-
+    border-radius: 3px;
 }
 
 .glyphicon-upload{
@@ -235,7 +233,10 @@ input[type='text'], select, .inputNumber {
     margin: 60px auto;
     position: relative;
     padding: 50px;
+    font-family: Arial, Helvetica, sans-serif;
+
 }
+
 
 #title {
     color: #474544;

@@ -174,10 +174,8 @@
             background-color: #ff758f;
             color:white;
         }
-        .name{
-            float:left;
 
-        }
+
     </style>
 
 </head>
@@ -329,7 +327,11 @@
                         </div>
                         <div class="form-group">
                             <label class="col-md-4 control-label">Layer Description</label>
-                            <textarea class="form-control" id="message" name="Layer_Description" placeholder="Enter your description here..." required type="text" rows="6" maxlength="140"></textarea>
+                                <div class="col-md-8 inputGroupContainer">
+                                    <div>
+                                        <textarea class="form-control" id="message" name="Layer_Description" placeholder="Enter your description here..." required type="text" rows="6" maxlength="140"></textarea>
+                                    </div>
+                                </div>
                         </div>
                         <div class="form-group">
                             <label  class="col-md-4 control-label">Layer Uploader</label>
@@ -409,8 +411,6 @@
                         console.log(d);
                     }
                 });
-                var frm ="document.getElementsById('form-name')"
-                frm.reset();
             }
 
             // function clearForm(){
@@ -442,11 +442,7 @@
                             // by the built-in "email" rule
                             email: true
                         },
-                        Phone_Number: "required",
-                        Layer_Name:"required",
-                        Layer_Category:"required",
-                        Layer_Description:"required",
-                        Layer_Uploader:"required"
+                        Phone_Number: "required"
                     },
                     // Specify validation error messages
                     messages: {
@@ -457,17 +453,13 @@
                         PostalCode_ZIP: "Please enter your postal code/ZIP",
                         Country: "Please enter your country",
                         Email: "Please enter a valid email address",
-                        Phone_Number: "Please enter your phone number",
-                        Layer_Name:"Please enter the layer name",
-                        Layer_Category:"Please select the layer category",
-                        Layer_Description:"Please write the description of the layer",
-                        Layer_Uploader:"Please upload the layer files"
+                        Phone_Number: "Please enter your phone number"
                     },
 
-                    invalidHandler: function(event) {
-                        console.log("1234");
-                        $(".error").css("color", "blue");
-                    },
+                    // invalidHandler: function(event) {
+                    //     console.log("1234");
+                    //     $(".error").css("color", "blue");
+                    // },
 
                     // Make sure the form is submitted to the destination defined
                     // in the "action" attribute of the form when valid
@@ -491,15 +483,15 @@
                     // Specify validation error messages
                     messages: {
                         Layer_Name: "Please enter the layer name",
-                        Layer_Category: "Please enter the layer category",
-                        Layer_Description: "Please enter the description",
+                        Layer_Category: "Please select the layer category",
+                        Layer_Description: "Please write the description of the layer",
                         Layer_Uploader:"Please upload your layer"
                     },
 
-                    invalidHandler: function(event) {
-                        console.log("5678");
-                        $(".error").css("color", "red");
-                    },
+                    // invalidHandler: function(event) {
+                    //     console.log("5678");
+                    //     $(".error").css("color", "red");
+                    // },
 
                     // Make sure the form is submitted to the destination defined
                     // in the "action" attribute of the form when valid
