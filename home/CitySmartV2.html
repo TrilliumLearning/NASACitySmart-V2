@@ -60,7 +60,7 @@
                     } else {
                         msg = 'Uncaught Error.\n' + jqXHR.responseText;
                     }
-                    alert(msg);
+                    // alert(msg);
                     console.log(msg);
 
                 }
@@ -99,7 +99,7 @@
                     } else {
                         msg = 'Uncaught Error.\n' + jqXHR.responseText;
                     }
-                    alert(msg);
+                    // alert(msg);
                     console.log("s" + msg);
                 }
             });
@@ -136,7 +136,7 @@
                     } else {
                         msg = 'Uncaught Error.\n' + jqXHR.responseText;
                     }
-                    alert(msg);
+                    // alert(msg);
                     console.log("t" + msg);
                 }
             });
@@ -173,7 +173,7 @@
                     } else {
                         msg = 'Uncaught Error.\n' + jqXHR.responseText;
                     }
-                    alert(msg);
+                    // alert(msg);
                     console.log("sds" + msg)
 
                 }
@@ -596,16 +596,24 @@
                 <div>
                     <p>
                         <select id="myListCountry"  style="width:180px; height:21px; background:white" onchange="ChangeSelectList(this.value)">
-                            <option selected="selected">All Layer</option>
+                            <option selected="selected" value="AL">All Layer</option>
+                            <!--<option>United States of America</option>-->
                             <!--<option value="AL" selected="selected" class="a">All Layer</option>-->
-                            <option>United States of America</option>
                         </select>
                     </p>
                 </div>
                 <div>
                     <p>
-                        <select id="myListCity"  style="width:180px; height:21px; background:lightgray" disabled onchange="ChangeLayerList(this.value)">
-                            <option selected="selected">All Layer</option>
+                        <select id="myListState"  style="width:180px; height:21px; background:lightgray" onchange="ChangeStateList(this.value)">
+                            <option selected="selected" value="AL">All Layer</option>
+                            <!--<option>-Select a State-</option>-->
+                        </select>
+                    </p>
+                </div>
+                <div>
+                    <p>
+                        <select id="myListCity"  style="width:180px; height:21px; background:lightgray" onchange="ChangeLayerList(this.value)">
+                            <option selected="selected" value="AL">All Layer</option>
                         </select>
                     </p>
                 </div>
