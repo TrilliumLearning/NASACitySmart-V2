@@ -105,16 +105,16 @@
 <script src="https://canvasjs.com/assets/script/canvasjs.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/raphael/2.2.7/raphael.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/justgage/1.2.9/justgage.min.js"></script>
-<script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
-<script src="//cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
+<script src="https://cdn.datatables.net/1.10.17/js/jquery.dataTables.min.js"></script>
+<script src="https://cdn.datatables.net/buttons/1.5.2/js/dataTables.buttons.min.js"></script>
 <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-<script src="//cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
-<link rel="stylesheet" href="//cdn.datatables.net/buttons/1.4.2/css/buttons.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/buttons/1.5.2/css/buttons.dataTables.min.css">
 <link rel="stylesheet" href="//unpkg.com/flatpickr/dist/flatpickr.min.css">
 <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
 <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-<link rel="stylesheet" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
+<link rel="stylesheet" href="https://cdn.datatables.net/1.10.17/css/jquery.dataTables.min.css">
 <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 
 <div id="g1"></div>
@@ -138,7 +138,7 @@
             <input type="date" class="inputBoxDate datePicker date" placeholder="Select Date" />
             <h4 class="floatingBox">Select End Date:</h4>
             <input type="date" class="inputBoxDate datePicker date" placeholder="Select Date" />
-            <input type="submit" onclick="enabled = false; query(barType = 'hum');" class="button button2" value="Filter">
+            <input type="button" onclick="enabled = false; query(barType = 'hum');" class="button button2" value="Filter">
         </form>
     </div>
 
@@ -161,7 +161,7 @@
             <input type="date" class="inputBoxDate datePicker date" placeholder="Select Date" />
             <h4 class="floatingBox">Select End Date:</h4>
             <input type="date" class="inputBoxDate datePicker date" placeholder="Select Date" />
-            <input type="submit" onclick="enabled = false; query(barType = 'temp');" class="button button2" value="Filter">
+            <input type="button" onclick="enabled = false; query(barType = 'temp');" class="button button2" value="Filter">
         </form>
     </div>
 
@@ -184,7 +184,7 @@
             <input type="date" class="inputBoxDate datePicker date" placeholder="Select Date" />
             <h4 class="floatingBox">Select End Date:</h4>
             <input type="date" class="inputBoxDate datePicker date" placeholder="Select Date" />
-            <input type="submit" onclick="enabled = false; query(barType = 'wind');" class="button button2" value="Filter">
+            <input type="button" onclick="enabled = false; query(barType = 'wind');" class="button button2" value="Filter">
         </form>
     </div>
 
@@ -293,7 +293,7 @@
 
     function fullDataHum() {
         $.ajax({
-            url: 'http://localhost:3000/allHum',
+            url: 'http://localhost:9086/allHum',
             type: 'GET',
             dataType: 'json',
             async: true,
@@ -331,7 +331,7 @@
 
     function fullDataTemp() {
         $.ajax({
-            url: 'http://localhost:3000/allTemp',
+            url: 'http://localhost:9086/allTemp',
             type: 'GET',
             dataType: 'json',
             async: true,
@@ -369,7 +369,7 @@
 
     function fullDataWind() {
         $.ajax({
-            url: 'http://localhost:3000/allWind',
+            url: 'http://localhost:9086/allWind',
             type: 'GET',
             dataType: 'json',
             async: true,
@@ -1153,7 +1153,7 @@
 
         if (barType === "hum"){
             $.ajax({
-                url: 'http://localhost:3000/newHum',
+                url: 'http://localhost:9086/newHum',
                 type: 'GET',
                 dataType: 'json',
                 async: true,
@@ -1191,7 +1191,7 @@
 
         } else if (barType === "temp") {
             $.ajax({
-                url: 'http://localhost:3000/newTemp',
+                url: 'http://localhost:9086/newTemp',
                 type: 'GET',
                 dataType: 'json',
                 async: true,
@@ -1228,7 +1228,7 @@
             });
         } else {
             $.ajax({
-                url: 'http://localhost:3000/newWind',
+                url: 'http://localhost:9086/newWind',
                 type: 'GET',
                 dataType: 'json',
                 async: true,
