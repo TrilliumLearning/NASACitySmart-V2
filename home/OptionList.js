@@ -22,10 +22,22 @@ $(document).ready(function () {
             $("#myListState").html("<option value='AL'> All Layer </option>");
             $("#myListCity").html("<option value= 'AL'> All Layer </option>");
         }else{
-            $("#myListState").html("<option> -Select a State- </option>");
+            $("#myListState").html("<option value = 'SAS'> -Select a State- </option>");
             $("#myListCity").html("<option> -Select a City- </option>");
         }
-    })
+    });
+    $("#myListState").change(function () {
+        var value = $(this).val();
+        console.log(value);
+        if (value == "SAS"){
+            $("#myListCity").html("<option> -Select a City-</option>");
+            document.getElementById("myListCity").disabled = true;
+            document.getElementById("myListCity").style.backgroundColor = "lightgray";
+            $('.Menu').show();
+        }else{
+            $("#myListCity").html("<option> -Select a City- </option>");
+        }
+    });
 });
 
 
@@ -51,7 +63,7 @@ function getObjects(obj, key, val) {
 }
 
 function ChangeSelectList(countrylevel) {
-    console.log(countrylevel);
+    // console.log(countrylevel);
     var stateList = document.getElementById("myListState");
     while (stateList.options.length) {
         stateList.remove(0);
@@ -60,18 +72,15 @@ function ChangeSelectList(countrylevel) {
         url: "http://localhost:9090/StateList",
         dataType: 'json',
         success: function (results) {
-            var Array = results;
             console.log(results);
             var option;
-            for (var i = 0; i < Array.length; i++) {
-                if (countrylevel === Array[i].CountryName) {
-                    for(var j = 1; j < Array.length; j++) {
-                        option = new Option(Array[j].StateName, Array[j].StateName);
+            for (var i = 0; i < results.length; i++) {
+                if (countrylevel === results[i]. CountryName) {
+                        option = new Option(results[i].StateName, results[i].StateName);
                         stateList.add(option);
                         $('.Menu').hide();
                         document.getElementById("myListState").disabled = false;
                         document.getElementById("myListState").style.backgroundColor = "white";
-                    }
                 }
             }
         }
@@ -92,17 +101,16 @@ function ChangeStateList(statelevel) {
         cityList.remove(0);
     }
     $.ajax({
-        url: "http://localhost:9090/ChangeSelectList",
+        url: "http://localhost:9090/CityList",
         dataType: 'json',
         success: function (results) {
             console.log(results);
             var option;
             for (var i = 0; i < results.length; i++) {
                 if (statelevel === results[i].StateName) {
-                        // console.log(j);
                         option = new Option(results[i].CityName, results[i].CityName);
                         cityList.add(option);
-                        // $('.Menu').hide();
+                        $('.Menu').hide();
                         document.getElementById("myListCity").disabled = false;
                         document.getElementById("myListCity").style.backgroundColor = "white";
                 }
@@ -112,16 +120,17 @@ function ChangeStateList(statelevel) {
 }
 
 function ChangeLayerList(citylevel) {
+    // alert(citylevel);
     $.ajax({
         url: "http://localhost:9090/ChangeLayerList",
-        dataType:"json",
+        dataType: "json",
         success: function (res) {
-            var returnCityObj = getObjects(res,'CityName',citylevel);
+            var returnCityObj = getObjects(res, 'CityName', citylevel);
             console.log(returnCityObj);
             $('.Menu').hide();
-            for(var j = 0; j < returnCityObj.length; j++) {
+            for (var j = 0; j < returnCityObj.length; j++) {
                 var obj1 = returnCityObj[j].FirstLayer;
-                var obj2 =returnCityObj[j].SecondLayer;
+                var obj2 = returnCityObj[j].SecondLayer;
                 var obj3 = returnCityObj[j].CityName;
                 var className1 = '.' + obj1;
                 var className2 = '.' + obj2;
@@ -132,26 +141,6 @@ function ChangeLayerList(citylevel) {
                 $(className3).show();
                 // console.log(className3)
             }
-        },
-        error: function (jqXHR, exception) {
-            var msg = '';
-            if (jqXHR.status === 0) {
-                msg = 'Not connect.\n Verify Network.';
-            } else if (jqXHR.status == 404) {
-                msg = 'Requested page not found. [404]';
-            } else if (jqXHR.status == 500) {
-                msg = 'Internal Server Error [500].';
-            } else if (exception === 'parsererror') {
-                msg = 'Requested JSON parse failed.';
-            } else if (exception === 'timeout') {
-                msg = 'Time out error.';
-            } else if (exception === 'abort') {
-                msg = 'Ajax request aborted.';
-            } else {
-                msg = 'Uncaught Error.\n' + jqXHR.responseText;
-            }
-            console.log(msg);
         }
     });
-
 }
