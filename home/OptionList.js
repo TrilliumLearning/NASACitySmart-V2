@@ -128,10 +128,11 @@ function ChangeLayerList(citylevel) {
             var returnCityObj = getObjects(res, 'CityName', citylevel);
             console.log(returnCityObj);
             $('.Menu').hide();
+            $('.State').hide();
             for (var j = 0; j < returnCityObj.length; j++) {
                 var obj1 = returnCityObj[j].FirstLayer;
                 var obj2 = returnCityObj[j].SecondLayer;
-                var obj3 = returnCityObj[j].CityName;
+                var obj3 = returnCityObj[j].StateName;
                 var className1 = '.' + obj1;
                 var className2 = '.' + obj2;
                 var className3 = '.' + obj3;
