@@ -2,22 +2,25 @@
 var multer = require('multer');
 var mysql = require('mysql');
 var config = require('../config/mainconf');
-var connection = mysql.createConnection(config.commondb_connection);
+var con_CS = mysql.createConnection(config.commondb_connection);
 var uploadPath = config.Upload_Path;
+var path = require('path');
 var bodyParser = require('body-parser');
 var bcrypt = require('bcrypt-nodejs');
 var nodemailer = require('nodemailer');
+var Influx = require('influx');
+var cors = require('cors');
 var async = require('async');
 var crypto = require('crypto');
-var fs = require("fs"),
-    rimraf = require("rimraf"),
-    mkdirp = require("mkdirp"),
-    multiparty = require('multiparty');
+var fs = require("fs");
+var rimraf = require("rimraf");
+var mkdirp = require("mkdirp");
+var multiparty = require('multiparty');
 
-var fileInputName = process.env.FILE_INPUT_NAME || "qqfile",
-    maxFileSize = process.env.MAX_FILE_SIZE || 0; // in bytes, 0 for unlimited
+var fileInputName = process.env.FILE_INPUT_NAME || "qqfile";
+var maxFileSize = process.env.MAX_FILE_SIZE || 0; // in bytes, 0 for unlimited
 
-
+var Layerpath = "";
 var filePathName = "";
 var filePath, transactionID, myStat, myVal, myErrMsg, token, errStatus;
 var today, date2, date3, time2, time3, dateTime, tokenExpire;
@@ -39,17 +42,101 @@ var today, date2, date3, time2, time3, dateTime, tokenExpire;
 var smtpTrans = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
-        user: 'aaaa.zhao@g.feitianacademy.org',
+        user: 'aaa.zhao@g.feitianacademy.org',
         pass: "12344321"
     }
 });
 
-connection.query('USE ' + config.Login_db); // Locate Login DB
+con_CS.query('USE ' + config.Login_db); // Locate Login DB
+
+var con_Water = new Influx.InfluxDB({
+    database: 'FTAA_Water',
+    host: 'aworldbridgelabs.com',
+    port: 8086,
+    username: 'trueman',
+    password: 'TruemanWu!04',
+    schema: [
+        {
+            measurement: 'Water_Experiment',
+            fields: {
+                Benchmark: Influx.FieldType.STRING,
+                Building_1_Drinking_Water: Influx.FieldType.FLOAT,
+                Building_2_Drinking_Water: Influx.FieldType.FLOAT,
+                Remark: Influx.FieldType.STRING,
+                Unit: Influx.FieldType.STRING
+            },
+            tags: [
+                'Element'
+            ]
+        }
+    ]
+});
+
+var con_EnergyBudget = new Influx.InfluxDB({
+    database: 'FTAA_Energy',
+    host: 'aworldbridgelabs.com',
+    port: 8086,
+    username: 'trueman',
+    password: 'TruemanWu!04',
+    schema: [
+        {
+            measurement: 'Energy_Budget',
+            fields: {
+                Electricity_Usage: Influx.FieldType.FLOAT,
+                Machine_Name: Influx.FieldType.STRING
+            },
+            tags: [
+                'Machine_ID'
+            ]
+        }
+    ]
+});
+
+var con_EnergyPredic = new Influx.InfluxDB({
+    database: 'FTAA_Energy',
+    host: 'aworldbridgelabs.com',
+    port: 8086,
+    username: 'trueman',
+    password: 'TruemanWu!04',
+    schema: [
+        {
+            measurement: 'Actual_vs_Prediction',
+            fields: {
+                Actual_Electricity_Usage: Influx.FieldType.FLOAT,
+                Predict_Electricity_Usage: Influx.FieldType.FLOAT
+            },
+            tags: [
+
+            ]
+        }
+    ]
+});
+
+var con_Wind = new Influx.InfluxDB({
+    host: '10.11.90.15',
+    database: 'Wind_Station',
+    schema: [
+        {
+            measurement: 'WS_MT1',
+            fields: {
+                Temp_out: Influx.FieldType.STRING,
+                Hum_out: Influx.FieldType.INTEGER,
+                Wind_Speed: Influx.FieldType.INTEGER
+            },
+            tags: []
+        }
+    ]
+});
 
 module.exports = function (app, passport) {
 
     app.use(bodyParser.urlencoded({extended: true}));
     app.use(bodyParser.json());
+    app.use(cors({
+        origin: '*',
+        credentials: true
+    }));
+
 
     // =====================================
     // HOME PAGE (with login links) ========
@@ -103,7 +190,7 @@ module.exports = function (app, passport) {
         var statement = "SELECT * FROM Users WHERE username = '" + req.body.username + "';";
         //console.log(statement);
 
-        connection.query(statement, function (err, results, fields) {
+        con_CS.query(statement, function (err, results, fields) {
             if (err) {
                 console.log(err);
                 res.json({"error": true, "message": "An unexpected error occurred !"});
@@ -119,10 +206,10 @@ module.exports = function (app, passport) {
                         });
                     },
                     function (token, tokenExpire, done) {
-                        // connection.query( "INSERT INTO Users ( resetPasswordExpires, resetPasswordToken ) VALUES (?,?) WHERE username = '" + req.body,username + "'; ")
+                        // con_CS.query( "INSERT INTO Users ( resetPasswordExpires, resetPasswordToken ) VALUES (?,?) WHERE username = '" + req.body,username + "'; ")
                         myStat = "UPDATE Users SET resetPasswordToken = ?, resetPasswordExpires = ? WHERE username = '" + req.body.username + "' ";
                         myVal = [token, tokenExpire];
-                        connection.query(myStat, myVal, function (err, rows) {
+                        con_CS.query(myStat, myVal, function (err, rows) {
 
                             //newUser.id = rows.insertId;
 
@@ -178,7 +265,7 @@ module.exports = function (app, passport) {
 
         myStat = "SELECT * FROM Users WHERE resetPasswordToken = '" + req.params.token + "'";
 
-        connection.query(myStat, function(err, user) {
+        con_CS.query(myStat, function(err, user) {
             dateNtime();
 
             if (!user || dateTime > user[0].resetPasswordExpires) {
@@ -197,7 +284,7 @@ module.exports = function (app, passport) {
 
                 myStat = "SELECT * FROM Users WHERE resetPasswordToken = '" + req.params.token + "'";
 
-                connection.query(myStat, function(err, user) {
+                con_CS.query(myStat, function(err, user) {
                     var userInfo = JSON.stringify(user, null, "\t");
 
                     if (!user) {
@@ -210,7 +297,7 @@ module.exports = function (app, passport) {
 
                         var passReset = "UPDATE Users SET password = '" + newPass.Newpassword + "' WHERE username = '" + req.body.username + "'";
 
-                        connection.query(passReset, function (err, rows) {
+                        con_CS.query(passReset, function (err, rows) {
                             if (err) {
                                 console.log(err);
                                 res.send("New Password Insert Fail!");
@@ -273,7 +360,7 @@ module.exports = function (app, passport) {
         myStat = "UPDATE Users SET firstName =?, lastName = ?, dateModified  = ? WHERE username = ? ";
         myVal = [newPass.firstname, newPass.lastname, dateTime, user.username];
 
-        connection.query(myStat, myVal, function (err, rows) {
+        con_CS.query(myStat, myVal, function (err, rows) {
             if(err){
                 console.log(err);
                 res.json({"error": true, "message": "Fail !"});
@@ -282,7 +369,7 @@ module.exports = function (app, passport) {
                 if (!!req.body.newpassword && passComp) {
                     var passReset = "UPDATE Users SET password = '" + newPass.Newpassword + "' WHERE username = '" + user.username + "'";
 
-                    connection.query(passReset, function (err, rows) {
+                    con_CS.query(passReset, function (err, rows) {
                         //console.log(result);
                         if (err) {
                             console.log(err);
@@ -310,7 +397,7 @@ module.exports = function (app, passport) {
     app.get('/userManagement', isLoggedIn, function (req, res) {
         myStat = "SELECT userrole FROM Users WHERE username = '" + req.user.username + "';";
 
-        connection.query(myStat, function (err, results, fields) {
+        con_CS.query(myStat, function (err, results, fields) {
 
             if (!results[0].userrole) {
                 console.log("Error");
@@ -336,7 +423,7 @@ module.exports = function (app, passport) {
     app.post('/signup', isLoggedIn, function (req, res) {
 
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-        // connection.query('USE ' + config.Login_db); // Locate Login DB
+        // con_CS.query('USE ' + config.Login_db); // Locate Login DB
 
         var newUser = {
             username: req.body.username,
@@ -352,7 +439,7 @@ module.exports = function (app, passport) {
 
         myStat = "INSERT INTO Users ( username, firstName, lastName, password, userrole, dateCreated, dateModified, createdUser, status) VALUES (?,?,?,?,?,?,?,?,?)";
         myVal = [newUser.username, newUser.firstName, newUser.lastName, newUser.password, newUser.userrole, newUser.dateCreated, newUser.dateModified, newUser.createdUser, newUser.status];
-        connection.query(myStat, myVal, function (err, rows) {
+        con_CS.query(myStat, myVal, function (err, rows) {
 
             //newUser.id = rows.insertId;
 
@@ -423,7 +510,7 @@ module.exports = function (app, passport) {
             res.setHeader("Access-Control-Allow-Origin", "*");
             // console.log("Query Statement: " + queryStat);
 
-            connection.query(myStat, function (err, results, fields) {
+            con_CS.query(myStat, function (err, results, fields) {
 
                 var status = [{errStatus: ""}];
 
@@ -561,10 +648,460 @@ module.exports = function (app, passport) {
     // we will want this protected so you have to be logged in to visit
     // we will use route middleware to verify this (the isLoggedIn function)
 
+    app.post('/upload', onUpload);
+
+    app.post('/submit',function(req,res){
+        console.log (req.body);
+        var result = Object.keys(req.body).map(function (key) {
+            return [String(key), req.body[key]];
+        });
+        // console.log (result);
+        res.setHeader("Access-Control-Allow-Origin", "*");
+
+        var name = "";
+        var value = "";
+
+        for(var i = 0; i < result.length; i++){
+            if (i === result.length - 1) {
+                name += result[i][0];
+                value += '"' + result[i][1] + '"';
+            } else {
+                name += result[i][0] + ", ";
+                value += '"' + result[i][1] + '"' + ", ";
+            }
+
+        }
+        // var newImage = {
+        //     Layer_Uploader: "http://localhost:9086/uploadfiles/" + responseDataUuid,
+        //     Layer_Uploader_name: responseDataUuid
+        // };
+        // name += ", Layer_Uploader, Layer_Uploader_name";
+        // value += ", '" + newImage.Layer_Uploader + "','" +newImage.Layer_Uploader_name + "'";
+
+        // var filepathname = "http://localhost:9086/uploadfiles/" + responseDataUuid ;
+        var statement1 = "INSERT INTO CitySmart.New_Users (" + name + ") VALUES (" + value + ");";
+        console.log(statement1);
+
+        con_CS.query(statement1, function(err,result) {
+            if (err) {
+                throw err;
+            } else {
+                res.json("Connected!")
+            }
+        });
+
+    });
+
+    app.post('/submitL',function (req,res){
+        console.log (req.body);
+        var result = Object.keys(req.body).map(function (key) {
+            return [String(key), req.body[key]];
+        });
+        res.setHeader("Access-Control-Allow-Origin", "*");
+
+        var name = "";
+        var value = "";
+
+        for(var i = 0; i < result.length; i++){
+            if (i === result.length - 1) {
+                name += result[i][0];
+                value += '"' + result[i][1] + '"';
+            } else {
+                name += result[i][0] + ", ";
+                value += '"' + result[i][1] + '"' + ", ";
+            }
+        }
+    });
+
+    app.get('/EditData',function (req,res){
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        con_CS.query("SELECT Full Name, Address Line 1, Address Line 2, City, State/Province/Region, Postal Code/ZIP, Country, Email, Phone Number, Layer Name, Layer Category, Layer Description, Layer Uploader FROM GeneralFormDatatable",function (err,results) {
+            if (err) throw err;
+            console.log(results);
+        })
+    });
+
+    app.get('/SearchLayerName',function (req,res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        con_CS.query("SELECT ThirdLayer FROM LayerMenu", function (err, results) {
+            if (err) throw err;
+            // console.log(results);
+            res.json(results);
+
+        });
+    });
+
+    app.delete("/deleteFiles/:uuid", onDeleteFile);
+
+    app.get('/firstlayer', function (req, res) {
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+
+        con_CS.query("SELECT FirstLayer From LayerMenu", function (err, result) {
+
+            console.log("recive and processing");
+
+            var JSONresult = JSON.stringify(result, null, "\t");
+            console.log(JSONresult);
+
+            res.send(JSONresult);
+
+            res.end();
+
+        });
+    });
+
+    app.get('/secondlayer', function (req, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+
+        con_CS.query("SELECT SecondLayer From LayerMenu", function (err,result) {
+
+            console.log("recive and processing");
+
+            var JSONresult = JSON.stringify(result, null, "\t");
+
+            res.send(JSONresult);
+            res.end();
+
+        });
+
+    });
+
+    app.get('/thirdlayer', function (req, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+
+        con_CS.query("SELECT ThirdLayer From LayerMenu", function (err,result) {
+
+            console.log("recive and processing");
+
+            var JSONresult = JSON.stringify(result, null, "\t");
+
+            res.send(JSONresult);
+            res.end();
+
+        });
+
+    });
+
+
+    app.get('/layername', function (req, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+
+        con_CS.query("SELECT LayerName From LayerMenu", function (err,result) {
+
+            console.log("recive and processing");
+
+            var JSONresult = JSON.stringify(result, null, "\t");
+
+            res.send(JSONresult);
+            res.end();
+
+        });
+    });
+
+    app.get('/createlayer', function (req, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+
+        con_CS.query("SELECT * From CitySmart.LayerMenu", function (err,result) {
+            console.log("recive and processing");
+
+            var JSONresult = JSON.stringify(result, null, "\t");
+
+            res.send(JSONresult);
+            res.end();
+
+        });
+
+    });
+
+    app.get('/times', function (req, res) {
+        con_Wind.query('select * from WS_MT1'
+        ).then(result => {
+            console.log(result.length);
+        res.send(result)
+    }).catch(err => {
+            res.status(500).send(err.stack)
+    })
+    });
+
+    app.get('/ChangeSelectList', function (req, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        con_CS.query("SELECT Country, City FROM Country2City", function (err, results) {
+            if (err) throw err;
+            res.send(results);
+            res.end();
+        });
+    });
+
+    app.get('/ChangeLayerList', function (req, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        con_CS.query("SELECT FirstLayer , SecondLayer , CityName , ClassName FROM LayerMenu", function (err, results) {
+            if (err) throw err;
+            var layerInfo = JSON.stringify(results, null, "\t");
+            res.send(layerInfo);
+            console.log(res);
+            res.end();
+
+        });
+    });
+
+    app.get('/filterUser', function (req, res) {
+        var myStat = 'SELECT Hum_Out FROM WS_MT1';
+
+        console.log(myStat);
+
+        var myQuery = [
+            {
+                fieldVal: req.query.timeFrom,
+                dbCol: "time",
+                op: " >= '",
+                adj: req.query.timeFrom
+            },
+            {
+                fieldVal: req.query.timeTo,
+                dbCol: "time",
+                op: " >= '",
+                adj: req.query.timeTo
+            }
+        ];
+
+        function userQuery() {
+            res.setHeader("Access-Control-Allow-Origin", "*");
+
+            con_Wind.query(myStat, function (err, result, fields) {
+                var status = [{errStatus: ""}];
+
+                if (err) {
+                    console.log(err);
+                    status[0].errStatus = "fail";
+                    res.send(status);
+                    res.end();
+                } else if (result.length === 0) {
+                    status[0].errStatus = "no data entry";
+                    res.send(status);
+                    res.end();
+                } else {
+                    var JSONresult = JSON.stringify(result, null, "\t");
+                    console.log(JSONresult);
+                    res.send(JSONresult);
+                    res.end();
+                }
+            }).then(result => {
+                console.log(result.length);
+            res.send(result)
+        }).catch(err => {
+                res.status(500).send(err.stack)
+        });
+        }
+
+        var j = 0;
+
+        for (var i = 0; i < myQuery.length; i++) {
+            // console.log("i = " + i);
+            // console.log("field Value: " + !!myQuery[i].fieldVal);
+            if (i === myQuery.length - 1) {
+                if (!!myQuery[i].fieldVal) {
+                    if (j === 0) {
+                        myStat += " WHERE " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
+                        j = 1;
+                        userQuery()
+                    } else {
+                        myStat += " AND " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
+                        userQuery()
+                    }
+                } else {
+                    userQuery()
+                }
+            } else {
+                if (!!myQuery[i].fieldVal) {
+                    if (j === 0) {
+                        myStat += " WHERE " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
+                        j = 1;
+                    } else {
+                        myStat += " AND " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
+                    }
+                }
+            }
+        }
+
+    });
+
+    var value;
+    var startDateTime;
+    var endDateTime;
+
+    app.get('/EnergyGraph', function (req, res) {
+        value = req.query.keywords;
+        startDateTime = req.query.startDateTime;
+        endDateTime = req.query.endDateTime;
+        //console.log(value);
+        //console.log(startDateTime);
+        //console.log(endDateTime);
+
+        if (value === "budget") {
+            con_EnergyBudget.query('SELECT sum(Electricity_Usage) as Electricity_Usage FROM "FTAA_Energy"."autogen"."Energy_Budget" WHERE time >= 1473120000000000000 and time <= 1504652400000000000 GROUP BY time(1h)').then(results => {
+                var origin = req.headers.origin;
+            res.setHeader("Access-Control-Allow-Origin", origin);
+
+            var JSONresult = JSON.stringify(results, null, "\t");
+            //console.log(JSONresult);
+
+            res.send(JSONresult);
+            res.end();
+        });
+        } else if (value === "actual") {
+            con_EnergyPredic.query('SELECT * FROM "FTAA_Energy"."autogen"."Actual_vs_Prediction"').then(results => {
+                var origin = req.headers.origin;
+            res.setHeader("Access-Control-Allow-Origin", origin);
+
+            var JSONresult = JSON.stringify(results, null, "\t");
+            //console.log(JSONresult);
+
+            res.send(JSONresult);
+            res.end();
+        });
+        } else {
+            var queryDate = 'SELECT Electricity_Usage, Machine_ID, Machine_Name FROM "FTAA_Energy"."autogen"."Energy_Budget" WHERE time >= ' + "'" + startDateTime + "'" + 'AND time < ' + "'" + endDateTime + "'" + " GROUP BY Machine_ID";
+            //console.log(queryDate);
+            con_EnergyBudget.query(queryDate).then(results => {
+                var origin = req.headers.origin;
+            res.setHeader("Access-Control-Allow-Origin", origin);
+
+            var JSONresult = JSON.stringify(results, null, "\t");
+            //console.log(JSONresult);
+
+            res.send(JSONresult);
+            res.end();
+        });
+        }
+
+    });
+
+
+    var value;
+    var query1 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'Calcium_Ion-Selective_Electrode'";
+    var query2 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'Ammonium_Ion-Selective_Electrode'";
+    var query3 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'Potassium_ion-Selective_Electrode'";
+    var query4 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'Chloride_Probe'";
+    var query5 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'Colorimeter'";
+    var query6 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'Turbidity_Sensor'";
+    var query7 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'PH_Sensor'";
+    var query8 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'Temperature_Probe_(C)'";
+
+//console.log(query1);
+
+    app.get('/WaterGraph', function (req, res) {
+        value = req.query.keywords;
+        console.log(value);
+        if (value === "Calcium") {
+            con_Water.query(query1).then(results => {
+                var origin = req.headers.origin;
+            res.setHeader("Access-Control-Allow-Origin", origin);
+
+            var JSONresult = JSON.stringify(results, null, "\t");
+            console.log(JSONresult);
+
+            res.send(JSONresult);
+            res.end();
+        });
+        }
+
+        if (value === "Ammonium") {
+            con_Water.query(query2).then(results => {
+                var origin = req.headers.origin;
+            res.setHeader("Access-Control-Allow-Origin", origin);
+
+            var JSONresult = JSON.stringify(results, null, "\t");
+            console.log(JSONresult);
+
+            res.send(JSONresult);
+            res.end();
+        });
+        }
+
+        if (value === "Potassium") {
+            con_Water.query(query3).then(results => {
+                var origin = req.headers.origin;
+            res.setHeader("Access-Control-Allow-Origin", origin);
+
+            var JSONresult = JSON.stringify(results, null, "\t");
+            console.log(JSONresult);
+
+            res.send(JSONresult);
+            res.end();
+        });
+        }
+
+        if (value === "Chloride") {
+            con_Water.query(query4).then(results => {
+                var origin = req.headers.origin;
+            res.setHeader("Access-Control-Allow-Origin", origin);
+
+            var JSONresult = JSON.stringify(results, null, "\t");
+            console.log(JSONresult);
+
+            res.send(JSONresult);
+            res.end();
+        });
+        }
+
+        if (value === "Colorimeter") {
+            con_Water.query(query5).then(results => {
+                var origin = req.headers.origin;
+            res.setHeader("Access-Control-Allow-Origin", origin);
+
+            var JSONresult = JSON.stringify(results, null, "\t");
+            console.log(JSONresult);
+
+            res.send(JSONresult);
+            res.end();
+        });
+        }
+
+        if (value === "Turbidity") {
+            con_Water.query(query6).then(results => {
+                var origin = req.headers.origin;
+            res.setHeader("Access-Control-Allow-Origin", origin);
+
+            var JSONresult = JSON.stringify(results, null, "\t");
+            console.log(JSONresult);
+
+            res.send(JSONresult);
+            res.end();
+        });
+        }
+
+        if (value === "pH") {
+            con_Water.query(query7).then(results => {
+                var origin = req.headers.origin;
+            res.setHeader("Access-Control-Allow-Origin", origin);
+
+            var JSONresult = JSON.stringify(results, null, "\t");
+            console.log(JSONresult);
+
+            res.send(JSONresult);
+            res.end();
+        });
+        }
+
+        if (value === "Temperature") {
+            con_Water.query(query8).then(results => {
+                var origin = req.headers.origin;
+            res.setHeader("Access-Control-Allow-Origin", origin);
+
+            var JSONresult = JSON.stringify(results, null, "\t");
+            console.log(JSONresult);
+
+            res.send(JSONresult);
+            res.end();
+        });
+        }
+    });
+
     app.get('/userhome', isLoggedIn, function (req, res) {
         var myStat = "SELECT userrole FROM Users WHERE username = '" + req.user.username + "';";
 
-        connection.query(myStat, function (err, results, fields) {
+        con_CS.query(myStat, function (err, results, fields) {
             //console.log(results);
 
             if (!results[0].userrole) {
@@ -603,7 +1140,7 @@ module.exports = function (app, passport) {
         var scoutingStat = "SELECT Users.firstName, Users.lastName, General_Form.*, Detailed_Scouting.* FROM Transaction INNER JOIN Users ON Users.username = Transaction.Cr_UN INNER JOIN General_Form ON General_Form.transactionID = Transaction.transactionID INNER JOIN Detailed_Scouting ON Detailed_Scouting.transactionID = Transaction.transactionID WHERE Transaction.transactionID = '" + editTransactionID +"';";
         var trapStat = "SELECT Users.firstName, Users.lastName, General_Form.*, Detailed_Trap.* FROM Transaction INNER JOIN Users ON Users.username = Transaction.Cr_UN INNER JOIN General_Form ON General_Form.transactionID = Transaction.transactionID INNER JOIN Detailed_Trap ON Detailed_Trap.transactionID = Transaction.transactionID WHERE Transaction.transactionID = '" + editTransactionID + "';";
 
-        connection.query(scoutingStat + trapStat, function (err, results, fields) {
+        con_CS.query(scoutingStat + trapStat, function (err, results, fields) {
 
             if (err) {
                 console.log(err);
@@ -631,7 +1168,7 @@ module.exports = function (app, passport) {
         console.log("This is for editing photos ONLY >:( " + editTransactionID);
 
         var filePath0;
-        connection.query(myStat, function (err, results) {
+        con_CS.query(myStat, function (err, results) {
             console.log("query statement : " + myStat);
 
             if (!results[0].Damage_photo && !results[0].Damage_photo_name) {
@@ -654,7 +1191,7 @@ module.exports = function (app, passport) {
         console.log("This is for editing photos ONLY >:( " + editTransactionID);
 
         var filePath0;
-        connection.query(myStat, function (err, results) {
+        con_CS.query(myStat, function (err, results) {
             console.log("query statement : " + myStat);
 
             if (!results[0].Pest_photo && !results[0].Pest_photo_name) {
@@ -787,13 +1324,13 @@ module.exports = function (app, passport) {
         var utcDateTime = d.getUTCFullYear() + "-" + ('0' + (d.getUTCMonth() + 1)).slice(-2) + "-" + ('0' + d.getUTCDate()).slice(-2);
         var queryTransID = "SELECT COUNT(transactionID) AS number FROM Transaction WHERE transactionID LIKE '" + utcDateTime + "%';";
 
-        connection.query(queryTransID, function (err, results, fields) {
+        con_CS.query(queryTransID, function (err, results, fields) {
             transactionID = utcDateTime + "_" + ('0000' + (results[0].number + 1)).slice(-5);
             if (err) {
                 console.log(err);
             } else {
                 var insertTransID = "INSERT INTO Transaction (transactionID, Cr_UN) VALUE (" + "'" + transactionID + "', '" + req.user.username + "');";
-                connection.query(insertTransID, function (err, results, fields) {
+                con_CS.query(insertTransID, function (err, results, fields) {
                     if (err) {
                         console.log(err);
                     } else {
@@ -811,104 +1348,7 @@ module.exports = function (app, passport) {
         });
     });
 
-    // // Upload photos
-    // routes.post('/upload', fileUpload, function (req,res) {
-    //     //console.log(req.headers.origin);
-    //     res.setHeader("Access-Control-Allow-Origin", "*");
-    //
-    //     fileUpload(req, res, function (err) {
-    //         if (err) {
-    //             console.log(err);
-    //             res.json({"error": true, "message": "Fail"});
-    //             filePathName = "";
-    //             //res.send("Error uploading file.");
-    //         } else {
-    //             console.log("Success:" + filePathName);
-    //             filePath = filePathName;
-    //             if (!!filePathName){
-    //                 // filePath = editData.Photo_of_Pest + ";" + editData.Photo_of_Damage;
-    //                 res.json({"error": false, "message": filePathName});
-    //                 filePathName = "";
-    //             } else {
-    //                 var error = false;
-    //                 filePath = editData.Photo_of_Pest + ";" + editData.Photo_of_Damage;
-    //                 var files = (editData.Photo_of_Pest + ";" + editData.Photo_of_Damage).split(";");
-    //                 for (var i = 0; i < files.length; i++) {
-    //                     fs.unlink(files[i],function(err){
-    //                         if(err) {
-    //                             error = true;
-    //                             res.json({"error": true, "message": "Upload Fail !"});
-    //                             filePathName = "";
-    //                         }
-    //                     });
-    //
-    //                     if (i === files.length - 1 && error === false) {
-    //                         res.json({"error": false, "message": filePathName});
-    //                         filePathName = "";
-    //                     }
-    //                 }
-    //             }
-    //             // res.json({"error": false, "message": filePathName});
-    //             // filePathName = "";
-    //             //res.send("File is uploaded");
-    //         }
-    //     });
-    // });
-
-    // Upload photos
-    app.post('/upload', onUpload);
-// , function (req,res) {
-//     //console.log(req.headers.origin);
-//     res.setHeader("Access-Control-Allow-Origin", "*");
-//
-//     fileUpload(req, res, function (err) {
-//         if (err) {
-//             console.log(err);
-//             res.json({"error": true, "message": "Fail"});
-//             filePathName = "";
-//             //res.send("Error uploading file.");
-//         } else {
-//             console.log("Success:" + filePathName);
-//             filePath = filePathName;
-//             res.json({"error": false, "message": filePathName});
-//             filePathName = "";
-//         }
-//     });
-//     routes.post("/submit", isLoggedIn, function (req, res) {
-//         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-//
-//         var newImage = {
-//             Damage_photo: "https://aworldbridgelabs.com/uploadfiles/" + responseDataUuid,
-//             Damage_photo_name: responseDataUuid
-//         };
-//         console.log("path: " + responseDataUuid);
-//         console.log("names: " + responseDataUuid);
-//
-//
-//         var myStat = "INSERT INTO Detailed_Scouting (Damage_photo, Damage_photo_name) VALUES (?,?)";
-//         var myVal = [newImage.Damage_photo, newImage.Damage_photo_name];
-//         console.log("query statement : " + myStat);
-//         console.log("values: " + myVal);
-//
-//         connection.query(myStat, myVal, function (err, results) {
-//             if (err) {
-//                 console.log("query statement T^T: " + myStat);
-//                 console.log("values T^T: " + myVal);
-//                 console.log(err);
-//                 res.send("Unfortunately, there has been an error!");
-//                 res.end();
-//             } else {
-//                 console.log("query statement yay: " + myStat);
-//                 console.log("values yay: " + myVal);
-//                 console.log("All a big success!");
-//                 res.send("All a big success!");
-//                 res.end();
-//             }
-//
-//         });
-//     });
-
-    // Submit general form
+      // Submit general form
     app.post('/generalForm', isLoggedIn, function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         //console.log(req.body);
@@ -954,7 +1394,7 @@ module.exports = function (app, passport) {
         var insertStatement = "INSERT INTO General_Form (" + name + ") VALUES (" + value + ");";
         console.log(insertStatement);
 
-        connection.query(deleteStatement + insertStatement, function (err, results, fields) {
+        con_CS.query(deleteStatement + insertStatement, function (err, results, fields) {
             if (err) {
                 console.log(err);
                 res.json({"error": true, "message": "Insert Error! Check your entry."});
@@ -1030,7 +1470,7 @@ module.exports = function (app, passport) {
         var insertStatement = "INSERT INTO Detailed_Scouting (" + name + ") VALUES (" + value + ");";
         console.log(insertStatement);
 
-        connection.query(deleteStatement + insertStatement, function (err, results, fields) {
+        con_CS.query(deleteStatement + insertStatement, function (err, results, fields) {
             if (err) {
                 console.log(err);
                 res.json({"error": true, "message": "Insert Error! Check your entry."});
@@ -1058,31 +1498,11 @@ module.exports = function (app, passport) {
         name = name.substring(0, name.length - 2);
         value = value.substring(0, value.length - 2);
 
-        // var path = filePath.split(";");
-        // console.log(path);
-        // var damage = "";
-        // var pest = "";
-        //
-        // for (var i = 0; i < path.length - 1; i++) {
-        //     console.log("A");
-        //     if (path[i].substring(0,12) === "Damage_photo") {
-        //         damage += "https://aworldbridgelabs.com/uploadfiles/" + path[i] + ";";
-        //     } else if (path[i].substring(0,10) === "Pest_photo") {
-        //         pest += "https://aworldbridgelabs.com/uploadfiles/" + path[i] + ";";
-        //     }
-        // }
-        // console.log(pest + "  " + damage);
-        // damage = damage.substring(0, damage.length - 1);
-        // pest = pest.substring(0, pest.length - 1);
-        //
-        // name += ", Damage_photo, Pest_photo";
-        // value += ", '" + damage + "', '" + pest + "'";
-
         var deleteStatement = "DELETE FROM Detailed_Trap WHERE transactionID = '" + req.body.transactionID + "'; ";
         var insertStatement = "INSERT INTO Detailed_Trap (" + name + ") VALUES (" + value + ");";
         console.log(insertStatement);
 
-        connection.query(deleteStatement + insertStatement, function (err, results, fields) {
+        con_CS.query(deleteStatement + insertStatement, function (err, results, fields) {
             if (err) {
                 console.log(err);
                 res.json({"error": true, "message": "Insert Error! Check your entry."});
@@ -1180,7 +1600,7 @@ function updateDBNres(SQLstatement, Value, ErrMsg, targetURL, res) {
     res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
     //console.log("Query Statement: " + SQLstatement);
 
-    connection.query(SQLstatement, Value, function (err, rows) {
+    con_CS.query(SQLstatement, Value, function (err, rows) {
         if (err) {
             console.log(err);
             res.json({"error": true, "message": ErrMsg});
@@ -1192,7 +1612,7 @@ function updateDBNredir(SQLstatement, Value, ErrMsg, failURL, redirURL, res) {
     res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
     //console.log("Query Statement: " + SQLstatement);
 
-    connection.query(SQLstatement, Value, function (err, rows) {
+    con_CS.query(SQLstatement, Value, function (err, rows) {
         if (err) {
             console.log(err);
             res.render(failURL, {message: req.flash(ErrMsg)});
@@ -1241,47 +1661,6 @@ function QueryStat(myObj, scoutingStat, trapStat, res) {
                 dataList(sqlStatement, res);
             }
         }
-
-        // if (!!myObj[i].adj) {
-        //     if (j === 0) {
-        //         j = 1;
-        //         if (i === myObj.length - 1) {
-        //             if (!!myObj[i].fieldVal) {
-        //                 myNewStat += " WHERE " + myObj[i].dbCol + myObj[i].op + myObj[i].fieldVal + "'";
-        //                 dataList(myNewStat,res)
-        //             } else {
-        //                 // myNewStat += " WHERE " + myObj[i].dbCol + " IS NULL";
-        //                 dataList(myNewStat,res)
-        //             }
-        //         } else {
-        //             if (!!myObj[i].fieldVal) {
-        //                 myNewStat += " WHERE " + myObj[i].dbCol + myObj[i].op + myObj[i].fieldVal + "'";
-        //             } else {
-        //                 // myNewStat += " WHERE " + myObj[i].dbCol + " IS NULL";
-        //             }
-        //         }
-        //     } else {
-        //         if (i === myObj.length - 1) {
-        //             if (!!myObj[i].fieldVal) {
-        //                 myNewStat += " AND " + myObj[i].dbCol + myObj[i].op + myObj[i].fieldVal + "'";
-        //                 dataList(myNewStat,res)
-        //             } else {
-        //                 // myNewStat += " AND " + myObj[i].dbCol + " IS NULL";
-        //                 dataList(myNewStat,res)
-        //             }
-        //         } else {
-        //             if (!!myObj[i].fieldVal) {
-        //                 myNewStat += " AND " + myObj[i].dbCol + myObj[i].op + myObj[i].fieldVal + "'";
-        //             } else {
-        //                 // myNewStat += " AND " + myObj[i].dbCol + " IS NULL";
-        //             }
-        //         }
-        //     }
-        // } else {
-        //     if (i === myObj.length - 1) {
-        //         dataList(myNewStat,res)
-        //     }
-        // }
     }
 
     function editStat(stat, aw, dbCol, op, fieldVal) {
@@ -1294,7 +1673,7 @@ function dataList(sqlStatement, res) {
     console.log(sqlStatement);
 
     res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-    connection.query(sqlStatement, function (err, results, fields) {
+    con_CS.query(sqlStatement, function (err, results, fields) {
 
         errStatus = [{errMsg: ""}];
 
@@ -1337,7 +1716,11 @@ function changeMail(str) {
 
     return result;
 }
+
 function onUpload(req, res, next) {
+    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+    console.log (req.headers.origin);
+
     var form = new multiparty.Form();
 
     form.parse(req, function(err, fields, files) {
@@ -1365,16 +1748,19 @@ var responseDataUuid = "",
     responseDataUuid2 = "",
     responseDataName2 = "";
 function onSimpleUpload(fields, file, res) {
+    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+    responseDataUuid = "";
+
     var d = new Date(),
         uuid = d.getUTCFullYear() + "-" + ('0' + (d.getUTCMonth() + 1)).slice(-2) + "-" + ('0' + d.getUTCDate()).slice(-2) + "T" + ('0' + d.getUTCHours()).slice(-2) + ":" + ('0' + d.getUTCMinutes()).slice(-2) + ":" + ('0' + d.getUTCSeconds()).slice(-2) + "Z",
         responseData = {
             success: false,
-            newuuid: uuid + "_" + fields.qqfilename,
-            newuuid2: uuid + "_" + fields.qqfilename
+            newuuid: uuid + "_" + fields.qqfilename
+            // newuuid2: uuid + "_" + fields.qqfilename
         };
 
     responseDataUuid = responseData.newuuid;
-    responseDataUuid2 = responseData.newuuid2;
+    // responseDataUuid2 = responseData.newuuid2;
 
     file.name = fields.qqfilename;
     responseDataName = file.name;
@@ -1401,6 +1787,8 @@ function onSimpleUpload(fields, file, res) {
 }
 
 function onChunkedUpload(fields, file, res) {
+    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+
     console.log("Z");
     var size = parseInt(fields.qqtotalfilesize),
         uuid = fields.qquuid,
@@ -1440,15 +1828,18 @@ function onChunkedUpload(fields, file, res) {
 }
 
 function failWithTooBigFile(responseData, res) {
+    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+
     responseData.error = "Too big!";
     responseData.preventRetry = true;
     res.send(responseData);
 }
 
 function onDeleteFile(req, res) {
-    console.log("A");
+    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+
     var uuid = req.params.uuid,
-        dirToDelete = "var/www/faw/current/uploadfiles/" + uuid;
+        dirToDelete = "uploadfiles/" + uuid;
     console.log(uuid);
     rimraf(dirToDelete, function(error) {
         if (error) {
@@ -1488,31 +1879,6 @@ function moveFile(destinationDir, sourceFile, destinationFile, success, failure)
                     success();
                 })
                 .pipe(destStream);
-
-            // res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-            //
-            // var newImage = {
-            //     imagePath: req.body.imagePath,
-            //     status: req.body.status
-            // };
-            //
-            // var myStat = "INSERT INTO Julia.FineUploader";
-            //
-            // var filePath0;
-            // connection.query(myStat, function (err, results) {
-            //     console.log("query statement : " + myStat);
-            //
-            //     if (!results[0].imagePath) {
-            //         console.log("Error");
-            //     } else {
-            //         filePath0 = results[0];
-            //         var JSONresult = JSON.stringify(results, null, "\t");
-            //         console.log(JSONresult);
-            //         res.send(JSONresult);
-            //         res.end()
-            //     }
-            //
-            // });
         }
     });
 }
