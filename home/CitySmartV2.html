@@ -43,6 +43,7 @@
                     var removesecondlayer = unpack(res, 'SecondLayer');
                     var removethirdlayer = unpack(res,"ThirdLayer");
                     var Layerinfo = unpack(res,"LayerName");
+                    // console.log(removethirdlayer);
 
                     $.each(removefirstlayer, function (index, value) {
                         if($.inArray(value, firstlayer) === -1) firstlayer.push(value);
@@ -52,6 +53,7 @@
                     });
                     $.each(removethirdlayer, function (index, value) {
                         if($.inArray(value, thirdlayer) === -1) thirdlayer.push(value);
+                        // console.log(thirdlayer);
                     });
                     $.each(Layerinfo, function (index, value) {
                         layervalue.push(value);
@@ -166,7 +168,7 @@
                                         if (c === comparing3.length - 1) {
                                             var checkboxdivG = document.createElement("div");
                                             checkboxdivG.className = "State " + res[i].ThirdLayer + " " + res[i].StateName + " " + res[i].CityName;
-                                            console.log(checkboxdivG.className);
+                                            // console.log(checkboxdivG.className);
                                             var checkboxh5G = document.createElement("h5");
                                             var checkboxaG = document.createElement("a");
                                             var checkaboxatG = document.createTextNode(res[i].ThirdLayer);
@@ -188,9 +190,7 @@
                                             checkboxlabelG.appendChild(checkboxspanG);
                                             document.getElementsByClassName("panel-body " + res[i].SecondLayer)[0].appendChild(checkboxdivG);
                                             comparing3.push([res[i].ThirdLayer, res[i].LayerName]);
-                                            classname.push([res[i].ThirdLayer +" " + res[i].StateName, res[i].CityName]);
-                                            console.log(classname);
-
+                                            classname.push([res[i].ThirdLayer +" " + res[i].CityName + res[i].StateName, res[i].CityName]);
                                         }
 
                                     } else {
@@ -202,8 +202,8 @@
                                             // console.log(document.getElementsByClassName(res[i].ThirdLayer)[0]);
 
                                         }
-                                        if (classname[c][0] !== res[i].ThirdLayer +" "+ res[i].CityName + " " + res[i].StateName) {
-                                            classname[c][0] += " " + res[i].StateName;
+                                        if (classname[c][0] !== res[i].ThirdLayer +" "+ res[i].CityName  + " " + res[i].StateName) {
+                                            classname[c][0] += " " + res[i].CityName + res[i].StateName;
                                             // classname[c][1] += res[i].CityName;
                                             document.getElementsByClassName("State " + res[i].ThirdLayer)[0].className = "State " + classname[c][0];
 
@@ -247,18 +247,17 @@
                                             checkboxlabel.appendChild(checkboxspan);
                                             document.getElementsByClassName("panel-body " + res[i].SecondLayer)[0].appendChild(checkboxdiv);
                                             comparing3.push([res[i].ThirdLayer, res[i].LayerName]);
-                                            classname.push([res[i].ThirdLayer +" "+ res[i].CityName + " " + res[i].StateName, res[i].CityName]);
+                                            classname.push([res[i].ThirdLayer +" "+ res[i].CityName + res[i].StateName,  res[i].CityName]);
 
                                         }
                                     }
                                     else {
                                         document.getElementsByClassName("input" + res[i].ThirdLayer)[0].setAttribute("value", res[i].LayerName);
                                         if (classname[a][0] !== res[i].ThirdLayer +" "+ res[i].CityName + " " + res[i].StateName) {
-                                            classname[a][0] += " " + res[i].StateName;
+                                            classname[a][0] += " " + res[i].CityName + res[i].StateName;
                                             document.getElementsByClassName("State " + res[i].ThirdLayer)[0].className ="State "+ classname[a][0];
 
                                             if (classname[a][1] !== res[i].CityName) {
-
                                                 document.getElementsByClassName(classname[a][0])[0].className += " " + res[i].CityName;
 
                                             }
@@ -275,9 +274,9 @@
                     };
 
                     createotherlayer(createfirstlayer());
-                    console.log(classname);
-                    console.log(parentmenu);
-                    console.log(document.getElementsByClassName("State "));
+                    // console.log(classname);
+                    // console.log(parentmenu);
+                    // console.log(document.getElementsByClassName("State "));
                 },
                 error: function (jqXHR, exception) {
                     var msg = '';

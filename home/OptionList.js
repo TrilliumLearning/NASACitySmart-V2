@@ -101,47 +101,98 @@ function ChangeStateList(statelevel) {
         cityList.remove(0);
     }
     $.ajax({
-        url: "http://localhost:9090/CityList",
+        url: "http://localhost:9090/ChangeCityName",
         dataType: 'json',
         success: function (results) {
-            console.log(results);
+            // console.log(results);
             var option;
             for (var i = 0; i < results.length; i++) {
                 if (statelevel === results[i].StateName) {
-                        option = new Option(results[i].CityName, results[i].CityName);
-                        cityList.add(option);
-                        $('.Menu').hide();
-                        document.getElementById("myListCity").disabled = false;
-                        document.getElementById("myListCity").style.backgroundColor = "white";
+                    option = new Option(results[i].CityName, results[i].CityName);
+                    cityList.add(option);
+                    $('.Menu').hide();
+                    document.getElementById("myListCity").disabled = false;
+                    document.getElementById("myListCity").style.backgroundColor = "white";
                 }
             }
+        }
+    });
+
+    $.ajax({
+        url: "http://localhost:9090/CityList",
+        success: function (res) {
+            var returnCityObj1 = getObjects(res, 'StateName', statelevel);
+            console.log(returnCityObj1);
+            // $('.Menu').hide();
+            // $('.State').hide();
+            // for (var j = 0; j < returnCityObj1.length; j++) {
+            //     var obj1 = returnCityObj1[j].FirstLayer;
+            //     var obj2 = returnCityObj1[j].SecondLayer;
+            //     var obj3 = returnCityObj1[j].StateName;
+            //     var className1 = '.' + obj1;
+            //     var className2 = '.' + obj2;
+            //     var className3 = '.' + obj3;
+            //     $(className1).show();
+            //     $(className2).show();
+            //     $(className3).show();
+            //     // console.log(className3)
+            //     console.log(returnCityObj1);
+                localStorage.setItem("returnvalue",JSON.stringify(returnCityObj1));
+            // }
         }
     });
 }
 
 function ChangeLayerList(citylevel) {
-    // alert(citylevel);
-    $.ajax({
-        url: "http://localhost:9090/ChangeLayerList",
-        dataType: "json",
-        success: function (res) {
-            var returnCityObj = getObjects(res, 'CityName', citylevel);
-            console.log(returnCityObj);
-            $('.Menu').hide();
-            $('.State').hide();
-            for (var j = 0; j < returnCityObj.length; j++) {
-                var obj1 = returnCityObj[j].FirstLayer;
-                var obj2 = returnCityObj[j].SecondLayer;
-                var obj3 = returnCityObj[j].StateName;
-                var className1 = '.' + obj1;
-                var className2 = '.' + obj2;
-                var className3 = '.' + obj3;
-                console.log(className3);
-                $(className1).show();
-                $(className2).show();
-                $(className3).show();
-                // console.log(className3)
+    console.log(citylevel);
+
+    var returnvalue = JSON.parse(localStorage.getItem("returnvalue"));
+    console.log(returnvalue);
+    // var sta = document.getElementById("myListCity").value;
+    $('.Menu').hide();
+    $('.State').hide();
+    // $(className1).show();
+    // $(className2).show();
+    // $.ajax({
+    //     url:"http://localhost:9090/CityList",
+    //     success:function (results) {
+    //         var returnCityObj1 = getObjects(results, 'CityName', citylevel);
+    //         console.log(returnCityObj1);
+            for(var i =0; i< returnvalue.length; i++) {
+                if (citylevel === returnvalue[i].CityName) {
+                    console.log(returnvalue[i].CityName);
+                    // console.log("work2");
+                    var obj1 = returnvalue[i].FirstLayer;
+                    var obj2 = returnvalue[i].SecondLayer;
+                    var obj3 = returnvalue[i].CityName + returnvalue[i].StateName;
+                        console.log(obj3);
+                        // console.log(i);
+                        var className1 = '.' + obj1;
+                        var className2 = '.' + obj2;
+                        var className4 = '.' + obj3;
+                        console.log(className4);
+                        $(className1).show();
+                        $(className2).show();
+                        $(className4).show();
+                }
             }
-        }
-    });
+        // }
+    // })
+
+
+
+        // var obj3 = returnCityObj1[i].StateName;
+
+        // console.log(obj3);
+
+// var className3 = '.' + obj3;
+        // console.log(className3);
+        // console.log(className3)
+        // $(className4).hide();
+
+    // }
+
 }
+
+
+
