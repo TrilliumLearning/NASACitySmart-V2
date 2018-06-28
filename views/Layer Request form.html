@@ -190,6 +190,14 @@
             <form class="well form-horizontal" id="layer">
                 <fieldset >
                     <div class="form-group">
+                        <label class="col-md-4 control-label">Request ID</label>
+                        <div class="col-md-8 inputGroupContainer">
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
+                                <input id="Request ID" name="Request_ID" placeholder="Layer Name" class="form-control" required value="" type="text" onchange="SearchLayerName(this.value)"></div>
+
+
+                        </div>
+                    <div class="form-group">
                         <label class="col-md-4 control-label">Layer Name</label>
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
@@ -224,7 +232,7 @@
                             <div class="input-group">
                                 <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-list"></i></span>
                                 <select required class="selectpicker form-control" name="Layer_Category">
-                                    <option value="">SELECT LAYER TYPE</option>
+                                    <option value="">SELECT LAYER CATEGORY</option>
                                     <option>Energy</option>
                                     <option>Water</option>
                                     <option>Agriculture</option>
@@ -242,6 +250,19 @@
                         <div class="col-md-8 inputGroupContainer">
                             <div>
                                 <textarea class="form-control" id="message" name="Layer_Description" placeholder="Enter your description here..." required type="text" rows="6" maxlength="140"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Layer Format</label>
+                        <div class="col-md-8 inputGroupContainer">
+                            <div class="input-group">
+                                <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-list"></i></span>
+                                <select required class="selectpicker form-control" name="Layer_format">
+                                    <option value="">SELECT LAYER FORMAT</option>
+                                    <option>GeoTIFF</option>
+                                    <option>Shapefile</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -303,6 +324,9 @@
                     //     }
                     // })
                 }
+            },
+            validation:{
+                allowedExtensions: ['GeoTIFF', 'shp']
             }
         });
 
