@@ -1,37 +1,55 @@
 // routes/routes.js
-const mysql = require('mysql');
-const config = require('../config/mainconf');
-const con_CS = mysql.createConnection(config.commondb_connection);
-const uploadPath = config.Upload_Path;
-const bodyParser = require('body-parser');
-const bcrypt = require('bcrypt-nodejs');
-const nodemailer = require('nodemailer');
-const Influx = require('influx');
-const cors = require('cors');
-const async = require('async');
-const crypto = require('crypto');
-const fs = require("fs");
-const rimraf = require("rimraf");
-const mkdirp = require("mkdirp");
-const multiparty = require('multiparty');
+var multer = require('multer');
+var mysql = require('mysql');
+var config = require('../config/mainconf');
+var con_CS = mysql.createConnection(config.commondb_connection);
+var uploadPath = config.Upload_Path;
+var path = require('path');
+var bodyParser = require('body-parser');
+var bcrypt = require('bcrypt-nodejs');
+var nodemailer = require('nodemailer');
+var Influx = require('influx');
+var cors = require('cors');
+var async = require('async');
+var crypto = require('crypto');
+var fs = require("fs");
+var rimraf = require("rimraf");
+var mkdirp = require("mkdirp");
+var multiparty = require('multiparty');
 
-const fileInputName = process.env.FILE_INPUT_NAME || "qqfile";
-const maxFileSize = process.env.MAX_FILE_SIZE || 0; // in bytes, 0 for unlimited
+var fileInputName = process.env.FILE_INPUT_NAME || "qqfile";
+var maxFileSize = process.env.MAX_FILE_SIZE || 0; // in bytes, 0 for unlimited
 
-let transactionID, myStat, myVal, myErrMsg, token, errStatus;
-let today, date2, date3, time2, time3, dateTime, tokenExpire;
+var Layerpath = "";
+var filePathName = "";
+var filePath, transactionID, myStat, myVal, myErrMsg, token, errStatus;
+var today, date2, date3, time2, time3, dateTime, tokenExpire;
 
-const smtpTrans = nodemailer.createTransport({
+// var storage = multer.diskStorage({
+//     destination: function (req, file, callback) {
+//         callback(null, uploadPath);
+//     },
+//     filename: function (req, file, callback) {
+//         //console.log(file.fieldname + " " + file.originalname);
+//         filePathName += file.fieldname + '-' + file.originalname + ";";
+//         //console.log(filePathName);
+//         callback(null, file.fieldname + '-' + file.originalname);
+//     }
+// });
+//
+// var fileUpload = multer({storage: storage}).any();
+
+var smtpTrans = nodemailer.createTransport({
     service: 'Gmail',
     auth: {
-        user: 'aaaa.zhao@g.feitianacademy.org',
+        user: 'aaa.zhao@g.feitianacademy.org',
         pass: "12344321"
     }
 });
 
 con_CS.query('USE ' + config.Login_db); // Locate Login DB
 
-const con_Water = new Influx.InfluxDB({
+var con_Water = new Influx.InfluxDB({
     database: 'FTAA_Water',
     host: 'aworldbridgelabs.com',
     port: 8086,
@@ -54,7 +72,7 @@ const con_Water = new Influx.InfluxDB({
     ]
 });
 
-const con_EnergyBudget = new Influx.InfluxDB({
+var con_EnergyBudget = new Influx.InfluxDB({
     database: 'FTAA_Energy',
     host: 'aworldbridgelabs.com',
     port: 8086,
@@ -74,7 +92,7 @@ const con_EnergyBudget = new Influx.InfluxDB({
     ]
 });
 
-const con_EnergyPredic = new Influx.InfluxDB({
+var con_EnergyPredic = new Influx.InfluxDB({
     database: 'FTAA_Energy',
     host: 'aworldbridgelabs.com',
     port: 8086,
@@ -94,7 +112,7 @@ const con_EnergyPredic = new Influx.InfluxDB({
     ]
 });
 
-const con_Wind = new Influx.InfluxDB({
+var con_Wind = new Influx.InfluxDB({
     host: '10.11.90.15',
     database: 'Wind_Station',
     schema: [
@@ -119,15 +137,19 @@ module.exports = function (app, passport) {
         credentials: true
     }));
 
-    // =====================================
-    // LOGIN PAGE===========================
-    // =====================================
 
+    // =====================================
+    // HOME PAGE (with login links) ========
+    // =====================================
     app.get('/', function (req, res) {
+        // res.render('index.ejs'); // load the index.ejs file
         res.redirect('/login');
     });
 
-// show the login form
+    // =====================================
+    // LOGIN PAGE===========================
+    // =====================================
+    // show the login form
     app.get('/login', function (req, res) {
 
         // render the page and pass in any flash data if it exists
@@ -165,7 +187,7 @@ module.exports = function (app, passport) {
 
     app.post('/email', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-        let statement = "SELECT * FROM Users WHERE username = '" + req.body.username + "';";
+        var statement = "SELECT * FROM Users WHERE username = '" + req.body.username + "';";
         //console.log(statement);
 
         con_CS.query(statement, function (err, results, fields) {
@@ -203,7 +225,7 @@ module.exports = function (app, passport) {
                     },
                     function(token, done, err) {
                         // Message object
-                        let message = {
+                        var message = {
                             from: 'FTAA <aaaa.zhao@g.feitianacademy.org>', // sender info
                             to: req.body.username, // Comma separated list of recipients
                             subject: 'Password Reset', // Subject of the message
@@ -263,17 +285,17 @@ module.exports = function (app, passport) {
                 myStat = "SELECT * FROM Users WHERE resetPasswordToken = '" + req.params.token + "'";
 
                 con_CS.query(myStat, function(err, user) {
-                    let userInfo = JSON.stringify(user, null, "\t");
+                    var userInfo = JSON.stringify(user, null, "\t");
 
                     if (!user) {
                         res.send('Password reset token is invalid or has expired. Please contact Administrator.');
                     } else {
-                        let newPass = {
+                        var newPass = {
                             Newpassword: bcrypt.hashSync(req.body.newpassword, null, null),
                             ConfirmPassword: bcrypt.hashSync(req.body.Confirmpassword, null, null)
                         };
 
-                        let passReset = "UPDATE Users SET password = '" + newPass.Newpassword + "' WHERE username = '" + req.body.username + "'";
+                        var passReset = "UPDATE Users SET password = '" + newPass.Newpassword + "' WHERE username = '" + req.body.username + "'";
 
                         con_CS.query(passReset, function (err, rows) {
                             if (err) {
@@ -288,7 +310,7 @@ module.exports = function (app, passport) {
                 });
             }, function(user, done, err) {
 
-                let message = {
+                var message = {
                     from: 'FTAA <aaaa.zhao@g.feitianacademy.org>',
                     to: req.body.username,
                     subject: 'Your password has been changed',
@@ -324,8 +346,8 @@ module.exports = function (app, passport) {
     // Update user profile page
     app.post('/userProfile', isLoggedIn, function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-        let user = req.user;
-        let newPass = {
+        var user = req.user;
+        var newPass = {
             firstname: req.body.usernameF,
             lastname: req.body.usernameL,
             currentpassword: req.body.currentpassword,
@@ -343,9 +365,9 @@ module.exports = function (app, passport) {
                 console.log(err);
                 res.json({"error": true, "message": "Fail !"});
             } else {
-                let passComp = bcrypt.compareSync(newPass.currentpassword, user.password);
+                var passComp = bcrypt.compareSync(newPass.currentpassword, user.password);
                 if (!!req.body.newpassword && passComp) {
-                    let passReset = "UPDATE Users SET password = '" + newPass.Newpassword + "' WHERE username = '" + user.username + "'";
+                    var passReset = "UPDATE Users SET password = '" + newPass.Newpassword + "' WHERE username = '" + user.username + "'";
 
                     con_CS.query(passReset, function (err, rows) {
                         //console.log(result);
@@ -403,7 +425,7 @@ module.exports = function (app, passport) {
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
         // con_CS.query('USE ' + config.Login_db); // Locate Login DB
 
-        let newUser = {
+        var newUser = {
             username: req.body.username,
             firstName: req.body.firstName,
             lastName: req.body.lastName,
@@ -426,7 +448,7 @@ module.exports = function (app, passport) {
                 res.send("New User Insert Fail!");
                 res.end();
             } else {
-                res.render('userHome1.ejs', {
+                res.render('userHome.ejs', {
                     user: req.user // get the user out of session and pass to template
                 });
             }
@@ -437,7 +459,7 @@ module.exports = function (app, passport) {
     app.get('/filterUser', isLoggedIn, function (req, res) {
         myStat = "SELECT * FROM Users";
 
-        let myQuery = [
+        var myQuery = [
             {
                 fieldVal: req.query.dateCreatedFrom,
                 dbCol: "dateCreated",
@@ -490,7 +512,7 @@ module.exports = function (app, passport) {
 
             con_CS.query(myStat, function (err, results, fields) {
 
-                let status = [{errStatus: ""}];
+                var status = [{errStatus: ""}];
 
                 if (err) {
                     console.log(err);
@@ -502,7 +524,7 @@ module.exports = function (app, passport) {
                     res.send(status);
                     res.end();
                 } else {
-                    let JSONresult = JSON.stringify(results, null, "\t");
+                    var JSONresult = JSON.stringify(results, null, "\t");
                     console.log(JSONresult);
                     res.send(JSONresult);
                     res.end();
@@ -510,9 +532,9 @@ module.exports = function (app, passport) {
             });
         }
 
-        let j = 0;
+        var j = 0;
 
-        for (let i = 0; i < myQuery.length; i++) {
+        for (var i = 0; i < myQuery.length; i++) {
             // console.log("i = " + i);
             // console.log("field Value: " + !!myQuery[i].fieldVal);
             if (i === myQuery.length - 1) {
@@ -542,7 +564,7 @@ module.exports = function (app, passport) {
     });
 
     // Retrieve user data from user management page
-    let edit_User, edit_firstName, edit_lastName, edit_userrole, edit_status;
+    var edit_User, edit_firstName, edit_lastName, edit_userrole, edit_status;
     app.get('/editUserQuery', isLoggedIn, function(req, res) {
 
         edit_User = req.query.Username;
@@ -570,7 +592,7 @@ module.exports = function (app, passport) {
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
 
         if (req.body.newPassword !== "") {
-            let updatedUserPass = {
+            var updatedUserPass = {
                 firstName: req.body.First_Name,
                 lastName: req.body.Last_Name,
                 userrole: req.body.User_Role,
@@ -583,7 +605,7 @@ module.exports = function (app, passport) {
             updateDBNres(myStat, myVal, "Update failed!", "/userManagement", res);
 
         } else {
-            let updatedUser = {
+            var updatedUser = {
                 firstName: req.body.First_Name,
                 lastName: req.body.Last_Name,
                 userrole: req.body.User_Role,
@@ -602,10 +624,10 @@ module.exports = function (app, passport) {
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
         dateNtime();
 
-        let username = req.query.usernameStr.split(",");
+        var username = req.query.usernameStr.split(",");
         myStat = "UPDATE Users SET modifiedUser = '" + req.user.username + "', dateModified = '" + dateTime + "',  status = 'Suspended'";
 
-        for (let i = 0; i < username.length; i++) {
+        for (var i = 0; i < username.length; i++) {
             if (i === 0) {
                 myStat += " WHERE username = '" + username[i] + "'";
                 if (i === username.length - 1) {
@@ -630,16 +652,16 @@ module.exports = function (app, passport) {
 
     app.post('/submit',function(req,res){
         console.log (req.body);
-        let result = Object.keys(req.body).map(function (key) {
+        var result = Object.keys(req.body).map(function (key) {
             return [String(key), req.body[key]];
         });
         // console.log (result);
         res.setHeader("Access-Control-Allow-Origin", "*");
 
-        let name = "";
-        let valueSubmit = "";
+        var name = "";
+        var value = "";
 
-        for(let i = 0; i < result.length; i++){
+        for(var i = 0; i < result.length; i++){
             if (i === result.length - 1) {
                 name += result[i][0];
                 value += '"' + result[i][1] + '"';
@@ -649,15 +671,15 @@ module.exports = function (app, passport) {
             }
 
         }
-        // let newImage = {
+        // var newImage = {
         //     Layer_Uploader: "http://localhost:9086/uploadfiles/" + responseDataUuid,
         //     Layer_Uploader_name: responseDataUuid
         // };
         // name += ", Layer_Uploader, Layer_Uploader_name";
         // value += ", '" + newImage.Layer_Uploader + "','" +newImage.Layer_Uploader_name + "'";
 
-        // let filepathname = "http://localhost:9086/uploadfiles/" + responseDataUuid ;
-        let statement1 = "INSERT INTO CitySmart.New_Users (" + name + ") VALUES (" + value + ");";
+        // var filepathname = "http://localhost:9086/uploadfiles/" + responseDataUuid ;
+        var statement1 = "INSERT INTO CitySmart.New_Users (" + name + ") VALUES (" + value + ");";
         console.log(statement1);
 
         con_CS.query(statement1, function(err,result) {
@@ -671,14 +693,14 @@ module.exports = function (app, passport) {
     });
 
     app.get('/newHum', function (req, res) {
-        let myStat = "SELECT Hum_Out, time FROM WS_MT1 WHERE time >= '" + req.query.timeFrom + "' AND time <= '" + req.query.timeTo + "'";
+        var myStat = "SELECT Hum_Out, time FROM WS_MT1 WHERE time >= '" + req.query.timeFrom + "' AND time <= '" + req.query.timeTo + "'";
 
         console.log(myStat);
 
         res.setHeader("Access-Control-Allow-Origin", "*");
 
         con_Wind.query(myStat, function (err, result, fields) {
-            let status = [{errStatus: ""}];
+            var status = [{errStatus: ""}];
 
             if (err) {
                 console.log(err);
@@ -690,7 +712,7 @@ module.exports = function (app, passport) {
                 res.send(status);
                 res.end();
             } else {
-                let Hum_Out = [];
+                var Hum_Out = [];
 
                 Hum_Out = JSON.stringify(result, null, "\t");
                 console.log(Hum_Out);
@@ -706,14 +728,14 @@ module.exports = function (app, passport) {
     });
 
     app.get('/newTemp', function (req, res) {
-        let myStat = "SELECT Temp_Out, time FROM WS_MT1 WHERE time >= '" + req.query.timeFrom + "' AND time <= '" + req.query.timeTo + "'";
+        var myStat = "SELECT Temp_Out, time FROM WS_MT1 WHERE time >= '" + req.query.timeFrom + "' AND time <= '" + req.query.timeTo + "'";
 
         console.log(myStat);
 
         res.setHeader("Access-Control-Allow-Origin", "*");
 
         con_Wind.query(myStat, function (err, result, fields) {
-            let status = [{errStatus: ""}];
+            var status = [{errStatus: ""}];
 
             if (err) {
                 console.log(err);
@@ -725,7 +747,7 @@ module.exports = function (app, passport) {
                 res.send(status);
                 res.end();
             } else {
-                let Temp_Out = [];
+                var Temp_Out = [];
 
                 Temp_Out = JSON.stringify(result, null, "\t");
                 console.log(Temp_Out);
@@ -741,14 +763,14 @@ module.exports = function (app, passport) {
     });
 
     app.get('/newWind', function (req, res) {
-        let myStat = "SELECT Wind_Speed, time FROM WS_MT1 WHERE time >= '" + req.query.timeFrom + "' AND time <= '" + req.query.timeTo + "'";
+        var myStat = "SELECT Wind_Speed, time FROM WS_MT1 WHERE time >= '" + req.query.timeFrom + "' AND time <= '" + req.query.timeTo + "'";
 
         console.log(myStat);
 
         res.setHeader("Access-Control-Allow-Origin", "*");
 
         con_Wind.query(myStat, function (err, result, fields) {
-            let status = [{errStatus: ""}];
+            var status = [{errStatus: ""}];
 
             if (err) {
                 console.log(err);
@@ -760,7 +782,7 @@ module.exports = function (app, passport) {
                 res.send(status);
                 res.end();
             } else {
-                let Wind_Speed = [];
+                var Wind_Speed = [];
 
                 Wind_Speed = JSON.stringify(result, null, "\t");
                 console.log(Wind_Speed);
@@ -776,14 +798,14 @@ module.exports = function (app, passport) {
     });
 
     app.get('/allHum', function (req, res) {
-        let myStat = "SELECT Hum_Out, time FROM WS_MT1 WHERE time >= '2018-04-01T04:00:00.000Z' AND time <= '2018-05-30T04:00:00.000Z'";
+        var myStat = "SELECT Hum_Out, time FROM WS_MT1 WHERE time >= '2018-04-01T04:00:00.000Z' AND time <= '2018-05-30T04:00:00.000Z'";
 
         console.log(myStat);
 
         res.setHeader("Access-Control-Allow-Origin", "*");
 
         con_Wind.query(myStat, function (err, result, fields) {
-            let status = [{errStatus: ""}];
+            var status = [{errStatus: ""}];
 
             if (err) {
                 console.log(err);
@@ -795,7 +817,7 @@ module.exports = function (app, passport) {
                 res.send(status);
                 res.end();
             } else {
-                let Hum_Out = [];
+                var Hum_Out = [];
 
                 Hum_Out = JSON.stringify(result, null, "\t");
                 console.log(Hum_Out);
@@ -811,14 +833,14 @@ module.exports = function (app, passport) {
     });
 
     app.get('/allTemp', function (req, res) {
-        let myStat = "SELECT Temp_Out, time FROM WS_MT1 WHERE time >= '2018-04-01T04:00:00.000Z' AND time <= '2018-05-30T04:00:00.000Z'";
+        var myStat = "SELECT Temp_Out, time FROM WS_MT1 WHERE time >= '2018-04-01T04:00:00.000Z' AND time <= '2018-05-30T04:00:00.000Z'";
 
         console.log(myStat);
 
         res.setHeader("Access-Control-Allow-Origin", "*");
 
         con_Wind.query(myStat, function (err, result, fields) {
-            let status = [{errStatus: ""}];
+            var status = [{errStatus: ""}];
 
             if (err) {
                 console.log(err);
@@ -830,7 +852,7 @@ module.exports = function (app, passport) {
                 res.send(status);
                 res.end();
             } else {
-                let Temp_Out = [];
+                var Temp_Out = [];
 
                 Temp_Out = JSON.stringify(result, null, "\t");
                 console.log(Temp_Out);
@@ -846,14 +868,14 @@ module.exports = function (app, passport) {
     });
 
     app.get('/allWind', function (req, res) {
-        let myStat = "SELECT Wind_Speed, time FROM WS_MT1 WHERE time >= '2018-04-01T04:00:00.000Z' AND time <= '2018-05-30T04:00:00.000Z'";
+        var myStat = "SELECT Wind_Speed, time FROM WS_MT1 WHERE time >= '2018-04-01T04:00:00.000Z' AND time <= '2018-05-30T04:00:00.000Z'";
 
         console.log(myStat);
 
         res.setHeader("Access-Control-Allow-Origin", "*");
 
         con_Wind.query(myStat, function (err, result, fields) {
-            let status = [{errStatus: ""}];
+            var status = [{errStatus: ""}];
 
             if (err) {
                 console.log(err);
@@ -865,7 +887,7 @@ module.exports = function (app, passport) {
                 res.send(status);
                 res.end();
             } else {
-                let Wind_Speed = [];
+                var Wind_Speed = [];
 
                 Wind_Speed = JSON.stringify(result, null, "\t");
                 console.log(Wind_Speed);
@@ -917,10 +939,10 @@ module.exports = function (app, passport) {
 
     app.get('/recover',function (req,res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
-        let recoverIDStr = req.query.recoverIDStr;
+        var recoverIDStr = req.query.recoverIDStr;
         console.log(recoverIDStr);
-        for(let i = 0; i < recoverIDStr.length; i++) {
-            let statement = "UPDATE CitySmart.GeneralFormDatatable SET Status = 'Active' WHERE ID = '" + recoverIDStr[i] + "'";
+        for(var i = 0; i < recoverIDStr.length; i++) {
+            var statement = "UPDATE CitySmart.GeneralFormDatatable SET Status = 'Active' WHERE ID = '" + recoverIDStr[i] + "'";
             con_CS.query(statement, function (err, results) {
                 if (err) throw err;
                 res.json(results[i]);
@@ -930,10 +952,10 @@ module.exports = function (app, passport) {
 
     app.get('/approve',function (req,res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
-        let approveIDStr = req.query.approveIDStr;
+        var approveIDStr = req.query.approveIDStr;
         console.log(approveIDStr);
-        for(let i = 0; i < approveIDStr.length; i++) {
-            let statement = "UPDATE CitySmart.GeneralFormDatatable SET Status = 'Active' WHERE ID = '" + approveIDStr[i] + "'";
+        for(var i = 0; i < approveIDStr.length; i++) {
+            var statement = "UPDATE CitySmart.GeneralFormDatatable SET Status = 'Active' WHERE ID = '" + approveIDStr[i] + "'";
             con_CS.query(statement, function (err, results) {
                 if (err) throw err;
                 res.json(results[i]);
@@ -944,19 +966,19 @@ module.exports = function (app, passport) {
 //Put back the photo in the form
     app.get('/edit', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-        let editIDSr = req.query.editIDSr;
+        var editIDSr = req.query.editIDSr;
         // console.log(editIDSr);
-        let myStat = "SELECT Layer_Uploader, Layer_Uploader_name FROM GeneralFormDatatable WHERE ID = '" + editIDSr + "'";
+        var myStat = "SELECT Layer_Uploader, Layer_Uploader_name FROM GeneralFormDatatable WHERE ID = '" + editIDSr + "'";
         // console.log(myStat);
 
-        let filePath0;
+        var filePath0;
         con_CS.query(myStat, function (err, results) {
             // console.log("query statement : " + myStat);
             if (!results[0].Layer_Uploader && !results[0].Layer_Uploader_name) {
                 console.log("Error");
             } else {
                 filePath0 = results[0];
-                let JSONresult = JSON.stringify(results, null, "\t");
+                var JSONresult = JSON.stringify(results, null, "\t");
                 // console.log(JSONresult);
                 res.send(JSONresult);
                 res.end()
@@ -967,10 +989,10 @@ module.exports = function (app, passport) {
 //Delete button
     app.get('/deleteData', function(req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
-        let transactionID = req.query.transactionIDStr.split(',');
+        var transactionID = req.query.transactionIDStr.split(',');
         console.log(transactionID);
-        for(let i = 0; i < transactionID.length; i++) {
-            let statement = "UPDATE CitySmart.GeneralFormDatatable SET Status = 'Delete' WHERE ID = '" + transactionID[i] + "'";
+        for(var i = 0; i < transactionID.length; i++) {
+            var statement = "UPDATE CitySmart.GeneralFormDatatable SET Status = 'Delete' WHERE ID = '" + transactionID[i] + "'";
             // console.log(statement);
             con_CS.query(statement, function (err, results) {
                 if (err) throw err;
@@ -983,7 +1005,7 @@ module.exports = function (app, passport) {
 //AddData in table
     app.get('/AddData',function (req,res){
         res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query("SELECT * FROM Request_Form",function (err,results) {
+        con_CS.query("SELECT * FROM GeneralFormDatatable",function (err,results) {
             if (err) throw err;
             res.json(results);
         })
@@ -1002,31 +1024,23 @@ module.exports = function (app, passport) {
 
     app.post('/submitL',function (req,res){
         console.log (req.body);
-        let result = Object.keys(req.body).map(function (key) {
+        var result = Object.keys(req.body).map(function (key) {
             return [String(key), req.body[key]];
         });
         res.setHeader("Access-Control-Allow-Origin", "*");
 
-        let name = "";
-        let valueSubmit = "";
+        var name = "";
+        var value = "";
 
-        for(let i = 0; i < result.length; i++){
+        for(var i = 0; i < result.length; i++){
             if (i === result.length - 1) {
                 name += result[i][0];
-                valueSubmit += '"' + result[i][1] + '"';
+                value += '"' + result[i][1] + '"';
             } else {
                 name += result[i][0] + ", ";
-                valueSubmit += '"' + result[i][1] + '"' + ", ";
+                value += '"' + result[i][1] + '"' + ", ";
             }
         }
-    });
-
-    app.get('/AddData',function (req,res){
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query("SELECT * FROM Request_Form",function (err,results) {
-            if (err) throw err;
-            res.json(results);
-        })
     });
 
     app.get('/EditData',function (req,res){
@@ -1057,7 +1071,7 @@ module.exports = function (app, passport) {
 
             console.log("recive and processing");
 
-            let JSONresult = JSON.stringify(result, null, "\t");
+            var JSONresult = JSON.stringify(result, null, "\t");
             console.log(JSONresult);
 
             res.send(JSONresult);
@@ -1074,7 +1088,7 @@ module.exports = function (app, passport) {
 
             console.log("recive and processing");
 
-            let JSONresult = JSON.stringify(result, null, "\t");
+            var JSONresult = JSON.stringify(result, null, "\t");
 
             res.send(JSONresult);
             res.end();
@@ -1090,7 +1104,7 @@ module.exports = function (app, passport) {
 
             console.log("recive and processing");
 
-            let JSONresult = JSON.stringify(result, null, "\t");
+            var JSONresult = JSON.stringify(result, null, "\t");
 
             res.send(JSONresult);
             res.end();
@@ -1107,7 +1121,7 @@ module.exports = function (app, passport) {
 
             console.log("recive and processing");
 
-            let JSONresult = JSON.stringify(result, null, "\t");
+            var JSONresult = JSON.stringify(result, null, "\t");
 
             res.send(JSONresult);
             res.end();
@@ -1121,7 +1135,7 @@ module.exports = function (app, passport) {
         con_CS.query("SELECT * From CitySmart.LayerMenu", function (err,result) {
             console.log("recive and processing");
 
-            let JSONresult = JSON.stringify(result, null, "\t");
+            var JSONresult = JSON.stringify(result, null, "\t");
 
             res.send(JSONresult);
             res.end();
@@ -1153,7 +1167,7 @@ module.exports = function (app, passport) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         con_CS.query("SELECT FirstLayer , SecondLayer , CityName , ClassName FROM LayerMenu", function (err, results) {
             if (err) throw err;
-            let layerInfo = JSON.stringify(results, null, "\t");
+            var layerInfo = JSON.stringify(results, null, "\t");
             res.send(layerInfo);
             console.log(res);
             res.end();
@@ -1162,11 +1176,11 @@ module.exports = function (app, passport) {
     });
 
     app.get('/filterUser', function (req, res) {
-        let myStat = 'SELECT Hum_Out FROM WS_MT1';
+        var myStat = 'SELECT Hum_Out FROM WS_MT1';
 
         console.log(myStat);
 
-        let myQuery = [
+        var myQuery = [
             {
                 fieldVal: req.query.timeFrom,
                 dbCol: "time",
@@ -1185,7 +1199,7 @@ module.exports = function (app, passport) {
             res.setHeader("Access-Control-Allow-Origin", "*");
 
             con_Wind.query(myStat, function (err, result, fields) {
-                let status = [{errStatus: ""}];
+                var status = [{errStatus: ""}];
 
                 if (err) {
                     console.log(err);
@@ -1197,7 +1211,7 @@ module.exports = function (app, passport) {
                     res.send(status);
                     res.end();
                 } else {
-                    let JSONresult = JSON.stringify(result, null, "\t");
+                    var JSONresult = JSON.stringify(result, null, "\t");
                     console.log(JSONresult);
                     res.send(JSONresult);
                     res.end();
@@ -1205,14 +1219,14 @@ module.exports = function (app, passport) {
             }).then(result => {
                 console.log(result.length);
             res.send(result)
-            }).catch(err => {
+        }).catch(err => {
                 res.status(500).send(err.stack)
-            });
+        });
         }
 
-        let j = 0;
+        var j = 0;
 
-        for (let i = 0; i < myQuery.length; i++) {
+        for (var i = 0; i < myQuery.length; i++) {
             // console.log("i = " + i);
             // console.log("field Value: " + !!myQuery[i].fieldVal);
             if (i === myQuery.length - 1) {
@@ -1242,48 +1256,48 @@ module.exports = function (app, passport) {
 
     });
 
-    let valueEnergy;
-    let startDateTime;
-    let endDateTime;
+    var value;
+    var startDateTime;
+    var endDateTime;
 
     app.get('/EnergyGraph', function (req, res) {
-        valueEnergy = req.query.keywords;
+        value = req.query.keywords;
         startDateTime = req.query.startDateTime;
         endDateTime = req.query.endDateTime;
-        //console.log(valueEnergy);
+        //console.log(value);
         //console.log(startDateTime);
         //console.log(endDateTime);
 
-        if (valueEnergy === "budget") {
+        if (value === "budget") {
             con_EnergyBudget.query('SELECT sum(Electricity_Usage) as Electricity_Usage FROM "FTAA_Energy"."autogen"."Energy_Budget" WHERE time >= 1473120000000000000 and time <= 1504652400000000000 GROUP BY time(1h)').then(results => {
-                let origin = req.headers.origin;
+                var origin = req.headers.origin;
             res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
+            var JSONresult = JSON.stringify(results, null, "\t");
             //console.log(JSONresult);
 
             res.send(JSONresult);
             res.end();
         });
-        } else if (valueEnergy === "actual") {
+        } else if (value === "actual") {
             con_EnergyPredic.query('SELECT * FROM "FTAA_Energy"."autogen"."Actual_vs_Prediction"').then(results => {
-                let origin = req.headers.origin;
+                var origin = req.headers.origin;
             res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
+            var JSONresult = JSON.stringify(results, null, "\t");
             //console.log(JSONresult);
 
             res.send(JSONresult);
             res.end();
         });
         } else {
-            let queryDate = 'SELECT Electricity_Usage, Machine_ID, Machine_Name FROM "FTAA_Energy"."autogen"."Energy_Budget" WHERE time >= ' + "'" + startDateTime + "'" + 'AND time < ' + "'" + endDateTime + "'" + " GROUP BY Machine_ID";
+            var queryDate = 'SELECT Electricity_Usage, Machine_ID, Machine_Name FROM "FTAA_Energy"."autogen"."Energy_Budget" WHERE time >= ' + "'" + startDateTime + "'" + 'AND time < ' + "'" + endDateTime + "'" + " GROUP BY Machine_ID";
             //console.log(queryDate);
             con_EnergyBudget.query(queryDate).then(results => {
-                let origin = req.headers.origin;
+                var origin = req.headers.origin;
             res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
+            var JSONresult = JSON.stringify(results, null, "\t");
             //console.log(JSONresult);
 
             res.send(JSONresult);
@@ -1294,27 +1308,27 @@ module.exports = function (app, passport) {
     });
 
 
-    let valueWater;
-    let query1 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'Calcium_Ion-Selective_Electrode'";
-    let query2 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'Ammonium_Ion-Selective_Electrode'";
-    let query3 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'Potassium_ion-Selective_Electrode'";
-    let query4 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'Chloride_Probe'";
-    let query5 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'Colorimeter'";
-    let query6 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'Turbidity_Sensor'";
-    let query7 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'PH_Sensor'";
-    let query8 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'Temperature_Probe_(C)'";
+    var value;
+    var query1 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'Calcium_Ion-Selective_Electrode'";
+    var query2 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'Ammonium_Ion-Selective_Electrode'";
+    var query3 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'Potassium_ion-Selective_Electrode'";
+    var query4 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'Chloride_Probe'";
+    var query5 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'Colorimeter'";
+    var query6 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'Turbidity_Sensor'";
+    var query7 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'PH_Sensor'";
+    var query8 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'Temperature_Probe_(C)'";
 
 //console.log(query1);
 
     app.get('/WaterGraph', function (req, res) {
-        valueWater = req.query.keywords;
-        console.log(valueWater);
-        if (valueWater === "Calcium") {
+        value = req.query.keywords;
+        console.log(value);
+        if (value === "Calcium") {
             con_Water.query(query1).then(results => {
-                let origin = req.headers.origin;
+                var origin = req.headers.origin;
             res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
+            var JSONresult = JSON.stringify(results, null, "\t");
             console.log(JSONresult);
 
             res.send(JSONresult);
@@ -1322,12 +1336,12 @@ module.exports = function (app, passport) {
         });
         }
 
-        if (valueWater === "Ammonium") {
+        if (value === "Ammonium") {
             con_Water.query(query2).then(results => {
-                let origin = req.headers.origin;
+                var origin = req.headers.origin;
             res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
+            var JSONresult = JSON.stringify(results, null, "\t");
             console.log(JSONresult);
 
             res.send(JSONresult);
@@ -1335,12 +1349,12 @@ module.exports = function (app, passport) {
         });
         }
 
-        if (valueWater === "Potassium") {
+        if (value === "Potassium") {
             con_Water.query(query3).then(results => {
-                let origin = req.headers.origin;
+                var origin = req.headers.origin;
             res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
+            var JSONresult = JSON.stringify(results, null, "\t");
             console.log(JSONresult);
 
             res.send(JSONresult);
@@ -1348,12 +1362,12 @@ module.exports = function (app, passport) {
         });
         }
 
-        if (valueWater === "Chloride") {
+        if (value === "Chloride") {
             con_Water.query(query4).then(results => {
-                let origin = req.headers.origin;
+                var origin = req.headers.origin;
             res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
+            var JSONresult = JSON.stringify(results, null, "\t");
             console.log(JSONresult);
 
             res.send(JSONresult);
@@ -1361,12 +1375,12 @@ module.exports = function (app, passport) {
         });
         }
 
-        if (valueWater === "Colorimeter") {
+        if (value === "Colorimeter") {
             con_Water.query(query5).then(results => {
-                let origin = req.headers.origin;
+                var origin = req.headers.origin;
             res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
+            var JSONresult = JSON.stringify(results, null, "\t");
             console.log(JSONresult);
 
             res.send(JSONresult);
@@ -1374,12 +1388,12 @@ module.exports = function (app, passport) {
         });
         }
 
-        if (valueWater === "Turbidity") {
+        if (value === "Turbidity") {
             con_Water.query(query6).then(results => {
-                let origin = req.headers.origin;
+                var origin = req.headers.origin;
             res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
+            var JSONresult = JSON.stringify(results, null, "\t");
             console.log(JSONresult);
 
             res.send(JSONresult);
@@ -1387,12 +1401,12 @@ module.exports = function (app, passport) {
         });
         }
 
-        if (valueWater === "pH") {
+        if (value === "pH") {
             con_Water.query(query7).then(results => {
-                let origin = req.headers.origin;
+                var origin = req.headers.origin;
             res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
+            var JSONresult = JSON.stringify(results, null, "\t");
             console.log(JSONresult);
 
             res.send(JSONresult);
@@ -1400,12 +1414,12 @@ module.exports = function (app, passport) {
         });
         }
 
-        if (valueWater === "Temperature") {
+        if (value === "Temperature") {
             con_Water.query(query8).then(results => {
-                let origin = req.headers.origin;
+                var origin = req.headers.origin;
             res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
+            var JSONresult = JSON.stringify(results, null, "\t");
             console.log(JSONresult);
 
             res.send(JSONresult);
@@ -1415,7 +1429,7 @@ module.exports = function (app, passport) {
     });
 
     app.get('/userhome', isLoggedIn, function (req, res) {
-        let myStat = "SELECT userrole FROM Users WHERE username = '" + req.user.username + "';";
+        var myStat = "SELECT userrole FROM Users WHERE username = '" + req.user.username + "';";
 
         con_CS.query(myStat, function (err, results, fields) {
             //console.log(results);
@@ -1423,7 +1437,7 @@ module.exports = function (app, passport) {
             if (!results[0].userrole) {
                 console.log("Error");
             } else {
-                res.render('userHome1.ejs', {
+                res.render('userHome.ejs', {
                     user: req.user // get the user out of session and pass to template
                 });
             }
@@ -1447,14 +1461,14 @@ module.exports = function (app, passport) {
     });
 
     // edit on homepage
-    let editTransactionID;
-    let editData;
+    var editTransactionID;
+    var editData;
     app.get('/sendEditData', isLoggedIn, function(req, res) {
         editTransactionID = req.query.transactionIDStr;
         console.log(editTransactionID);
 
-        let scoutingStat = "SELECT Users.firstName, Users.lastName, General_Form.*, Detailed_Scouting.* FROM Transaction INNER JOIN Users ON Users.username = Transaction.Cr_UN INNER JOIN General_Form ON General_Form.transactionID = Transaction.transactionID INNER JOIN Detailed_Scouting ON Detailed_Scouting.transactionID = Transaction.transactionID WHERE Transaction.transactionID = '" + editTransactionID +"';";
-        let trapStat = "SELECT Users.firstName, Users.lastName, General_Form.*, Detailed_Trap.* FROM Transaction INNER JOIN Users ON Users.username = Transaction.Cr_UN INNER JOIN General_Form ON General_Form.transactionID = Transaction.transactionID INNER JOIN Detailed_Trap ON Detailed_Trap.transactionID = Transaction.transactionID WHERE Transaction.transactionID = '" + editTransactionID + "';";
+        var scoutingStat = "SELECT Users.firstName, Users.lastName, General_Form.*, Detailed_Scouting.* FROM Transaction INNER JOIN Users ON Users.username = Transaction.Cr_UN INNER JOIN General_Form ON General_Form.transactionID = Transaction.transactionID INNER JOIN Detailed_Scouting ON Detailed_Scouting.transactionID = Transaction.transactionID WHERE Transaction.transactionID = '" + editTransactionID +"';";
+        var trapStat = "SELECT Users.firstName, Users.lastName, General_Form.*, Detailed_Trap.* FROM Transaction INNER JOIN Users ON Users.username = Transaction.Cr_UN INNER JOIN General_Form ON General_Form.transactionID = Transaction.transactionID INNER JOIN Detailed_Trap ON Detailed_Trap.transactionID = Transaction.transactionID WHERE Transaction.transactionID = '" + editTransactionID + "';";
 
         con_CS.query(scoutingStat + trapStat, function (err, results, fields) {
 
@@ -1480,10 +1494,10 @@ module.exports = function (app, passport) {
         // console.log("11");
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
 
-        let myStat = "SELECT Damage_photo, Damage_photo_name FROM Detailed_Scouting WHERE transactionID = '" + editTransactionID +"';";
+        var myStat = "SELECT Damage_photo, Damage_photo_name FROM Detailed_Scouting WHERE transactionID = '" + editTransactionID +"';";
         console.log("This is for editing photos ONLY >:( " + editTransactionID);
 
-        let filePath0;
+        var filePath0;
         con_CS.query(myStat, function (err, results) {
             console.log("query statement : " + myStat);
 
@@ -1491,7 +1505,7 @@ module.exports = function (app, passport) {
                 console.log("Error");
             } else {
                 filePath0 = results[0];
-                let JSONresult = JSON.stringify(results, null, "\t");
+                var JSONresult = JSON.stringify(results, null, "\t");
                 console.log(JSONresult);
                 res.send(JSONresult);
                 res.end()
@@ -1503,10 +1517,10 @@ module.exports = function (app, passport) {
         // console.log("11");
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
 
-        let myStat = "SELECT Pest_photo, Pest_photo_name FROM Detailed_Scouting WHERE transactionID = '" + editTransactionID +"';";
+        var myStat = "SELECT Pest_photo, Pest_photo_name FROM Detailed_Scouting WHERE transactionID = '" + editTransactionID +"';";
         console.log("This is for editing photos ONLY >:( " + editTransactionID);
 
-        let filePath0;
+        var filePath0;
         con_CS.query(myStat, function (err, results) {
             console.log("query statement : " + myStat);
 
@@ -1514,7 +1528,7 @@ module.exports = function (app, passport) {
                 console.log("Error");
             } else {
                 filePath0 = results[0];
-                let JSONresult = JSON.stringify(results, null, "\t");
+                var JSONresult = JSON.stringify(results, null, "\t");
                 console.log(JSONresult);
                 res.send(JSONresult);
                 res.end()
@@ -1556,10 +1570,10 @@ module.exports = function (app, passport) {
     });
 
     app.get('/filterQuery', isLoggedIn, function (req, res) {
-        let scoutingStat = "SELECT Users.username, Users.firstName, Users.lastName, General_Form.*, Detailed_Scouting.* FROM Transaction INNER JOIN Users ON Users.username = Transaction.Cr_UN INNER JOIN General_Form ON General_Form.transactionID = Transaction.transactionID INNER JOIN Detailed_Scouting ON Detailed_Scouting.transactionID = Transaction.transactionID";
-        let trapStat = "SELECT Users.username, Users.firstName, Users.lastName, General_Form.*, Detailed_Trap.* FROM Transaction INNER JOIN Users ON Users.username = Transaction.Cr_UN INNER JOIN General_Form ON General_Form.transactionID = Transaction.transactionID INNER JOIN Detailed_Trap ON Detailed_Trap.transactionID = Transaction.transactionID";
+        var scoutingStat = "SELECT Users.username, Users.firstName, Users.lastName, General_Form.*, Detailed_Scouting.* FROM Transaction INNER JOIN Users ON Users.username = Transaction.Cr_UN INNER JOIN General_Form ON General_Form.transactionID = Transaction.transactionID INNER JOIN Detailed_Scouting ON Detailed_Scouting.transactionID = Transaction.transactionID";
+        var trapStat = "SELECT Users.username, Users.firstName, Users.lastName, General_Form.*, Detailed_Trap.* FROM Transaction INNER JOIN Users ON Users.username = Transaction.Cr_UN INNER JOIN General_Form ON General_Form.transactionID = Transaction.transactionID INNER JOIN Detailed_Trap ON Detailed_Trap.transactionID = Transaction.transactionID";
         //console.log(req.query);
-        let myQueryObj = [
+        var myQueryObj = [
             {
                 fieldVal: req.query.statusDel,
                 dbCol: "General_Form.Status_del",
@@ -1636,22 +1650,22 @@ module.exports = function (app, passport) {
 
     // Prepare and assign new transaction ID
     app.get('/newEntry', isLoggedIn, function (req, res) {
-        let d = new Date();
-        let utcDateTime = d.getUTCFullYear() + "-" + ('0' + (d.getUTCMonth() + 1)).slice(-2) + "-" + ('0' + d.getUTCDate()).slice(-2);
-        let queryTransID = "SELECT COUNT(transactionID) AS number FROM Transaction WHERE transactionID LIKE '" + utcDateTime + "%';";
+        var d = new Date();
+        var utcDateTime = d.getUTCFullYear() + "-" + ('0' + (d.getUTCMonth() + 1)).slice(-2) + "-" + ('0' + d.getUTCDate()).slice(-2);
+        var queryTransID = "SELECT COUNT(transactionID) AS number FROM Transaction WHERE transactionID LIKE '" + utcDateTime + "%';";
 
         con_CS.query(queryTransID, function (err, results, fields) {
             transactionID = utcDateTime + "_" + ('0000' + (results[0].number + 1)).slice(-5);
             if (err) {
                 console.log(err);
             } else {
-                let insertTransID = "INSERT INTO Transaction (transactionID, Cr_UN) VALUE (" + "'" + transactionID + "', '" + req.user.username + "');";
+                var insertTransID = "INSERT INTO Transaction (transactionID, Cr_UN) VALUE (" + "'" + transactionID + "', '" + req.user.username + "');";
                 con_CS.query(insertTransID, function (err, results, fields) {
                     if (err) {
                         console.log(err);
                     } else {
                         // Show general form
-                        res.render('Regular_Datatable.html', {
+                        res.render('form.ejs', {
                             user: req.user, // get the user out of session and pass to template
                             message: req.flash('Data Entry Message'),
                             firstname: req.user.firstName,
@@ -1669,14 +1683,14 @@ module.exports = function (app, passport) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         //console.log(req.body);
 
-        let result = Object.keys(req.body).map(function (key) {
+        var result = Object.keys(req.body).map(function (key) {
             return [String(key), req.body[key]];
         });
 
-        let name = "";
-        let value = "";
+        var name = "";
+        var value = "";
 
-        for (let i = 0; i < result.length; i++) {
+        for (var i = 0; i < result.length; i++) {
             if (result[i][0] === "Latitude_direction" || result[i][0] === "Longitude_direction") {
                 // lati and long
                 name += result[i][0].substring(0, result[i][0].length - 10) + ", ";
@@ -1690,7 +1704,7 @@ module.exports = function (app, passport) {
                 i = i + 1;
             } else if (result[i][0] === "Rotation_intercropping_crop") {
                 name += result[i][0] + ", ";
-                let str = result[i][1].toString();
+                var str = result[i][1].toString();
                 str = str.replace(/,/g, "/");
                 value += '"' + str + '"' + ", ";
             } else {
@@ -1706,8 +1720,8 @@ module.exports = function (app, passport) {
 
         // console.log(name);
         // console.log(value);
-        let deleteStatement = "DELETE FROM General_Form WHERE transactionID = '" + req.body.transactionID + "'; ";
-        let insertStatement = "INSERT INTO General_Form (" + name + ") VALUES (" + value + ");";
+        var deleteStatement = "DELETE FROM General_Form WHERE transactionID = '" + req.body.transactionID + "'; ";
+        var insertStatement = "INSERT INTO General_Form (" + name + ") VALUES (" + value + ");";
         console.log(insertStatement);
 
         con_CS.query(deleteStatement + insertStatement, function (err, results, fields) {
@@ -1724,17 +1738,17 @@ module.exports = function (app, passport) {
     app.post('/detailedFormScouting', isLoggedIn, function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         console.log(req.body);
-        let result = Object.keys(req.body).map(function (key) {
+        var result = Object.keys(req.body).map(function (key) {
             return [String(key), req.body[key]];
         });
 
-        let name = "";
-        let value = "";
+        var name = "";
+        var value = "";
 
-        for (let i = 0; i < result.length; i++) {
+        for (var i = 0; i < result.length; i++) {
             if (result[i][0] === "Pest_stage" || result[i][0] === "Control_undertaken") {
                 name += result[i][0] + ", ";
-                let str = result[i][1].toString();
+                var str = result[i][1].toString();
                 str = str.replace(/,/g, "/");
                 value += '"' + str + '"' + ", ";
             } else {
@@ -1745,13 +1759,13 @@ module.exports = function (app, passport) {
         name = name.substring(0, name.length - 2);
         value = value.substring(0, value.length - 2);
 
-        // let path = responseDataUuid.split(";");
+        // var path = responseDataUuid.split(";");
         // //console.log(path);
-        // let damage = "";
-        // let damage_name = "";
-        // let pest = "";
+        // var damage = "";
+        // var damage_name = "";
+        // var pest = "";
         //
-        // for (let i = 0; i < path.length - 1; i++) {
+        // for (var i = 0; i < path.length - 1; i++) {
         //     console.log("New paths underway!!!!");
         //     if (path[i] === "Damage_photo") {
         //         damage += "https://aworldbridgelabs.com/uploadfiles/" + path[i] + ";";
@@ -1769,7 +1783,7 @@ module.exports = function (app, passport) {
         // name += ", Damage_photo, Damage_photo_name";
         // value += ", '" + damage + "', '" + damage_name + "'";
 
-        let newImage = {
+        var newImage = {
             Damage_photo: "https://aworldbridgelabs.com/uploadfiles/" + responseDataUuid,
             Damage_photo_name: responseDataUuid,
             Pest_photo: "https://aworldbridgelabs.com/uploadfiles/" + responseDataUuid2,
@@ -1782,8 +1796,8 @@ module.exports = function (app, passport) {
         name += ", Damage_photo, Damage_photo_name, Pest_photo, Pest_photo_name";
         value += ", '" + newImage.Damage_photo + "', '" + newImage.Damage_photo_name + "', '" + newImage.Pest_photo + "', '" + newImage.Pest_photo_name + "'";
 
-        let deleteStatement = "DELETE FROM Detailed_Scouting WHERE transactionID = '" + req.body.transactionID + "'; ";
-        let insertStatement = "INSERT INTO Detailed_Scouting (" + name + ") VALUES (" + value + ");";
+        var deleteStatement = "DELETE FROM Detailed_Scouting WHERE transactionID = '" + req.body.transactionID + "'; ";
+        var insertStatement = "INSERT INTO Detailed_Scouting (" + name + ") VALUES (" + value + ");";
         console.log(insertStatement);
 
         con_CS.query(deleteStatement + insertStatement, function (err, results, fields) {
@@ -1800,22 +1814,22 @@ module.exports = function (app, passport) {
     app.post('/detailedFormTrap', isLoggedIn, function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         console.log(req.body);
-        let result = Object.keys(req.body).map(function (key) {
+        var result = Object.keys(req.body).map(function (key) {
             return [String(key), req.body[key]];
         });
 
-        let name = "";
-        let value = "";
+        var name = "";
+        var value = "";
 
-        for (let i = 0; i < result.length; i++) {
+        for (var i = 0; i < result.length; i++) {
             name += result[i][0] + ", ";
             value += '"' + result[i][1] + '"' + ", ";
         }
         name = name.substring(0, name.length - 2);
         value = value.substring(0, value.length - 2);
 
-        let deleteStatement = "DELETE FROM Detailed_Trap WHERE transactionID = '" + req.body.transactionID + "'; ";
-        let insertStatement = "INSERT INTO Detailed_Trap (" + name + ") VALUES (" + value + ");";
+        var deleteStatement = "DELETE FROM Detailed_Trap WHERE transactionID = '" + req.body.transactionID + "'; ";
+        var insertStatement = "INSERT INTO Detailed_Trap (" + name + ") VALUES (" + value + ");";
         console.log(insertStatement);
 
         con_CS.query(deleteStatement + insertStatement, function (err, results, fields) {
@@ -1879,11 +1893,11 @@ function del_recov(StatusUpd, ErrMsg, targetURL, req, res) {
 
     transactionID = req.query.transactionIDStr.split(",");
     console.log(transactionID);
-    let statementGeneral = "UPDATE General_Form SET Status_del = '" + StatusUpd + "'";
-    let statementDetailedS = "UPDATE Detailed_Scouting SET Status_del = '" + StatusUpd + "'";
-    let statementDetailedT = "UPDATE Detailed_Trap SET Status_del = '" + StatusUpd + "'";
+    var statementGeneral = "UPDATE General_Form SET Status_del = '" + StatusUpd + "'";
+    var statementDetailedS = "UPDATE Detailed_Scouting SET Status_del = '" + StatusUpd + "'";
+    var statementDetailedT = "UPDATE Detailed_Trap SET Status_del = '" + StatusUpd + "'";
 
-    for (let i = 0; i < transactionID.length; i++) {
+    for (var i = 0; i < transactionID.length; i++) {
         if (i === 0) {
             statementGeneral += " WHERE transactionID = '" + transactionID[i] + "'";
             statementDetailedS += " WHERE transactionID = '" + transactionID[i] + "'";
@@ -1940,8 +1954,8 @@ function updateDBNredir(SQLstatement, Value, ErrMsg, failURL, redirURL, res) {
 }
 
 function QueryStat(myObj, scoutingStat, trapStat, res) {
-    let j = 0;
-    for (let i = 0; i < myObj.length; i++) {
+    var j = 0;
+    for (var i = 0; i < myObj.length; i++) {
         //console.log("i = " + i);
         //console.log("field Value: " + !!myObj[i].fieldVal);
         if (!!myObj[i].adj){
@@ -1950,7 +1964,7 @@ function QueryStat(myObj, scoutingStat, trapStat, res) {
                 myObj[i].table = parseInt(myObj[i].table.substring(0, 1));
             }
 
-            let aw;
+            var aw;
             if (j === 0) {
                 aw = " WHERE ";
                 j = 1;
@@ -1968,12 +1982,12 @@ function QueryStat(myObj, scoutingStat, trapStat, res) {
             }
 
             if (i === myObj.length - 1) {
-                let sqlStatement = scoutingStat + "; " + trapStat;
+                var sqlStatement = scoutingStat + "; " + trapStat;
                 dataList(sqlStatement, res);
             }
         } else {
             if (i === myObj.length - 1) {
-                let sqlStatement = scoutingStat + "; " + trapStat;
+                var sqlStatement = scoutingStat + "; " + trapStat;
                 dataList(sqlStatement, res);
             }
         }
@@ -2003,8 +2017,8 @@ function dataList(sqlStatement, res) {
             res.send(errStatus);
             res.end();
         } else {
-            let result = results[0].concat(results[1]);
-            let JSONresult = JSON.stringify(result, null, "\t");
+            var result = results[0].concat(results[1]);
+            var JSONresult = JSON.stringify(result, null, "\t");
             // console.log(JSONresult);
             res.send(JSONresult);
             res.end();
@@ -2013,22 +2027,22 @@ function dataList(sqlStatement, res) {
 }
 
 function changeMail(str) {
-    let spliti = str.split("@");
-    let letter1 = spliti[0].substring(0, 1);
-    let letter2 = spliti[0].substring(spliti[0].length - 1, spliti[0].length);
-    let newFirst = letter1;
+    var spliti = str.split("@");
+    var letter1 = spliti[0].substring(0, 1);
+    var letter2 = spliti[0].substring(spliti[0].length - 1, spliti[0].length);
+    var newFirst = letter1;
     for(i = 0; i < spliti[0].length - 2; i++) {
         newFirst += "*";
     }
     newFirst += letter2;
 
-    let letter3 = spliti[1].substring(0, 1);
-    let extension = letter3;
+    var letter3 = spliti[1].substring(0, 1);
+    var extension = letter3;
     for(i = 0; i < spliti[1].split(".")[0].length - 1; i++) {
         extension += "*";
     }
     extension += "." + spliti[1].split(".")[1];
-    let result = newFirst + "@" + extension;
+    var result = newFirst + "@" + extension;
 
     return result;
 }
@@ -2037,12 +2051,12 @@ function onUpload(req, res, next) {
     res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
     console.log (req.headers.origin);
 
-    let form = new multiparty.Form();
+    var form = new multiparty.Form();
 
     form.parse(req, function(err, fields, files) {
         console.log(fields);
         console.log("A");
-        let partIndex = fields.qqpartindex;
+        var partIndex = fields.qqpartindex;
 
         // text/plain is required to ensure support for IE9 and older
         res.set("Content-Type", "text/plain");
@@ -2059,7 +2073,7 @@ function onUpload(req, res, next) {
     // return next();
 }
 
-let responseDataUuid = "",
+var responseDataUuid = "",
     responseDataName = "",
     responseDataUuid2 = "",
     responseDataName2 = "";
@@ -2067,7 +2081,7 @@ function onSimpleUpload(fields, file, res) {
     res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
     responseDataUuid = "";
 
-    let d = new Date(),
+    var d = new Date(),
         uuid = d.getUTCFullYear() + "-" + ('0' + (d.getUTCMonth() + 1)).slice(-2) + "-" + ('0' + d.getUTCDate()).slice(-2) + "T" + ('0' + d.getUTCHours()).slice(-2) + ":" + ('0' + d.getUTCMinutes()).slice(-2) + ":" + ('0' + d.getUTCSeconds()).slice(-2) + "Z",
         responseData = {
             success: false,
@@ -2106,7 +2120,7 @@ function onChunkedUpload(fields, file, res) {
     res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
 
     console.log("Z");
-    let size = parseInt(fields.qqtotalfilesize),
+    var size = parseInt(fields.qqtotalfilesize),
         uuid = fields.qquuid,
         index = fields.qqpartindex,
         totalParts = parseInt(fields.qqtotalparts),
@@ -2154,7 +2168,7 @@ function failWithTooBigFile(responseData, res) {
 function onDeleteFile(req, res) {
     res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
 
-    let uuid = req.params.uuid,
+    var uuid = req.params.uuid,
         dirToDelete = "uploadfiles/" + uuid;
     console.log(uuid);
     rimraf(dirToDelete, function(error) {
@@ -2174,7 +2188,7 @@ function isValid(size) {
 function moveFile(destinationDir, sourceFile, destinationFile, success, failure) {
     console.log(destinationDir);
     mkdirp(destinationDir, function(error) {
-        let sourceStream, destStream;
+        var sourceStream, destStream;
 
         if (error) {
             console.error("Problem creating directory " + destinationDir + ": " + error);
@@ -2201,15 +2215,15 @@ function moveFile(destinationDir, sourceFile, destinationFile, success, failure)
 
 function moveUploadedFile(file, uuid, success, failure) {
     console.log("this is: " + uuid);
-    // let destinationDir = uploadedFilesPath + uuid + "/",
-    let destinationDir = "uploadfiles/",
+    // var destinationDir = uploadedFilesPath + uuid + "/",
+    var destinationDir = "uploadfiles/",
         fileDestination = destinationDir + uuid + "_" + file.name;
 
     moveFile(destinationDir, file.path, fileDestination, success, failure);
 }
 
 function storeChunk(file, uuid, index, numChunks, success, failure) {
-    let destinationDir = uploadedFilesPath + uuid + "/" + chunkDirName + "/",
+    var destinationDir = uploadedFilesPath + uuid + "/" + chunkDirName + "/",
         chunkFilename = getChunkFilename(index, numChunks),
         fileDestination = destinationDir + chunkFilename;
 
@@ -2217,13 +2231,13 @@ function storeChunk(file, uuid, index, numChunks, success, failure) {
 }
 
 function combineChunks(file, uuid, success, failure) {
-    let chunksDir = uploadedFilesPath + uuid + "/" + chunkDirName + "/",
+    var chunksDir = uploadedFilesPath + uuid + "/" + chunkDirName + "/",
         destinationDir = uploadedFilesPath + uuid + "/",
         fileDestination = destinationDir + file.name;
 
 
     fs.readdir(chunksDir, function(err, fileNames) {
-        let destFileStream;
+        var destFileStream;
 
         if (err) {
             console.error("Problem listing chunks! " + err);
@@ -2266,7 +2280,7 @@ function appendToStream(destStream, srcDir, srcFilesnames, index, success, failu
 }
 
 function getChunkFilename(index, count) {
-    let digits = new String(count).length,
+    var digits = new String(count).length,
         zeros = new Array(digits + 1).join("0");
 
     return (zeros + index).slice(-digits);
