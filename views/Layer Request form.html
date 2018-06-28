@@ -172,11 +172,19 @@
                     <div class="form-group">
                         <label class="col-md-4 control-label">Request ID</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                                <input id="Request ID" name="Request_ID" placeholder="Layer Name" class="form-control" required value="" type="text" onchange="SearchLayerName(this.value)"></div>
-
-
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                <input id="Request ID" name="Request_ID" style="background:WhiteSmoke;" value="<%= RequestID %>>" readonly class="form-control" required type="text">
+                            </div>
                         </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">User ID</label>
+                        <div class="col-md-8 inputGroupContainer">
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
+                                <input id="User ID" name="User_ID" style="background:WhiteSmoke;" value="<%= user.userrole%>" readonly class="form-control" required type="text">
+                            </div>
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label class="col-md-4 control-label">Layer Name</label>
                         <div class="col-md-8 inputGroupContainer">
@@ -267,6 +275,29 @@
 </div>
 
     <script>
+        $(function() {
+            //getLocation();
+
+            $('#Training').multiSelect();
+
+
+            flatpickr(".date", {
+                dateFormat: "Y-m-d",
+                time_24hr: true
+            });
+
+            flatpickr(".dateS", {
+                dateFormat: "Y-m-d",
+                time_24hr: true
+            });
+
+            var today = new Date();
+            var todayDate = today.getFullYear() + '-' + ('0' + (today.getMonth() + 1)).slice(-2) + '-' + ('0' + today.getDate()).slice(-2);
+            var todayDateV = document.getElementsByClassName("date");
+            for (var i = 0; i < todayDateV.length; i++) {
+                todayDateV[i].value = todayDate;
+            }
+        });
         var uploader = new qq.FineUploader({
             element: document.getElementById("uploader"),
             // debug: true,
