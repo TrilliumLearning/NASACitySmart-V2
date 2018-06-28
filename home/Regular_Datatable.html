@@ -51,9 +51,9 @@
             <th>UID</th>
             <th>RID</th>
             <th>Layer Type</th>
-            <th>Country Name</th>
-            <th>City Name</th>
-            <th>State Name</th>
+            <th>Layer City</th>
+            <th>Layer State</th>
+            <th>Layer Country</th>
             <th>Layer Category</th>
             <th>--SecondLayer---</th>
             <th>Layer Name</th>
@@ -70,9 +70,9 @@
             <th>UID</th>
             <th>RID</th>
             <th>Layer Type</th>
-            <th>Country Name</th>
-            <th>City Name</th>
-            <th>State Name</th>
+            <th>Layer City</th>
+            <th>Layer State</th>
+            <th>Layer Country</th>
             <th>Layer Category</th>
             <th>--SecondLayer---</th>
             <th>Layer Name</th>
@@ -133,8 +133,10 @@
                 //            console.log("rowSelected[" + i + "][0]: " + rowSelected[i][0]);
                 scoutingTransactionID.push(scoutingRowSelected[i][0]);
             }
-            document.getElementById("approve").disabled = true;
-            document.getElementById("recover").disabled = true;
+        });
+
+        $("#Request").on("click",function () {
+            location.replace('Layer Request form.html');
         });
 
         $("#Profile").on("click",function () {
@@ -155,7 +157,7 @@
                 localStorage.setItem("getvalue",JSON.stringify(getvalue[0]));
                     // alert(getvalue[i][0]);
                     // alert(getvalue[i][4]);
-                window.location.replace('test2.html');
+                window.location.replace('test1.html');
                 // console.log(localStorage.getItem("getvalue"));
             }
         });

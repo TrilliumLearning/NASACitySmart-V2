@@ -9,7 +9,7 @@ var multiparty = require('multiparty');
 var fs = require("fs");
 var rimraf = require("rimraf");
 var mkdirp = require("mkdirp");
-var port = 9086;
+var port = 9091;
 
 var fileInputName = process.env.FILE_INPUT_NAME || "qqfile";
 var maxFileSize = process.env.MAX_FILE_SIZE || 0; // in bytes, 0 for unlimited
@@ -448,7 +448,7 @@ app.get('/deleteData', function(req, res) {
 //AddData in table
 app.get('/AddData',function (req,res){
     res.setHeader("Access-Control-Allow-Origin", "*");
-    con_CS.query("SELECT * FROM GeneralFormDatatable",function (err,results) {
+    con_CS.query("SELECT * FROM Request_Form",function (err,results) {
         if (err) throw err;
         res.json(results);
     })
@@ -457,7 +457,7 @@ app.get('/AddData',function (req,res){
 //check if the layer name is available
 app.get('/SearchLayerName',function (req,res) {
     res.setHeader("Access-Control-Allow-Origin", "*");
-    con_CS.query("SELECT ThirdLayer FROM LayerMenu", function (err, results) {
+    con_CS.query("SELECT LayerName FROM LayerMenu", function (err, results) {
         if (err) throw err;
         res.json(results);
 
@@ -515,16 +515,6 @@ app.get('/EditData',function (req,res){
         if (err) throw err;
         console.log(results);
     })
-});
-
-app.get('/SearchLayerName',function (req,res) {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    con_CS.query("SELECT ThirdLayer FROM LayerMenu", function (err, results) {
-        if (err) throw err;
-        // console.log(results);
-        res.json(results);
-
-    });
 });
 
 app.delete("/deleteFiles/:uuid", onDeleteFile);
@@ -606,16 +596,6 @@ app.get('/EditData',function (req,res){
         if (err) throw err;
         console.log(results);
     })
-});
-
-app.get('/SearchLayerName',function (req,res) {
-    res.setHeader("Access-Control-Allow-Origin", "*");
-    con_CS.query("SELECT ThirdLayer FROM LayerMenu", function (err, results) {
-        if (err) throw err;
-        // console.log(results);
-        res.json(results);
-
-    });
 });
 
 app.delete("/deleteFiles/:uuid", onDeleteFile);

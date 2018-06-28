@@ -448,7 +448,7 @@ module.exports = function (app, passport) {
                 res.send("New User Insert Fail!");
                 res.end();
             } else {
-                res.render('userHome.ejs', {
+                res.render('userHome1.ejs', {
                     user: req.user // get the user out of session and pass to template
                 });
             }
@@ -1005,7 +1005,7 @@ module.exports = function (app, passport) {
 //AddData in table
     app.get('/AddData',function (req,res){
         res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query("SELECT * FROM GeneralFormDatatable",function (err,results) {
+        con_CS.query("SELECT * FROM Request_Form",function (err,results) {
             if (err) throw err;
             res.json(results);
         })
@@ -1445,7 +1445,7 @@ module.exports = function (app, passport) {
             if (!results[0].userrole) {
                 console.log("Error");
             } else {
-                res.render('userHome.ejs', {
+                res.render('userHome1.ejs', {
                     user: req.user // get the user out of session and pass to template
                 });
             }
@@ -1673,7 +1673,7 @@ module.exports = function (app, passport) {
                         console.log(err);
                     } else {
                         // Show general form
-                        res.render('form.ejs', {
+                        res.render('Regular_Datatable.html', {
                             user: req.user, // get the user out of session and pass to template
                             message: req.flash('Data Entry Message'),
                             firstname: req.user.firstName,

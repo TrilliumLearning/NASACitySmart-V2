@@ -20,28 +20,8 @@
     <!--<script src="../src/jquery.form.min.js"></script>-->
     <!-- Change the "src" attribute according to your installation path -->
     <!--<script src="https://cdn.jsdelivr.net/jquery.validation/1.15.1/jquery.validate.min.js"></script>-->
-    <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.17.0/dist/jquery.validate.min.js"></script>
+    <!--<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.17.0/dist/jquery.validate.min.js"></script>-->
     <script src="../jquery-validation-1.17.0/dist/jquery.validate.js"></script>
-    <!--<script src="http://malsup.github.com/jquery.form.js"></script>-->
-
-    <!--<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>-->
-    <!--<script src="fineUploader_copy/fine-uploader/fine-uploader.js"></script>-->
-    <!--<script src="fineUploader_copy/fine-uploader/jquery.fine-uploader.js"></script>-->
-
-    <!--<link rel="stylesheet" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">-->
-    <!--<link rel="stylesheet" type="text/css" href="//cdn.datatables.net/buttons/1.4.2/css/buttons.dataTables.min.css">-->
-    <!--<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">-->
-    <!--<link href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">-->
-    <!--<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.0/js/bootstrap.min.js"></script>-->
-    <!--<script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>-->
-    <!--<link rel="stylesheet" href="//unpkg.com/flatpickr/dist/flatpickr.min.css">-->
-    <!--<link rel="stylesheet" href="//unpkg.com/flatpickr@4.1.1/dist/flatpickr.min.css">-->
-    <!--<script src="//maps.googleapis.com/maps/api/js?key=AIzaSyBX94wEDdQ52lCDhKAhcfR-flIw1NyLTMA"></script>-->
-    <!--<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>-->
-    <!--<script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>-->
-    <!--<script src="//cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>-->
-    <!--<script src="//cdn.jsdelivr.net/npm/flatpickr"></script>-->
-    <!--<script src="//unpkg.com/flatpickr@4.1.1/dist/flatpickr.js"></script>-->
 
     <script type="text/template" id="qq-template">
         <div class="qq-uploader-selector qq-uploader qq-gallery" qq-drop-area-text="Drop files here">
@@ -174,134 +154,29 @@
             background-color: #ff758f;
             color:white;
         }
-        .name{
-            float:left;
 
-        }
+
     </style>
 
 </head>
 <body>
 
-<!-- Fine Uploader DOM Element
-====================================================================== -->
-<!--<div id="fine-uploader"></div>-->
-
-<!-- Your code to create an instance of Fine Uploader and bind to the DOM/template
-====================================================================== -->
-<!--<script>-->
-    <!--$('#fine-uploader').fineUploader({-->
-        <!--template: 'qq-template',-->
-        <!--request: {-->
-            <!--endpoint: 'http://localhost:9090/upload'-->
-        <!--},-->
-        <!--thumbnails: {-->
-            <!--placeholders: {-->
-                <!--waitingPath: '/source/placeholders/waiting-generic.png',-->
-                <!--notAvailablePath: '/source/placeholders/not_available-generic.png'-->
-            <!--}-->
-        <!--},-->
-        <!--validation: {-->
-            <!--allowedExtensions: ['jpeg', 'jpg', 'txt'],-->
-            <!--itemLimit: 3,-->
-            <!--sizeLimit: 51200 // 50 kB = 50 * 1024 bytes-->
-        <!--}-->
-    <!--});-->
-
 <div class="container">
-    <a href="//aworldbridge.com"><img class="banner" src="../home/NewWBBanner.jpg"/></a>
-    <!--<div id="modal" class="modal">-->
-        <!--&lt;!&ndash; Modal content &ndash;&gt;-->
-        <!--<div id="modal-content">-->
-            <!--<div id="modal-header">-->
-                <!--<span id="close"></span>-->
-                <!--<h2 id="header"></h2>-->
-            <!--</div>-->
-            <!--<div id="modal-body">-->
-                <!--<p id="body"></p>-->
-            <!--</div>-->
-            <!--<div id="modal-footer">-->
-            <!--</div>-->
-        <!--</div>-->
-    <!--</div>-->
-
-    <h1 id="title">General Form</h1>
-
+    <a href="//aworldbridge.com"><img class="banner" src="../pic/NewWBBanner.jpg"/></a>
     <div id="container">
-
-        <h2 id="Binfo">Basic Info</h2>
-        <div style="display: block;" class="generalForm">
-            <form class="well form-horizontal" id="basic" >
+        <h1 id="title">General Form</h1>
+        <h2 id="Linfo">Layer Info</h2>
+        <div class="generalForm">
+            <form class="well form-horizontal" id="layer">
                 <fieldset>
                     <div class="form-group">
-                        <label class="col-md-4 control-label">Full Name</label>
+                        <label class="col-md-4 control-label">Request ID</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group">
-                                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span><input id="fullName" name="Full_Name" placeholder="Full Name" class="form-control" required value="" type="text"></div>
-                            </div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
+                                <input id="Request ID" name="Request_ID" placeholder="Layer Name" class="form-control" required value="" type="text" onchange="SearchLayerName(this.value)"></div>
                         </div>
-
-
-                    <div class="form-group">
-                        <label class="col-md-4 control-label">Address Line 1</label>
-                        <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="addressLine1" name="Address_Line1" placeholder="Address Line 1" class="form-control" required value="" type="text"></div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label">Address Line 2</label>
-                        <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="addressLine2" name="Address_Line2" placeholder="Address Line 2" class="form-control" value="" type="text"></div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label">City</label>
-                        <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="city" name="City" placeholder="City" class="form-control" required value="" type="text"></div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label">State/Province/Region</label>
-                        <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="state" name="State_Province_Region" placeholder="State/Province/Region" class="form-control" required value="" type="text"></div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label">Postal Code/ZIP</label>
-                        <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="postcode" name="PostalCode_ZIP" placeholder="Postal Code/ZIP" class="form-control" required value="" type="text"></div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label">Country</label>
-                        <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="country" name="Country" placeholder="Country" class="form-control" required value="" type="text"></div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label class="col-md-4 control-label">Email</label>
-                        <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span><input id="email" name="Email" placeholder="Email" class="form-control" required value="" type="text"></div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label">Phone Number</label>
-                        <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-earphone"></i></span><input id="phoneNumber" name="Phone_Number" placeholder="Phone Number" class="form-control" required value="" type="text"></div>
-                        </div>
-                    </div>
-
-
-                </fieldset>
-            </form>
-        </div>
-            <h2 id="Linfo">Layer Info</h2>
-        <div  class="generalForm">
-            <form class="well form-horizontal" id="layer">
-                <fieldset >
-                    <div class="form-group">
-                        <label class="col-md-4 control-label">Layer Name</label>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">Layer Name</label>
                             <div class="col-md-8 inputGroupContainer">
                                 <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
                                     <input id="LayerNameInput" name="Layer_Name" placeholder="Layer Name" class="form-control" required value="" type="text" onchange="SearchLayerName(this.value)"></div>
@@ -309,12 +184,33 @@
                         </div>
                         <p id="LayerName1" style="color: palevioletred; margin-left:270px;">Please Enter the Layer Name, the Layer Name must be at least 6 characters</p>
                         <div class="form-group">
+                            <label class="col-md-4 control-label">Layer City</label>
+                            <div class="col-md-8 inputGroupContainer">
+                                <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-globe"></i></span>
+                                    <input id="LayerCityInput" name="CityName" placeholder="Layer City" class="form-control" required value="" type="text"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">Layer State</label>
+                            <div class="col-md-8 inputGroupContainer">
+                                <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-globe"></i></span>
+                                    <input id="LayerStateInput" name="StateName" placeholder="Layer State" class="form-control" required value="" type="text"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">Layer Country</label>
+                            <div class="col-md-8 inputGroupContainer">
+                                <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-globe"></i></span>
+                                    <input id="LayerCountryInput" name="CountryName" placeholder="Layer Country" class="form-control" required value="" type="text"></div>
+                            </div>
+                        </div>
+                        <div class="form-group">
                             <label class="col-md-4 control-label">Layer Category</label>
                             <div class="col-md-8 inputGroupContainer">
                                 <div class="input-group">
                                     <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-list"></i></span>
-                                    <select required class="selectpicker form-control" id="select" name="Layer_Category">
-                                        <option value="">SELECT LAYER TYPE</option>
+                                    <select required id = "layerCategory" class="selectpicker form-control" name="Layer_Category">
+                                        <option value="">SELECT LAYER CATEGORY</option>
                                         <option>Energy</option>
                                         <option>Water</option>
                                         <option>Agriculture</option>
@@ -329,11 +225,24 @@
                         </div>
                         <div class="form-group">
                             <label class="col-md-4 control-label">Layer Description</label>
-                                <div class="col-md-8 inputGroupContainer">
-                                    <div>
-                                        <textarea class="form-control" id="message" name="Layer_Description" placeholder="Enter your description here..." required type="text" rows="6" maxlength="140"></textarea>
-                                    </div>
+                            <div class="col-md-8 inputGroupContainer">
+                                <div>
+                                    <textarea class="form-control" id="message" name="Layer_Description" placeholder="Enter your description here..." required type="text" rows="6" maxlength="140"></textarea>
                                 </div>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-md-4 control-label">Layer Format</label>
+                            <div class="col-md-8 inputGroupContainer">
+                                <div class="input-group">
+                                    <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-list"></i></span>
+                                    <select required class="selectpicker form-control" name="Layer_format">
+                                        <option value="">SELECT LAYER FORMAT</option>
+                                        <option>GeoTIFF</option>
+                                        <option>Shapefile</option>
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         <div class="form-group">
                             <label  class="col-md-4 control-label">Layer Uploader</label>
@@ -341,189 +250,157 @@
                                 <div id="uploader" ></div>
                             </div>
                         </div>
-                    </fieldset>
-                </form>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+        <div class="row">
+            <div class="column">
+                <button id="submit" type="submit" value="Submit" form="layer" >Submit</button>
             </div>
-            <div class="row">
-                <div class="column">
-                    <button id="submit" type="submit" value="Submit" form="basic" >Submit</button>
-                </div>
-                <div class="column">
-                    <button id="clear" type="reset" onclick="window.location.reload()" value="  Clear  ">Clear</button>
-                </div>
+            <div class="column">
+                <button id="clear" type="reset" onclick="window.location.reload()" value="  Clear  ">Clear</button>
             </div>
-
+        </div>
     </div>
+</div>
 
-        <script>
-            var uploader = new qq.FineUploader({
-                element: document.getElementById("uploader"),
-                // debug: true,
-                request: {
-                    endpoint: 'http://localhost:9086/upload'
-                },
-                cors: {
-                    //all requests are expected to be cross-domain requests
-                    expected: true
+<script>
 
-                    // //if you want cookies to be sent along with the request
-                    // sendCredentials: true
-                },
-                deleteFile: {
-                    enabled: true, // defaults to false
-                    endpoint: 'http://localhost:9086/deleteFiles'
-                },
-                callbacks: {
-                    onComplete: function (id, name, responseJSON) {
-                        // alert(responseJSON.newuuid);
-                        // alert(id + "      " + name);
-                        uploader.setUuid(id, responseJSON.newuuid);
-                        // $.ajax({
-                        //     url: '/submit',
-                        //     type: 'POST',
-                        //     dataType: 'json',
-                        //     async: false,
-                        //     success: function (product) {
-                        //         if (!product.error) {
-                        //             globalPaths = product;
-                        //             console.log("results: " + globalPaths[0].Damage_photo);
-                        //         } else {
-                        //             console.log("you're gonna have a bad time");
-                        //         }
-                        //     }
-                        // })
-                    }
-                }
-            });
+    var getvalue = JSON.parse(localStorage.getItem("getvalue"));
+    console.log(getvalue);
+    document.getElementById('Request ID').value = getvalue[1];
+    document.getElementById('LayerNameInput').value = getvalue[8];
+    document.getElementById('LayerCityInput').value = getvalue[5];
+    document.getElementById('LayerStateInput').value = getvalue[4];
+    document.getElementById('LayerCountryInput').value = getvalue[3];
+    document.getElementById('layerCategory').value = getvalue[6];
+    document.getElementById('message').value = getvalue[9];
 
-            function submitsecondForm() {
-                $('#layer').submit();
+    var uploader = new qq.FineUploader({
+        element: document.getElementById("uploader"),
+        // debug: true,
+        request: {
+            endpoint: 'http://localhost:9086/upload'
+        },
+        cors: {
+            //all requests are expected to be cross-domain requests
+            expected: true
+
+            // //if you want cookies to be sent along with the request
+            // sendCredentials: true
+        },
+        deleteFile: {
+            enabled: true, // defaults to false
+            endpoint: 'http://localhost:9086/deleteFiles'
+        },
+        callbacks: {
+            onComplete: function (id, name, responseJSON) {
+                // alert(responseJSON.newuuid);
+                // alert(id + "      " + name);
+                uploader.setUuid(id, responseJSON.newuuid);
+                // $.ajax({
+                //     url: '/submit',
+                //     type: 'POST',
+                //     dataType: 'json',
+                //     async: false,
+                //     success: function (product) {
+                //         if (!product.error) {
+                //             globalPaths = product;
+                //             console.log("results: " + globalPaths[0].Damage_photo);
+                //         } else {
+                //             console.log("you're gonna have a bad time");
+                //         }
+                //     }
+                // })
             }
+        },
+        validation:{
+            allowedExtensions: ['GeoTIFF', 'shp']
+        }
+    });
 
-            function submitForm () {
-                alert("Submitted!");
-                var data = $("#basic").serialize() + "&" + $("#layer").serialize();
-                console.log($("#basic").serialize());
-                $.ajax({
-                    url  : 'http://localhost:9086/submit',
-                    method : "post",
-                    data : data,
-                    dataType: 'json',
-                    success : function(d){
-                        console.log(d);
-                    }
-                });
+    function submitForm () {
+        alert("Submitted!");
+        var data =$("#layer").serialize();
+        console.log($("#layer").serialize());
+        $.ajax({
+            url  : 'http://localhost:9086/submitL',
+            method : "post",
+            data : data,
+            dataType: 'json',
+            success : function(d){
+                console.log(d);
             }
+        });
+    }
 
-            // function clearForm(){
-            //     if (confirm("Are you sure to clear this page? All the data will be cleared accordingly!") === true) {
-            //         document.getElementById("layer").reset();
-            //         document.getElementById("basic").reset();
-            //     }
-            // }
+    // function clearForm(){
+    //     if (confirm("Are you sure to clear this page? All the data will be cleared accordingly!") === true) {
+    //         document.getElementById("layer").reset();
+    //         document.getElementById("basic").reset();
+    //     }
+    // }
 
-            // Wait for the DOM to be ready
-            $(function(){
-                // Initialize form validation on the registration form.
-                // It has the name attribute "registration"
-                $('#basic').validate({
-                    // Specify validation rules
-                    rules: {
-                        // The key name on the left side is the name attribute
-                        // of an input field. Validation rules are defined
-                        // on the right side
-                        Full_Name: "required",
-                        Address_Line1: "required",
-                        City: "required",
-                        State_Province_Region: "required",
-                        PostalCode_ZIP: "required",
-                        Country: "required",
-                        Email: {
-                            required: true,
-                            // Specify that email should be validated
-                            // by the built-in "email" rule
-                            email: true
-                        },
-                        Phone_Number: "required"
-                    },
-                    // Specify validation error messages
-                    messages: {
-                        Full_Name: "Please enter your full name",
-                        Address_Line1: "Please enter your address",
-                        City: "Please enter your city",
-                        State_Province_Region: "Please enter your state/province/state",
-                        PostalCode_ZIP: "Please enter your postal code/ZIP",
-                        Country: "Please enter your country",
-                        Email: "Please enter a valid email address",
-                        Phone_Number: "Please enter your phone number"
-                    },
+    // Wait for the DOM to be ready
+    $('#layer').validate({
+        // Specify validation rules
+        rules: {
+            // The key name on the left side is the name attribute
+            // of an input field. Validation rules are defined
+            // on the right side
+            Layer_Name: "required",
+            CityName:"required",
+            StateName:"required",
+            CountryName:"required",
+            Layer_Category: "required",
+            Layer_Description: "required",
+            Layer_Uploader:"required"
+        },
+        // Specify validation error messages
+        messages: {
+            Layer_Name: "Please enter the layer name",
+            CityName:"Please enter the layer city",
+            StateName:"Please enter the layer state",
+            CountryName:"Please enter the layer country",
+            Layer_Category: "Please select the layer category",
+            Layer_Description: "Please write the description of the layer",
+            Layer_Uploader:"Please upload your layer"
+        },
 
-                    // invalidHandler: function(event) {
-                    //     console.log("1234");
-                    //     $(".error").css("color", "blue");
-                    // },
+        // invalidHandler: function(event) {
+        //     console.log("5678");
+        //     $(".error").css("color", "red");
+        // },
 
-                    // Make sure the form is submitted to the destination defined
-                    // in the "action" attribute of the form when valid
-                    submitHandler: function (form) {
-                        console.log("123");
-                        submitsecondForm()
-                        // secondValidation()
-                    }
-                });
-                $('#layer').validate({
-                    // Specify validation rules
-                    rules: {
-                        // The key name on the left side is the name attribute
-                        // of an input field. Validation rules are defined
-                        // on the right side
-                        Layer_Name: "required",
-                        Layer_Category: "required",
-                        Layer_Description: "required",
-                        Layer_Uploader:"required"
-                    },
-                    // Specify validation error messages
-                    messages: {
-                        Layer_Name: "Please enter the layer name",
-                        Layer_Category: "Please select the layer category",
-                        Layer_Description: "Please write the description of the layer",
-                        Layer_Uploader:"Please upload your layer"
-                    },
-
-                    // invalidHandler: function(event) {
-                    //     console.log("5678");
-                    //     $(".error").css("color", "red");
-                    // },
-
-                    // Make sure the form is submitted to the destination defined
-                    // in the "action" attribute of the form when valid
-                    submitHandler: function (form) {
-                        console.log("456");
-                        submitForm()
-                        // form.ajaxSubmit(function(e){
-                        //     console.log("456");
-                        //     //
-                        //     // var data = $("#basic").formSerialize() + "&" + $("#layer").formSerialize();
-                        //     // console.log($("#basic").formSerialize());
-                        //     // $.ajax({
-                        //     //     url  : 'http://localhost:9086/submit',
-                        //     //     method : "post",
-                        //     //     data : data,
-                        //     //     dataType: 'json',
-                        //     //     success : function(d){
-                        //     //         console.log(d);
-                        //     //     }
-                        //     // });
-                        // })
-                    }
-                });
-
-            });
+        // Make sure the form is submitted to the destination defined
+        // in the "action" attribute of the form when valid
+        submitHandler: function (form) {
+            console.log("456");
+            submitForm()
+            // form.ajaxSubmit(function(e){
+            //     console.log("456");
+            //     //
+            //     // var data = $("#basic").formSerialize() + "&" + $("#layer").formSerialize();
+            //     // console.log($("#basic").formSerialize());
+            //     // $.ajax({
+            //     //     url  : 'http://localhost:9086/submit',
+            //     //     method : "post",
+            //     //     data : data,
+            //     //     dataType: 'json',
+            //     //     success : function(d){
+            //     //         console.log(d);
+            //     //     }
+            //     // });
+            // })
+        }
+    });
 
 
 
 
-        </script>
-    </div>
+
+
+</script>
 </body>
 </html>
