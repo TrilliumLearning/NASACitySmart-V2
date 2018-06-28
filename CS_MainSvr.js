@@ -35,6 +35,7 @@ app.set('views', path.join(__dirname, './', 'views'));
 app.engine('ejs', require('ejs').renderFile);
 app.set('view engine', 'ejs');
 
+
 //routes.set('view engine', 'ejs'); // set up ejs for templating
 
 // required for passport
