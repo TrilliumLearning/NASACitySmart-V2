@@ -692,6 +692,336 @@ module.exports = function (app, passport) {
 
     });
 
+    app.get('/newHum', function (req, res) {
+        var myStat = "SELECT Hum_Out, time FROM WS_MT1 WHERE time >= '" + req.query.timeFrom + "' AND time <= '" + req.query.timeTo + "'";
+
+        console.log(myStat);
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+
+        con_Wind.query(myStat, function (err, result, fields) {
+            var status = [{errStatus: ""}];
+
+            if (err) {
+                console.log(err);
+                status[0].errStatus = "fail";
+                res.send(status);
+                res.end();
+            } else if (result.length === 0) {
+                status[0].errStatus = "no data entry";
+                res.send(status);
+                res.end();
+            } else {
+                var Hum_Out = [];
+
+                Hum_Out = JSON.stringify(result, null, "\t");
+                console.log(Hum_Out);
+                res.send(Hum_Out);
+                res.end();
+            }
+        }).then(result => {
+            console.log(result.length);
+        res.send(result)
+    }).catch(err => {
+            res.status(500).send(err.stack)
+    });
+    });
+
+    app.get('/newTemp', function (req, res) {
+        var myStat = "SELECT Temp_Out, time FROM WS_MT1 WHERE time >= '" + req.query.timeFrom + "' AND time <= '" + req.query.timeTo + "'";
+
+        console.log(myStat);
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+
+        con_Wind.query(myStat, function (err, result, fields) {
+            var status = [{errStatus: ""}];
+
+            if (err) {
+                console.log(err);
+                status[0].errStatus = "fail";
+                res.send(status);
+                res.end();
+            } else if (result.length === 0) {
+                status[0].errStatus = "no data entry";
+                res.send(status);
+                res.end();
+            } else {
+                var Temp_Out = [];
+
+                Temp_Out = JSON.stringify(result, null, "\t");
+                console.log(Temp_Out);
+                res.send(Temp_Out);
+                res.end();
+            }
+        }).then(result => {
+            console.log(result.length);
+        res.send(result)
+    }).catch(err => {
+            res.status(500).send(err.stack)
+    });
+    });
+
+    app.get('/newWind', function (req, res) {
+        var myStat = "SELECT Wind_Speed, time FROM WS_MT1 WHERE time >= '" + req.query.timeFrom + "' AND time <= '" + req.query.timeTo + "'";
+
+        console.log(myStat);
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+
+        con_Wind.query(myStat, function (err, result, fields) {
+            var status = [{errStatus: ""}];
+
+            if (err) {
+                console.log(err);
+                status[0].errStatus = "fail";
+                res.send(status);
+                res.end();
+            } else if (result.length === 0) {
+                status[0].errStatus = "no data entry";
+                res.send(status);
+                res.end();
+            } else {
+                var Wind_Speed = [];
+
+                Wind_Speed = JSON.stringify(result, null, "\t");
+                console.log(Wind_Speed);
+                res.send(Wind_Speed);
+                res.end();
+            }
+        }).then(result => {
+            console.log(result.length);
+        res.send(result)
+    }).catch(err => {
+            res.status(500).send(err.stack)
+    });
+    });
+
+    app.get('/allHum', function (req, res) {
+        var myStat = "SELECT Hum_Out, time FROM WS_MT1 WHERE time >= '2018-04-01T04:00:00.000Z' AND time <= '2018-05-30T04:00:00.000Z'";
+
+        console.log(myStat);
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+
+        con_Wind.query(myStat, function (err, result, fields) {
+            var status = [{errStatus: ""}];
+
+            if (err) {
+                console.log(err);
+                status[0].errStatus = "fail";
+                res.send(status);
+                res.end();
+            } else if (result.length === 0) {
+                status[0].errStatus = "no data entry";
+                res.send(status);
+                res.end();
+            } else {
+                var Hum_Out = [];
+
+                Hum_Out = JSON.stringify(result, null, "\t");
+                console.log(Hum_Out);
+                res.send(Hum_Out);
+                res.end();
+            }
+        }).then(result => {
+            console.log(result.length);
+        res.send(result)
+    }).catch(err => {
+            res.status(500).send(err.stack)
+    });
+    });
+
+    app.get('/allTemp', function (req, res) {
+        var myStat = "SELECT Temp_Out, time FROM WS_MT1 WHERE time >= '2018-04-01T04:00:00.000Z' AND time <= '2018-05-30T04:00:00.000Z'";
+
+        console.log(myStat);
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+
+        con_Wind.query(myStat, function (err, result, fields) {
+            var status = [{errStatus: ""}];
+
+            if (err) {
+                console.log(err);
+                status[0].errStatus = "fail";
+                res.send(status);
+                res.end();
+            } else if (result.length === 0) {
+                status[0].errStatus = "no data entry";
+                res.send(status);
+                res.end();
+            } else {
+                var Temp_Out = [];
+
+                Temp_Out = JSON.stringify(result, null, "\t");
+                console.log(Temp_Out);
+                res.send(Temp_Out);
+                res.end();
+            }
+        }).then(result => {
+            console.log(result.length);
+        res.send(result)
+    }).catch(err => {
+            res.status(500).send(err.stack)
+    });
+    });
+
+    app.get('/allWind', function (req, res) {
+        var myStat = "SELECT Wind_Speed, time FROM WS_MT1 WHERE time >= '2018-04-01T04:00:00.000Z' AND time <= '2018-05-30T04:00:00.000Z'";
+
+        console.log(myStat);
+
+        res.setHeader("Access-Control-Allow-Origin", "*");
+
+        con_Wind.query(myStat, function (err, result, fields) {
+            var status = [{errStatus: ""}];
+
+            if (err) {
+                console.log(err);
+                status[0].errStatus = "fail";
+                res.send(status);
+                res.end();
+            } else if (result.length === 0) {
+                status[0].errStatus = "no data entry";
+                res.send(status);
+                res.end();
+            } else {
+                var Wind_Speed = [];
+
+                Wind_Speed = JSON.stringify(result, null, "\t");
+                console.log(Wind_Speed);
+                res.send(Wind_Speed);
+                res.end();
+            }
+        }).then(result => {
+            console.log(result.length);
+        res.send(result)
+    }).catch(err => {
+            res.status(500).send(err.stack)
+    });
+    });
+
+    app.get('/CountryList', function (req, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        con_CS.query("SELECT CountryName FROM LayerMenu GROUP BY CountryName", function (err, results) {
+            if (err) throw err;
+            res.json(results);
+            console.log(results);
+        });
+    });
+
+    app.get('/StateList',function (req,res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        con_CS.query('SELECT CountryName, StateName, COUNT (*) AS count FROM LayerMenu GROUP BY CountryName, StateName',function (err,results,fields) {
+            if (err) throw err;
+            res.json(results);
+            console.log(results);
+
+        });
+    });
+
+    app.get('/CityList',function (req,res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        con_CS.query('SELECT StateName, FirstLayer, SecondLayer, CityName FROM LayerMenu',function (err,results) {
+            res.json(results);
+            console.log(results);
+        });
+    });
+
+    app.get('/ChangeCityName',function (req,res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        con_CS.query('SELECT CityName, StateName, COUNT (*) AS count FROM LayerMenu GROUP BY CityName, StateName',function (err,results,fields) {
+            res.json(results);
+            console.log(results);
+        });
+    });
+
+    app.get('/recover',function (req,res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        var recoverIDStr = req.query.recoverIDStr;
+        console.log(recoverIDStr);
+        for(var i = 0; i < recoverIDStr.length; i++) {
+            var statement = "UPDATE CitySmart.GeneralFormDatatable SET Status = 'Active' WHERE ID = '" + recoverIDStr[i] + "'";
+            con_CS.query(statement, function (err, results) {
+                if (err) throw err;
+                res.json(results[i]);
+            });
+        }
+    });
+
+    app.get('/approve',function (req,res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        var approveIDStr = req.query.approveIDStr;
+        console.log(approveIDStr);
+        for(var i = 0; i < approveIDStr.length; i++) {
+            var statement = "UPDATE CitySmart.GeneralFormDatatable SET Status = 'Active' WHERE ID = '" + approveIDStr[i] + "'";
+            con_CS.query(statement, function (err, results) {
+                if (err) throw err;
+                res.json(results[i]);
+            });
+        }
+    });
+
+//Put back the photo in the form
+    app.get('/edit', function (req, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+        var editIDSr = req.query.editIDSr;
+        // console.log(editIDSr);
+        var myStat = "SELECT Layer_Uploader, Layer_Uploader_name FROM GeneralFormDatatable WHERE ID = '" + editIDSr + "'";
+        // console.log(myStat);
+
+        var filePath0;
+        con_CS.query(myStat, function (err, results) {
+            // console.log("query statement : " + myStat);
+            if (!results[0].Layer_Uploader && !results[0].Layer_Uploader_name) {
+                console.log("Error");
+            } else {
+                filePath0 = results[0];
+                var JSONresult = JSON.stringify(results, null, "\t");
+                // console.log(JSONresult);
+                res.send(JSONresult);
+                res.end()
+            }
+        });
+    });
+
+//Delete button
+    app.get('/deleteData', function(req, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        var transactionID = req.query.transactionIDStr.split(',');
+        console.log(transactionID);
+        for(var i = 0; i < transactionID.length; i++) {
+            var statement = "UPDATE CitySmart.GeneralFormDatatable SET Status = 'Delete' WHERE ID = '" + transactionID[i] + "'";
+            // console.log(statement);
+            con_CS.query(statement, function (err, results) {
+                if (err) throw err;
+                res.json(results[i]);
+            });
+        }
+
+    });
+
+//AddData in table
+    app.get('/AddData',function (req,res){
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        con_CS.query("SELECT * FROM GeneralFormDatatable",function (err,results) {
+            if (err) throw err;
+            res.json(results);
+        })
+    });
+
+//check if the layer name is available
+    app.get('/SearchLayerName',function (req,res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        con_CS.query("SELECT ThirdLayer FROM LayerMenu", function (err, results) {
+            if (err) throw err;
+            res.json(results);
+
+        });
+    });
+
+
     app.post('/submitL',function (req,res){
         console.log (req.body);
         var result = Object.keys(req.body).map(function (key) {
