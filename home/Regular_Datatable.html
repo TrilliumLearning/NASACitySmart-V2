@@ -167,7 +167,7 @@
                     var transactionIDStr = "transactionIDStr=" + scoutingTransactionID.concat(trapTransactionID).toString();
                     console.log ("transactionIDStr: " + transactionIDStr);
                     $.ajax({
-                        url:'http://localhost:9091/deleteData',
+                        url:'http://localhost:9086/deleteData',
                         type:"GET",
                         dataType:'json',
                         data:transactionIDStr

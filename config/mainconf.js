@@ -12,17 +12,17 @@ module.exports = {
         'multipleStatements': true,
         'connectionLimit' : 100,
         'host': '10.11.90.15',
-        'user': 'SessionManager',
-        'password': 'SManager$44',
+        'user': 'AppUser',
+        'password': 'Special888%',
         'port'    :  3306
     },
 
-    'Session_db': 'session_DB',
+    'Session_db': 'CitySmart',
     'Login_db': 'CitySmart',
     'Login_table': 'Users',
     'Upload_db': 'CitySmart',
 
-    'Server_Port': 9090,
+    'Server_Port': 9086,
 
     'Upload_Path': 'http://v2.cs.aworldbridgelabs.com/uploadfiles'
 

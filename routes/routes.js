@@ -155,7 +155,15 @@ module.exports = function (app, passport) {
         myStat = "UPDATE Users SET status = 'Active', lastLoginTime = ? WHERE username = ?";
         myVal = [dateTime, req.user.username];
         myErrMsg = "Please try to login again";
-        updateDBNredir(myStat, myVal, myErrMsg, "login.ejs", "/newEntry", res);
+        updateDBNredir(myStat, myVal, myErrMsg, "login.ejs", "/userhome", res);
+    });
+
+    app.get('/profile',function (req,res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        con_CS.query("SELECT * FROM Users1", function (err, results) {
+            if (err) throw err;
+            res.json(results);
+        })
     });
 
     app.get('/forgot', function (req, res) {
@@ -1423,7 +1431,7 @@ module.exports = function (app, passport) {
             if (!results[0].userrole) {
                 console.log("Error");
             } else {
-                res.render('userHome1.ejs', {
+                res.render('userHome.ejs', {
                     user: req.user // get the user out of session and pass to template
                 });
             }

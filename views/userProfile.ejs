@@ -211,6 +211,33 @@
 
 <script>
 
+    var UserName = "<%= user.username %>";
+    console.log( UserName);
+
+    $.ajax({
+        url: "/profile",
+        dataType: 'json',
+        success: function (results) {
+            console.log(results);
+            for(var i =0; i< results.length; i++) {
+                console.log(results[i].username);
+                if (results[i].username === UserName) {
+
+                    // document.getElementById('Request ID').value = getvalue[1];
+                    document.getElementById('fullName').value = results[i].firstName + " " + results[i].lastName;
+                    document.getElementById('addressLine1').value = results[i].Address_Line1;
+                    document.getElementById('addressLine2').value = results[i].Address_Line2;
+                    document.getElementById('city').value = results[i].City;
+                    document.getElementById('state').value = results[i].State_Province_Region;
+                    document.getElementById('postcode').value = results[i].PostalCode_ZIP;
+                    document.getElementById('country').value = results[i].Country;
+                    document.getElementById('email').value = results[i].username;
+                    document.getElementById('phoneNumber').value = results[i].Phone_Number;
+                }
+            }
+        }
+    })
+
     var UserRole = "<%= user.userrole %>";
     var DropMenu;
 
