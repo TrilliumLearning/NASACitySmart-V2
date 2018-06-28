@@ -224,7 +224,6 @@
     <!--</div>-->
 
     <h1 id="title">General Form</h1>
-
     <div id="container">
 
         <h2 id="Binfo">Basic Info</h2>
@@ -311,7 +310,7 @@
                             <div class="col-md-8 inputGroupContainer">
                                 <div class="input-group">
                                     <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-list"></i></span>
-                                    <select required class="selectpicker form-control" name="Layer_Category">
+                                    <select required class="selectpicker form-control" id="select" name="Layer_Category">
                                         <option value="">SELECT LAYER TYPE</option>
                                         <option>Energy</option>
                                         <option>Water</option>
@@ -411,6 +410,8 @@
                         console.log(d);
                     }
                 });
+                var frm ="document.getElementsById('form-name')";
+                frm.reset();
             }
 
             // function clearForm(){

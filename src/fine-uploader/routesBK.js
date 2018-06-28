@@ -24,20 +24,20 @@ var fileInputName = process.env.FILE_INPUT_NAME || "qqfile",
 //     maxFileSize = process.env.MAX_FILE_SIZE || 0; // in bytes, 0 for unlimited
 
 
-// app.listen(port);
+// routes.listen(port);
 // console.log('Upload Demo happen on port ' + port);
 connection.query('USE ' + config.Login_db); // Locate Login DB
 // routes
 module.exports = function (app, passport) {
 
-    // app.use(express.static(publicDir));
-    // app.use("/node_modules", express.static(nodeModulesDir));
-    // app.use("/css", express.static(__dirname + "/css"));
-    // app.use("/scripts", express.static(__dirname + "/scripts"));
-    // app.use("/pic", express.static(__dirname + "/pic"));
-    // app.set('views', path.join(__dirname, 'views'));
-    // app.engine('ejs', require('ejs').renderFile);
-    // app.set('view engine', 'ejs');
+    // routes.use(express.static(publicDir));
+    // routes.use("/node_modules", express.static(nodeModulesDir));
+    // routes.use("/css", express.static(__dirname + "/css"));
+    // routes.use("/scripts", express.static(__dirname + "/scripts"));
+    // routes.use("/pic", express.static(__dirname + "/pic"));
+    // routes.set('views', path.join(__dirname, 'views'));
+    // routes.engine('ejs', require('ejs').renderFile);
+    // routes.set('view engine', 'ejs');
 
     app.post("/upload", onUpload);
     app.post("/submit", function (req, res) {
