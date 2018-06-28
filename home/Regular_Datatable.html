@@ -18,10 +18,9 @@
 <style>
     #Request,#Profile{
         background-color: #2980B9 ;
-        font-size: 20px;
+        height:55px;
         border-radius: 4px;
         color: whitesmoke;
-        margin-left:300px;
         margin-top:50px;
     }
     table{
@@ -42,8 +41,8 @@
     }
 </style>
 <body>
-<button id="Request">New Request</button>
-<button id="Profile">User Profile</button>
+<button id="Request" style="margin-left:375px;">New Request</button>
+<button id="Profile" style="margin-left:275px;">User Profile</button>
 <!-- pending table  //edit //delete -->
 <div id="dvData"  style="width:80%; margin-left:100px; margin-top:50px;">
     <table id="dataDisplay">
@@ -138,6 +137,10 @@
             document.getElementById("recover").disabled = true;
         });
 
+        $("#Profile").on("click",function () {
+            location.replace('../views/userprofile1.html');
+        });
+
         $("#editButton").on("click", function () {
             var transactionID = scoutingTransactionID.concat(trapTransactionID);
             // console.log(transactionID);
@@ -162,7 +165,7 @@
                     var transactionIDStr = "transactionIDStr=" + scoutingTransactionID.concat(trapTransactionID).toString();
                     console.log ("transactionIDStr: " + transactionIDStr);
                     $.ajax({
-                        url:'http://localhost:9090/deleteData',
+                        url:'http://localhost:9091/deleteData',
                         type:"GET",
                         dataType:'json',
                         data:transactionIDStr
