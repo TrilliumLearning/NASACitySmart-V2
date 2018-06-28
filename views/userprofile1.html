@@ -6,24 +6,16 @@
     <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../css/style_final.css" type="text/css">
     <link rel="stylesheet" href="../css/multi-select.css" media="screen" type="text/css">
-    <link rel="stylesheet" href="../jquery-validation-1.17.0/demo/css/screen.css">
-    <link rel="stylesheet" href="../css/Profile.css" type="text/css">
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" href="//cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css">
-    <link rel="stylesheet" href="//cdn.datatables.net/buttons/1.4.2/css/buttons.dataTables.min.css">
-    <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <link rel="stylesheet" href="../jquery-validation-1.17.0/demo/css/screen.css">
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
-    <!--<link rel="stylesheet" href="//unpkg.com/flatpickr/dist/flatpickr.min.css">-->
-    <link rel="stylesheet" href="../css/Title.css" type="text/css">
+
     <script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
-    <script src="//cdn.jsdelivr.net/npm/flatpickr"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/file-uploader/5.16.2/all.fine-uploader/all.fine-uploader.min.js"></script>
     <script type = "text/javascript" src="LayerNameSearch.js"></script>
     <script src="../src/jquery.multi-select.js"></script>
     <script src="../jquery-validation-1.17.0/dist/jquery.validate.js"></script>
-
-
     <style>
         .banner{
             position:relative;
@@ -32,6 +24,35 @@
             display:inline-block;
         }
         body { padding-top:80px; word-wrap:break-word; }
+        #clear{
+            background-color: #31a0ba;
+            border-radius:4px;
+            font-size:14px;
+            padding:3px 10px 3px 10px;
+            -webkit-transition-duration: 0.4s;
+            transition-duration: 0.4s;
+            color:white;
+            float:right;
+            margin-right:10px;
+        }
+        #clear:hover {
+            background-color: #ff758f;
+            color: white;
+        }
+        #submit{
+            background-color: #31a0ba;
+            border-radius:4px;
+            font-size:14px;
+            padding:3px 10px 3px 10px;
+            -webkit-transition-duration: 0.4s;
+            transition-duration: 0.4s;
+            color:white;
+            float:right;
+        }
+        #submit:hover{
+            background-color: #ff758f;
+            color:white;
+        }
 
     </style>
 
@@ -42,156 +63,154 @@
     <a href="//aworldbridge.com"><img class="banner" src="../pic/NewWBBanner.jpg"/></a>
     <!--<ul id="userMenu" class="dropdown-menu dropdown-menu-right">-->
     <!--</ul>-->
-    <h1 id="title">User Profile</h1>
-<div id="container">
-    <div style="display: block;" class="generalForm">
-        <form id="basic" onsubmit="return checkForm()" action="/userProfile" method="post" class="well form-horizontal">
-            <fieldset>
-                <!--<div>-->
+    <div id="container">
+        <h1 id="title">User Profile</h1>
+        <h2>Basic Form</h2>
+        <div style="display:block" class="generalForm">
+            <form id="basic"  class="well form-horizontal">
+                <fieldset>
+                    <!--<div>-->
                     <!--<h4 class="floating-Box"><strong>Full name:&nbsp;&nbsp;</strong></h4><input id="fullName" name="Full_Name" placeholder="Full Name" class="form-control" required value="" type="text">-->
-                <!--</div>-->
-                <div>
-                    <label style="font-size:19px">Basic Form</label>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-4 control-label">Full Name</label>
-                    <div class="col-md-8 inputGroupContainer">
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span><input id="fullName" name="Full_Name" placeholder="Full Name" class="form-control" required value="" type="text">
+                    <!--</div>-->
+
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Full Name</label>
+                        <div class="col-md-8 inputGroupContainer">
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span><input id="fullName" name="Full_Name" placeholder="Full Name" class="form-control" required value="" type="text">
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-4 control-label">Address Line 1</label>
-                    <div class="col-md-8 inputGroupContainer">
-                        <div class="input-group">
-                            <span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="addressLine1" name="Address_Line1" placeholder="Address Line 1" class="form-control" required value="" type="text">
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Address Line 1</label>
+                        <div class="col-md-8 inputGroupContainer">
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="addressLine1" name="Address_Line1" placeholder="Address Line 1" class="form-control" required value="" type="text">
+                            </div>
                         </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-4 control-label">Address Line 2</label>
-                    <div class="col-md-8 inputGroupContainer">
-                        <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="addressLine2" name="Address_Line2" placeholder="Address Line 2" class="form-control" value="" type="text"></div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Address Line 2</label>
+                        <div class="col-md-8 inputGroupContainer">
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="addressLine2" name="Address_Line2" placeholder="Address Line 2" class="form-control" value="" type="text"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-4 control-label">City</label>
-                    <div class="col-md-8 inputGroupContainer">
-                        <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="city" name="City" placeholder="City" class="form-control" required value="" type="text"></div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">City</label>
+                        <div class="col-md-8 inputGroupContainer">
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="city" name="City" placeholder="City" class="form-control" required value="" type="text"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-4 control-label">State/Province/Region</label>
-                    <div class="col-md-8 inputGroupContainer">
-                        <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="state" name="State_Province_Region" placeholder="State/Province/Region" class="form-control" required value="" type="text"></div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">State/Province/Region</label>
+                        <div class="col-md-8 inputGroupContainer">
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="state" name="State_Province_Region" placeholder="State/Province/Region" class="form-control" required value="" type="text"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-4 control-label">Postal Code/ZIP</label>
-                    <div class="col-md-8 inputGroupContainer">
-                        <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="postcode" name="PostalCode_ZIP" placeholder="Postal Code/ZIP" class="form-control" required value="" type="text"></div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Postal Code/ZIP</label>
+                        <div class="col-md-8 inputGroupContainer">
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="postcode" name="PostalCode_ZIP" placeholder="Postal Code/ZIP" class="form-control" required value="" type="text"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-4 control-label">Country</label>
-                    <div class="col-md-8 inputGroupContainer">
-                        <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="country" name="Country" placeholder="Country" class="form-control" required value="" type="text"></div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Country</label>
+                        <div class="col-md-8 inputGroupContainer">
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="country" name="Country" placeholder="Country" class="form-control" required value="" type="text"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-4 control-label">Email</label>
-                    <div class="col-md-8 inputGroupContainer">
-                        <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span><input id="email" name="Email" placeholder="Email" class="form-control" required value="" type="text"></div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Email</label>
+                        <div class="col-md-8 inputGroupContainer">
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span><input id="email" name="Email" placeholder="Email" class="form-control" required value="" type="text"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-4 control-label">Phone Number</label>
-                    <div class="col-md-8 inputGroupContainer">
-                        <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-earphone"></i></span><input id="phoneNumber" name="Phone_Number" placeholder="Phone Number" class="form-control" required value="" type="text"></div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Phone Number</label>
+                        <div class="col-md-8 inputGroupContainer">
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-earphone"></i></span><input id="phoneNumber" name="Phone_Number" placeholder="Phone Number" class="form-control" required value="" type="text"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-4 control-label">User Role</label>
-                    <div class="col-md-8 inputGroupContainer">
-                        <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span><input class="form-control" type="text" style="background:WhiteSmoke;" value="<%= user.userrole%>" readonly></div>
-                    <!--<h4 id="userrole" class="floating-Box"><strong>User Role:&nbsp;&nbsp;</strong></h4>-->
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">User Role</label>
+                        <div class="col-md-8 inputGroupContainer">
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span><input class="form-control" type="text" style="background:WhiteSmoke;" value="<%= user.userrole%>" readonly></div>
+                            <!--<h4 id="userrole" class="floating-Box"><strong>User Role:&nbsp;&nbsp;</strong></h4>-->
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-4 control-label">Date Created</label>
-                    <div class="col-md-8 inputGroupContainer">
-                        <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span><input class="form-control" type="text" style="background:WhiteSmoke;" value="<%= user.dateCreated %>" readonly></div>
-                        <!--<h4 id="userrole" class="floating-Box"><strong>User Role:&nbsp;&nbsp;</strong></h4>-->
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Date Created</label>
+                        <div class="col-md-8 inputGroupContainer">
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span><input class="form-control" type="text" style="background:WhiteSmoke;" value="<%= user.dateCreated %>" readonly></div>
+                            <!--<h4 id="userrole" class="floating-Box"><strong>User Role:&nbsp;&nbsp;</strong></h4>-->
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-4 control-label">Last Modification</label>
-                    <div class="col-md-8 inputGroupContainer">
-                        <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span><input class="form-control" type="text" style="background:WhiteSmoke;" value="<%= user.dateModified %>" readonly></div>
-                        <!--<h4 id="userrole" class="floating-Box"><strong>User Role:&nbsp;&nbsp;</strong></h4>-->
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Last Modification</label>
+                        <div class="col-md-8 inputGroupContainer">
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span><input class="form-control" type="text" style="background:WhiteSmoke;" value="<%= user.dateModified %>" readonly></div>
+                            <!--<h4 id="userrole" class="floating-Box"><strong>User Role:&nbsp;&nbsp;</strong></h4>-->
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-4 control-label">LoginName/Email</label>
-                    <div class="col-md-8 inputGroupContainer">
-                        <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-cloud"></i></span><input class="form-control" type="text" style="background:WhiteSmoke;" value="<%= user.username%>" readonly></div>
-                        <!--<h4 id="userrole" class="floating-Box"><strong>User Role:&nbsp;&nbsp;</strong></h4>-->
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">LoginName/Email</label>
+                        <div class="col-md-8 inputGroupContainer">
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-cloud"></i></span><input class="form-control" type="text" style="background:WhiteSmoke;" value="<%= user.username%>" readonly></div>
+                            <!--<h4 id="userrole" class="floating-Box"><strong>User Role:&nbsp;&nbsp;</strong></h4>-->
+                        </div>
                     </div>
-                </div>
-                <div class="form-group">
-                    <label class="col-md-4 control-label">Last Modified by</label>
-                    <div class="col-md-8 inputGroupContainer">
-                        <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-star"></i></span><input class="form-control" type="text" style="background:WhiteSmoke;" value="<%= user.username%>" readonly></div>
-                        <!--<h4 id="userrole" class="floating-Box"><strong>User Role:&nbsp;&nbsp;</strong></h4>-->
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Last Modified by</label>
+                        <div class="col-md-8 inputGroupContainer">
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-star"></i></span><input class="form-control" type="text" style="background:WhiteSmoke;" value="<%= user.username%>" readonly></div>
+                            <!--<h4 id="userrole" class="floating-Box"><strong>User Role:&nbsp;&nbsp;</strong></h4>-->
+                        </div>
                     </div>
-                </div>
-            </fieldset>
-        </form>
+                </fieldset>
+            </form>
+        </div>
+        <p style="font-size:15px">
+            <label for="password" >Do you want to change your password?</label>
+            <input type="checkbox" id="password" name="password" onclick="myFunction()">
+        </p>
+        <div class="generalForm">
+            <form id="pswchange" onsubmit="return checkForm()" style="display:none" class="well form-horizontal">
+                <fieldset>
+                    <div>
+                        <label style="font-size:18px">Password Change</label>
+
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Current Password</label>
+                        <div class="col-md-8 inputGroupContainer">
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span><input id="currentpassword" name="CurrentPassword"  class="form-control" required value="" type="password"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">New Password</label>
+                        <div class="col-md-8 inputGroupContainer">
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span><input id="newpassword" name="NewPassword" class="form-control" required value="" type="password"></div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Confirm New Password</label>
+                        <div class="col-md-8 inputGroupContainer">
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span><input id="Confirmpassword" name="ConfirmNewPassword" class="form-control" required value="" type="password"></div>
+                        </div>
+                    </div>
+                </fieldset>
+            </form>
+        </div>
+        <div class="row">
+            <div class="column">
+                <button id="submit" type="submit" value="Submit" form="basic">Submit</button>
+            </div>
+            <div class="column">
+                <button id="clear" type="reset" onclick="window.location.reload()" value="  Clear  ">Clear</button>
+            </div>
+        </div>
     </div>
-    <p style="font-size:15px">
-        <label for="password">Do you want to change your password?</label>
-        <input type="checkbox" id="password" name="password">
-    </p>
-    <div class="generalForm">
-        <form id="pswchange" class="well form-horizontal">
-             <fieldset>
-                 <div>
-                     <label style="font-size:19px">Password Change</label>
-
-                 </div>
-                 <div class="form-group">
-                     <label class="col-md-4 control-label">Current Password</label>
-                     <div class="col-md-8 inputGroupContainer">
-                         <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span><input id="currentpassword" name="currentpassword"  class="form-control" required value="" type="password"></div>
-                     </div>
-                 </div>
-                 <div class="form-group">
-                     <label class="col-md-4 control-label">New Password</label>
-                     <div class="col-md-8 inputGroupContainer">
-                         <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span><input id="newpassword" name="newpassword" class="form-control" required value="" type="password"></div>
-                     </div>
-                 </div>
-                 <div class="form-group">
-                     <label class="col-md-4 control-label">Confirm New Password</label>
-                     <div class="col-md-8 inputGroupContainer">
-                         <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span><input id="Confirmpassword" name="Confirmpassword" class="form-control" required value="" type="password"></div>
-                     </div>
-                 </div>
-             </fieldset>
-         </form>
-    </div>
-                <div class="row">
-                    <div class="column">
-                        <button id="SS"  type="submit" class="btn btn-warning btn-sm"> Submit </button>
-                    </div>
-                    <div class="column">
-                        <a href="/userhome" class="btn btn-warning btn-sm">Cancel</a>
-                    </div>
-                </div>
-</div>
-
-
 </div>
 
 <script>
@@ -207,6 +226,16 @@
 
     var UserRole = "<%= user.userrole %>";
     var DropMenu;
+
+    function myFunction(){
+        var checkbox = document.getElementById("password");
+        var text = document.getElementById("pswchange");
+        if (checkbox.checked == true){
+            text.style.display = "block";
+        } else{
+            text.style.display = "none";
+        }
+    }
 
     $(document).ready(function(){
         if (UserRole === "Admin") {
@@ -249,54 +278,69 @@
         } else {return true}
     }
 
-    function submit(e) {
-        e.preventDefault();
+    function submitForm () {
+        alert("Submitted!");
+        var data = $("#basic").serialize() + "&" + $("#pswchange").serialize();
+        console.log($("#basic").serialize());
         $.ajax({
-            type: "post",
-            url: "http://localhost:9086/submit",
+            url  : 'http://localhost:9090/submit',
+            method : "POST",
+            data : data,
             dataType: 'json',
-            data: $("#detailed").serialize(),
-            success: function (result) {
-                if (!result.error) {
-                    document.getElementById("modal-footer").style.display = "none";
-
-                    document.getElementById("modal-header").style.backgroundColor = "#5cb85c";
-                    document.getElementById("close").innerHTML = "<a href='/userhome'>&times</a>";
-
-                    document.getElementById("header").innerHTML = "Congratulations, Your Data Entry is Successfully Complete !";
-                    document.getElementById("body").innerHTML = "<br>Click X to return to the Home Page.<br>";
-
-                    document.getElementById("modal").style.display = "block";
-                } else {
-                    alert(result.message);
-                }
+            success : function(d){
+                console.log(d);
             }
-        })
+        });
     }
 
-    $('#submit').submit(function(e) {
-        // Prevent form submission
-        e.preventDefault();
+    // function submit(e) {
+    //     e.preventDefault();
+    //     $.ajax({
+    //         type: "post",
+    //         url: "http://localhost:9086/submit",
+    //         dataType: 'json',
+    //         data: $("#pswchange").serialize(),
+    //         success: function (result) {
+    //             if (!result.error) {
+    //                 document.getElementById("modal-footer").style.display = "none";
+    //
+    //                 document.getElementById("modal-header").style.backgroundColor = "#5cb85c";
+    //                 document.getElementById("close").innerHTML = "<a href='/userhome'>&times</a>";
+    //
+    //                 document.getElementById("header").innerHTML = "Congratulations, Your Data Entry is Successfully Complete !";
+    //                 document.getElementById("body").innerHTML = "<br>Click X to return to the Home Page.<br>";
+    //
+    //                 document.getElementById("modal").style.display = "block";
+    //             } else {
+    //                 alert(result.message);
+    //             }
+    //         }
+    //     })
+    // }
 
-        $.ajax({
-            type: "post",
-            url: "/userProfile",
-            dataType: 'json',
-            data: $(this).serialize(),
-            success: function (result) {
-                if (!result.error) {
-                    alert("SUCCESS");
-                    window.location.replace('/userHome')
-                } else {
-                    alert(result.message);
-                }
-            }
-        })
-    });
+    // $('#submit').submit(function(e) {
+    //     // Prevent form submission
+    //     e.preventDefault();
+    //
+    //     $.ajax({
+    //         type: "post",
+    //         url: "/userProfile",
+    //         dataType: 'json',
+    //         data: $(this).serialize(),
+    //         success: function (result) {
+    //             if (!result.error) {
+    //                 alert("SUCCESS");
+    //                 window.location.replace('/userHome')
+    //             } else {
+    //                 alert(result.message);
+    //             }
+    //         }
+    //     })
+    // });
     $(function() {
         // Initialize form validation on the registration form.
         // It has the name attribute "registration"
-        $('#submit').validate({
+        $('#basic').validate({
             // Specify validation rules
             rules: {
                 // The key name on the left side is the name attribute
@@ -329,7 +373,7 @@
             },
             submitHandler: function (form) {
                 console.log("123");
-
+                submitForm()
             }
         })
     })

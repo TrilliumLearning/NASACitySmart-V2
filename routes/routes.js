@@ -713,6 +713,14 @@ module.exports = function (app, passport) {
         }
     });
 
+    app.get('/AddData',function (req,res){
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        con_CS.query("SELECT * FROM Request_Form",function (err,results) {
+            if (err) throw err;
+            res.json(results);
+        })
+    });
+
     app.get('/EditData',function (req,res){
         res.setHeader("Access-Control-Allow-Origin", "*");
         con_CS.query("SELECT Full Name, Address Line 1, Address Line 2, City, State/Province/Region, Postal Code/ZIP, Country, Email, Phone Number, Layer Name, Layer Category, Layer Description, Layer Uploader FROM GeneralFormDatatable",function (err,results) {

@@ -22,7 +22,7 @@ module.exports = {
     'Login_table': 'Users',
     'Upload_db': 'CitySmart',
 
-    'Server_Port': 9086,
+    'Server_Port': 9090,
 
     'Upload_Path': 'http://v2.cs.aworldbridgelabs.com/uploadfiles'
 
