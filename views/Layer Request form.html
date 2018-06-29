@@ -173,7 +173,7 @@
                         <label class="col-md-4 control-label">Request ID</label>
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                                <input id="Request ID" name="Request_ID" style="background:WhiteSmoke;" value="<%= RequestID %>>" readonly class="form-control" required type="text">
+                                <input id="Request ID" name="RID" style="background:WhiteSmoke;" value="<%= RequestID %>" readonly class="form-control" required type="text">
                             </div>
                         </div>
                     </div>
@@ -181,7 +181,37 @@
                         <label class="col-md-4 control-label">User ID</label>
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                                <input id="User ID" name="User_ID" style="background:WhiteSmoke;" value="<%= user.userrole%>" readonly class="form-control" required type="text">
+                                <input id="User ID" name="UID" style="background:WhiteSmoke;" value="<%= UserID %>" readonly class="form-control" required type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Main-Category</label>
+                        <div class="col-md-8 inputGroupContainer">
+                            <div class="input-group">
+                                <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-list"></i></span>
+                                <select required class="selectpicker form-control" name="FirstLayer">
+                                    <option value="">SELECT MAIN CATEGORY</option>
+                                    <option>Energy</option>
+                                    <option>Water</option>
+                                    <option>Agriculture</option>
+                                    <option>Transportation</option>
+                                    <option>Economics</option>
+                                    <option>Health Services</option>
+                                    <option>Risk Management</option>
+                                    <option>Education</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Sub-Category</label>
+                        <div class="col-md-8 inputGroupContainer">
+                            <div class="input-group">
+                                <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-list"></i></span>
+                                <select required class="selectpicker form-control" name="SecondLayer">
+                                <option value="">SELECT SUB CATEGORY</option>
+                                </select>
                             </div>
                         </div>
                     </div>
@@ -214,25 +244,7 @@
                                 <input id="LayerCountryInput" name="CountryName" placeholder="Layer Country" class="form-control" required value="" type="text"></div>
                         </div>
                     </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label">Layer Category</label>
-                        <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group">
-                                <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-list"></i></span>
-                                <select required class="selectpicker form-control" name="Layer_Category">
-                                    <option value="">SELECT LAYER CATEGORY</option>
-                                    <option>Energy</option>
-                                    <option>Water</option>
-                                    <option>Agriculture</option>
-                                    <option>Transportation</option>
-                                    <option>Economics</option>
-                                    <option>Health Services</option>
-                                    <option>Risk Management</option>
-                                    <option>Education</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
+
                     <div class="form-group">
                         <label class="col-md-4 control-label">Layer Description</label>
                         <div class="col-md-8 inputGroupContainer">
@@ -246,7 +258,7 @@
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group">
                                 <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-list"></i></span>
-                                <select required class="selectpicker form-control" name="Layer_format">
+                                <select required class="selectpicker form-control" name="LayerFormat">
                                     <option value="">SELECT LAYER FORMAT</option>
                                     <option>GeoTIFF</option>
                                     <option>Shapefile</option>
@@ -275,29 +287,6 @@
 </div>
 
     <script>
-        $(function() {
-            //getLocation();
-
-            $('#Training').multiSelect();
-
-
-            flatpickr(".date", {
-                dateFormat: "Y-m-d",
-                time_24hr: true
-            });
-
-            flatpickr(".dateS", {
-                dateFormat: "Y-m-d",
-                time_24hr: true
-            });
-
-            var today = new Date();
-            var todayDate = today.getFullYear() + '-' + ('0' + (today.getMonth() + 1)).slice(-2) + '-' + ('0' + today.getDate()).slice(-2);
-            var todayDateV = document.getElementsByClassName("date");
-            for (var i = 0; i < todayDateV.length; i++) {
-                todayDateV[i].value = todayDate;
-            }
-        });
         var uploader = new qq.FineUploader({
             element: document.getElementById("uploader"),
             // debug: true,
@@ -374,9 +363,9 @@
                     CityName:"required",
                     StateName:"required",
                     CountryName:"required",
-                    Layer_Category: "required",
+                    LayerCategory: "required",
                     Layer_Description: "required",
-                    Layer_Uploader:"required"
+                    LayerFormat:"required"
                 },
                 // Specify validation error messages
                 messages: {
@@ -384,9 +373,9 @@
                     CityName:"Please enter the layer city",
                     StateName:"Please enter the layer state",
                     CountryName:"Please enter the layer country",
-                    Layer_Category: "Please select the layer category",
+                    LayerCategory: "Please select the layer category",
                     Layer_Description: "Please write the description of the layer",
-                    Layer_Uploader:"Please upload your layer"
+                    LayerFormat:"Please choose your layer format"
                 },
 
                 // invalidHandler: function(event) {

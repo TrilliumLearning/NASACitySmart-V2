@@ -1019,6 +1019,16 @@ module.exports = function (app, passport) {
                 valueSubmit += '"' + result[i][1] + '"' + ", ";
             }
         }
+        let statement = "INSERT INTO CitySmart.Request_Form(" + name + ") VALUES (" + value + ");";
+        console.log(statement);
+
+        con_CS.query(statement, function(err,result) {
+            if (err) {
+                throw err;
+            } else {
+                res.json("Connected!")
+            }
+        });
     });
 
     app.get('/EditData',function (req,res){
