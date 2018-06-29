@@ -120,14 +120,20 @@ module.exports = function (app, passport) {
     }));
 
     // =====================================
-    // LOGIN PAGE===========================
+    // CS APP Home Section =================
     // =====================================
-
-    app.get('/', function (req, res) {
-        res.redirect('/login');
+    app.get('/app', function (req, res) {
+        res.render('CitySmartV2.ejs');
     });
 
-// show the login form
+    // =====================================
+    // LOGIN Section =======================
+    // =====================================
+
+    app.get('/request', function (req, res) {
+        res.redirect('/login');
+    });
+    // show the login form
     app.get('/login', function (req, res) {
 
         // render the page and pass in any flash data if it exists
@@ -368,12 +374,10 @@ module.exports = function (app, passport) {
             user: req.user // get the user out of session and pass to template
         });
     });
+
     // =====================================
     // USER PROFILE  =======================
     // =====================================
-    // we will want this protected so you have to be logged in to visit
-    // we will use route middleware to verify this (the isLoggedIn function)
-
     // Show user profile page
     app.get('/profile',function (req,res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -382,7 +386,6 @@ module.exports = function (app, passport) {
             res.json(results);
         })
     });
-
 
     app.get('/userProfile', isLoggedIn, function (req, res) {
         res.render('userProfile.ejs', {user: req.user});
@@ -435,9 +438,6 @@ module.exports = function (app, passport) {
     // =====================================
     // USER MANAGEMENT =====================
     // =====================================
-    // we will want this protected so you have to be logged in to visit
-    // we will use route middleware to verify this (the isLoggedIn function)
-
     // Show user management home page
     app.get('/userManagement', isLoggedIn, function (req, res) {
         myStat = "SELECT userrole FROM Users WHERE username = '" + req.user.username + "';";
@@ -698,9 +698,6 @@ module.exports = function (app, passport) {
     // =====================================
     // REQUEST FORM SECTION =================
     // =====================================
-    // we will want this protected so you have to be logged in to visit
-    // we will use route middleware to verify this (the isLoggedIn function)
-
     app.post('/upload', onUpload);
 
     app.post('/submit',function(req,res){
@@ -869,11 +866,8 @@ module.exports = function (app, passport) {
         })
     });
 
-    app.delete("/deleteFiles/:uuid", onDeleteFile);
-
-
     // =====================================
-    // Gauge SECTION =================
+    // GAUGE SECTION =================
     // =====================================
 
     // app.get('/filterUser', function (req, res) {
