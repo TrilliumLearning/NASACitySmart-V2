@@ -19,7 +19,7 @@ module.exports = {
 
     'Session_db': 'CitySmart',
     'Login_db': 'CitySmart',
-    'Login_table': 'Users',
+    'Login_table': 'UserLogin',
     'Upload_db': 'CitySmart',
 
     'Server_Port': 9086,
