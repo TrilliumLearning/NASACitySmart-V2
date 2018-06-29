@@ -991,9 +991,18 @@ module.exports = function (app, passport) {
 //AddData in table
     app.get('/AddData',function (req,res){
         res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query("SELECT * FROM Request_Form",function (err,results) {
+        con_CS.query('SELECT Request_Form.*, Users1.userrole FROM Users1 INNER JOIN Request_Form ON Users1.username = Request_Form.UID',function (err,results) {
             if (err) throw err;
             res.json(results);
+            console.log(results);
+            // var resultsAll = result1.concat(result2);
+            // console.log(resultsAll);
+            // var JSONresult = JSON.stringify(resultsAll, null, "\t");
+            // console.log(JSONresult.length);
+            // console.log(JSONresult);
+
+            // var origin = req.headers.origin;
+            // res.setHeader("Access-Control-Allow-Origin", origin);
         })
     });
 
