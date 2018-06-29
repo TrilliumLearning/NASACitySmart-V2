@@ -18,7 +18,7 @@ const multiparty = require('multiparty');
 const fileInputName = process.env.FILE_INPUT_NAME || "qqfile";
 const maxFileSize = process.env.MAX_FILE_SIZE || 0; // in bytes, 0 for unlimited
 
-let transactionID, myStat, myVal, myErrMsg, token, errStatus;
+let transactionID, myStat, myVal, myErrMsg, token, errStatus, mylogin;
 let today, date2, date3, time2, time3, dateTime, tokenExpire;
 
 const smtpTrans = nodemailer.createTransport({
@@ -152,7 +152,7 @@ module.exports = function (app, passport) {
     app.get('/loginUpdate', isLoggedIn, function (req, res) {
         dateNtime();
 
-        myStat = "UPDATE Users SET status = 'Active', lastLoginTime = ? WHERE username = ?";
+        myStat = "UPDATE UserLogin SET status = 'Active', lastLoginTime = ? WHERE username = ?";
         myVal = [dateTime, req.user.username];
         myErrMsg = "Please try to login again";
         updateDBNredir(myStat, myVal, myErrMsg, "login.ejs", "/userhome", res);
@@ -160,7 +160,7 @@ module.exports = function (app, passport) {
 
     app.get('/profile',function (req,res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query("SELECT * FROM Users1", function (err, results) {
+        con_CS.query("SELECT * FROM UserProfile", function (err, results) {
             if (err) throw err;
             res.json(results);
         })
@@ -173,7 +173,7 @@ module.exports = function (app, passport) {
 
     app.post('/email', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-        let statement = "SELECT * FROM Users WHERE username = '" + req.body.username + "';";
+        let statement = "SELECT * FROM UserLogin WHERE username = '" + req.body.username + "';";
         //console.log(statement);
 
         con_CS.query(statement, function (err, results, fields) {
@@ -193,7 +193,7 @@ module.exports = function (app, passport) {
                     },
                     function (token, tokenExpire, done) {
                         // con_CS.query( "INSERT INTO Users ( resetPasswordExpires, resetPasswordToken ) VALUES (?,?) WHERE username = '" + req.body,username + "'; ")
-                        myStat = "UPDATE Users SET resetPasswordToken = ?, resetPasswordExpires = ? WHERE username = '" + req.body.username + "' ";
+                        myStat = "UPDATE UserLogin SET resetPasswordToken = ?, resetPasswordExpires = ? WHERE username = '" + req.body.username + "' ";
                         myVal = [token, tokenExpire];
                         con_CS.query(myStat, myVal, function (err, rows) {
 
@@ -249,7 +249,7 @@ module.exports = function (app, passport) {
     app.get('/reset/:token', function(req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
 
-        myStat = "SELECT * FROM Users WHERE resetPasswordToken = '" + req.params.token + "'";
+        myStat = "SELECT * FROM UserLogin WHERE resetPasswordToken = '" + req.params.token + "'";
 
         con_CS.query(myStat, function(err, user) {
             dateNtime();
@@ -268,7 +268,7 @@ module.exports = function (app, passport) {
         async.waterfall([
             function(done) {
 
-                myStat = "SELECT * FROM Users WHERE resetPasswordToken = '" + req.params.token + "'";
+                myStat = "SELECT * FROM UserLogin WHERE resetPasswordToken = '" + req.params.token + "'";
 
                 con_CS.query(myStat, function(err, user) {
                     let userInfo = JSON.stringify(user, null, "\t");
@@ -281,7 +281,7 @@ module.exports = function (app, passport) {
                             ConfirmPassword: bcrypt.hashSync(req.body.Confirmpassword, null, null)
                         };
 
-                        let passReset = "UPDATE Users SET password = '" + newPass.Newpassword + "' WHERE username = '" + req.body.username + "'";
+                        let passReset = "UPDATE UserLogin SET password = '" + newPass.Newpassword + "' WHERE username = '" + req.body.username + "'";
 
                         con_CS.query(passReset, function (err, rows) {
                             if (err) {
@@ -343,17 +343,18 @@ module.exports = function (app, passport) {
 
         dateNtime();
 
-        myStat = "UPDATE Users SET firstName =?, lastName = ?, dateModified  = ? WHERE username = ? ";
+        myStat = "UPDATE UserProfile SET firstName =?, lastName = ? ";
+        mylogin = "UPDATE UserLogin SET dateModified  = ? WHERE username = ? ";
         myVal = [newPass.firstname, newPass.lastname, dateTime, user.username];
 
-        con_CS.query(myStat, myVal, function (err, rows) {
+        con_CS.query(myStat, myVal, mylogin, function (err, rows) {
             if(err){
                 console.log(err);
                 res.json({"error": true, "message": "Fail !"});
             } else {
                 let passComp = bcrypt.compareSync(newPass.currentpassword, user.password);
                 if (!!req.body.newpassword && passComp) {
-                    let passReset = "UPDATE Users SET password = '" + newPass.Newpassword + "' WHERE username = '" + user.username + "'";
+                    let passReset = "UPDATE UserLogin SET password = '" + newPass.Newpassword + "' WHERE username = '" + user.username + "'";
 
                     con_CS.query(passReset, function (err, rows) {
                         //console.log(result);
@@ -381,7 +382,7 @@ module.exports = function (app, passport) {
 
     // Show user management home page
     app.get('/userManagement', isLoggedIn, function (req, res) {
-        myStat = "SELECT userrole FROM Users WHERE username = '" + req.user.username + "';";
+        myStat = "SELECT userrole FROM UserLogin WHERE username = '" + req.user.username + "';";
 
         con_CS.query(myStat, function (err, results, fields) {
 
@@ -423,9 +424,10 @@ module.exports = function (app, passport) {
             status: req.body.status
         };
 
-        myStat = "INSERT INTO Users ( username, firstName, lastName, password, userrole, dateCreated, dateModified, createdUser, status) VALUES (?,?,?,?,?,?,?,?,?)";
+        myStat = "INSERT INTO UserLogin ( username, password, userrole, dateCreated, dateModified, createdUser, status) VALUES (?,?,?,?,?,?,?)";
+        mylogin = "INSERT INTO UserProfile ( firstName, lastName) VALUES (?,?)";
         myVal = [newUser.username, newUser.firstName, newUser.lastName, newUser.password, newUser.userrole, newUser.dateCreated, newUser.dateModified, newUser.createdUser, newUser.status];
-        con_CS.query(myStat, myVal, function (err, rows) {
+        con_CS.query(myStat, myVal, mylogin, function (err, rows) {
 
             //newUser.id = rows.insertId;
 
@@ -443,7 +445,7 @@ module.exports = function (app, passport) {
 
     // Filter by search criteria
     app.get('/filterUser', isLoggedIn, function (req, res) {
-        myStat = "SELECT * FROM Users";
+        myStat = "SELECT * FROM UserLogin";
 
         let myQuery = [
             {
@@ -586,9 +588,10 @@ module.exports = function (app, passport) {
                 newPassword: bcrypt.hashSync(req.body.newPassword, null, null)
             };
 
-            myStat = "UPDATE Users SET firstName = ?, lastName = ?, password = ?, userrole = ?, status = ?, modifiedUser = '" + req.user.username + "', dateModified = '" + dateTime + "' WHERE username = ?";
+            myStat = "UPDATE UserLogin SET password = ?, userrole = ?, status = ?, modifiedUser = '" + req.user.username + "', dateModified = '" + dateTime + "' WHERE username = ?";
+            mylogin = "UPDATE UserProfile SET firstName = ?, lastName = ?";
             myVal = [updatedUserPass.firstName, updatedUserPass.lastName, updatedUserPass.newPassword, updatedUserPass.userrole, updatedUserPass.status, edit_User];
-            updateDBNres(myStat, myVal, "Update failed!", "/userManagement", res);
+            updateDBNres(myStat, myVal, mylogin, "Update failed!", "/userManagement", res);
 
         } else {
             let updatedUser = {
@@ -598,10 +601,11 @@ module.exports = function (app, passport) {
                 status: req.body.Status
             };
 
-            myStat = "UPDATE Users SET firstName = ?, lastName = ?, userrole = ?, status = ?, modifiedUser = '" + req.user.username + "', dateModified = '" + dateTime + "'  WHERE username = ?";
+            myStat = "UPDATE UserLogin SET userrole = ?, status = ?, modifiedUser = '" + req.user.username + "', dateModified = '" + dateTime + "'  WHERE username = ?";
+            mylogin = "UPDATE UserProfile SET firstName = ?, lastName = ?";
             myVal = [updatedUser.firstName, updatedUser.lastName, updatedUser.userrole, updatedUser.status, edit_User];
 
-            updateDBNres(myStat, myVal, "Update failed!", "/userManagement", res);
+            updateDBNres(myStat, myVal, mylogin, "Update failed!", "/userManagement", res);
         }
 
     });
@@ -611,7 +615,7 @@ module.exports = function (app, passport) {
         dateNtime();
 
         let username = req.query.usernameStr.split(",");
-        myStat = "UPDATE Users SET modifiedUser = '" + req.user.username + "', dateModified = '" + dateTime + "',  status = 'Suspended'";
+        myStat = "UPDATE UserLogin SET modifiedUser = '" + req.user.username + "', dateModified = '" + dateTime + "',  status = 'Suspended'";
 
         for (let i = 0; i < username.length; i++) {
             if (i === 0) {
@@ -991,18 +995,10 @@ module.exports = function (app, passport) {
 //AddData in table
     app.get('/AddData',function (req,res){
         res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query('SELECT Request_Form.*, Users1.userrole FROM Users1 INNER JOIN Request_Form ON Users1.username = Request_Form.UID',function (err,results) {
+        con_CS.query('SELECT Request_Form.*, UserLogin.userrole FROM UserLogin INNER JOIN Request_Form ON UserLogin.username = Request_Form.UID',function (err,results) {
             if (err) throw err;
             res.json(results);
             console.log(results);
-            // var resultsAll = result1.concat(result2);
-            // console.log(resultsAll);
-            // var JSONresult = JSON.stringify(resultsAll, null, "\t");
-            // console.log(JSONresult.length);
-            // console.log(JSONresult);
-
-            // var origin = req.headers.origin;
-            // res.setHeader("Access-Control-Allow-Origin", origin);
         })
     });
 
@@ -1038,30 +1034,12 @@ module.exports = function (app, passport) {
         }
     });
 
-    app.get('/AddData',function (req,res){
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query("SELECT * FROM Request_Form",function (err,results) {
-            if (err) throw err;
-            res.json(results);
-        })
-    });
-
     app.get('/EditData',function (req,res){
         res.setHeader("Access-Control-Allow-Origin", "*");
         con_CS.query("SELECT Full Name, Address Line 1, Address Line 2, City, State/Province/Region, Postal Code/ZIP, Country, Email, Phone Number, Layer Name, Layer Category, Layer Description, Layer Uploader FROM GeneralFormDatatable",function (err,results) {
             if (err) throw err;
             console.log(results);
         })
-    });
-
-    app.get('/SearchLayerName',function (req,res) {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query("SELECT ThirdLayer FROM LayerMenu", function (err, results) {
-            if (err) throw err;
-            // console.log(results);
-            res.json(results);
-
-        });
     });
 
     app.delete("/deleteFiles/:uuid", onDeleteFile);
@@ -1432,7 +1410,7 @@ module.exports = function (app, passport) {
     });
 
     app.get('/userhome', isLoggedIn, function (req, res) {
-        let myStat = "SELECT userrole FROM Users WHERE username = '" + req.user.username + "';";
+        let myStat = "SELECT userrole FROM UserLogin WHERE username = '" + req.user.username + "';";
 
         con_CS.query(myStat, function (err, results, fields) {
             //console.log(results);
@@ -1470,8 +1448,8 @@ module.exports = function (app, passport) {
         editTransactionID = req.query.transactionIDStr;
         console.log(editTransactionID);
 
-        let scoutingStat = "SELECT Users.firstName, Users.lastName, General_Form.*, Detailed_Scouting.* FROM Transaction INNER JOIN Users ON Users.username = Transaction.Cr_UN INNER JOIN General_Form ON General_Form.transactionID = Transaction.transactionID INNER JOIN Detailed_Scouting ON Detailed_Scouting.transactionID = Transaction.transactionID WHERE Transaction.transactionID = '" + editTransactionID +"';";
-        let trapStat = "SELECT Users.firstName, Users.lastName, General_Form.*, Detailed_Trap.* FROM Transaction INNER JOIN Users ON Users.username = Transaction.Cr_UN INNER JOIN General_Form ON General_Form.transactionID = Transaction.transactionID INNER JOIN Detailed_Trap ON Detailed_Trap.transactionID = Transaction.transactionID WHERE Transaction.transactionID = '" + editTransactionID + "';";
+        let scoutingStat = "SELECT UserProfile.firstName, UserProfile.lastName, General_Form.*, Detailed_Scouting.* FROM Transaction INNER JOIN UserProfile ON UserProfile.username = Transaction.Cr_UN INNER JOIN General_Form ON General_Form.transactionID = Transaction.transactionID INNER JOIN Detailed_Scouting ON Detailed_Scouting.transactionID = Transaction.transactionID WHERE Transaction.transactionID = '" + editTransactionID +"';";
+        let trapStat = "SELECT UserProfile.firstName, UserProfile.lastName, General_Form.*, Detailed_Trap.* FROM Transaction INNER JOIN UserProfile ON UserProfile.username = Transaction.Cr_UN INNER JOIN General_Form ON General_Form.transactionID = Transaction.transactionID INNER JOIN Detailed_Trap ON Detailed_Trap.transactionID = Transaction.transactionID WHERE Transaction.transactionID = '" + editTransactionID + "';";
 
         con_CS.query(scoutingStat + trapStat, function (err, results, fields) {
 
@@ -1573,8 +1551,8 @@ module.exports = function (app, passport) {
     });
 
     app.get('/filterQuery', isLoggedIn, function (req, res) {
-        let scoutingStat = "SELECT Users.username, Users.firstName, Users.lastName, General_Form.*, Detailed_Scouting.* FROM Transaction INNER JOIN Users ON Users.username = Transaction.Cr_UN INNER JOIN General_Form ON General_Form.transactionID = Transaction.transactionID INNER JOIN Detailed_Scouting ON Detailed_Scouting.transactionID = Transaction.transactionID";
-        let trapStat = "SELECT Users.username, Users.firstName, Users.lastName, General_Form.*, Detailed_Trap.* FROM Transaction INNER JOIN Users ON Users.username = Transaction.Cr_UN INNER JOIN General_Form ON General_Form.transactionID = Transaction.transactionID INNER JOIN Detailed_Trap ON Detailed_Trap.transactionID = Transaction.transactionID";
+        let scoutingStat = "SELECT UserProfile.username, UserProfile.firstName, UserProfile.lastName, General_Form.*, Detailed_Scouting.* FROM Transaction INNER JOIN UserProfile ON UserProfile.username = Transaction.Cr_UN INNER JOIN General_Form ON General_Form.transactionID = Transaction.transactionID INNER JOIN Detailed_Scouting ON Detailed_Scouting.transactionID = Transaction.transactionID";
+        let trapStat = "SELECT UserProfile.username, UserProfile.firstName, UserProfile.lastName, General_Form.*, Detailed_Trap.* FROM Transaction INNER JOIN UserProfile ON UserProfile.username = Transaction.Cr_UN INNER JOIN General_Form ON General_Form.transactionID = Transaction.transactionID INNER JOIN Detailed_Trap ON Detailed_Trap.transactionID = Transaction.transactionID";
         //console.log(req.query);
         let myQueryObj = [
             {

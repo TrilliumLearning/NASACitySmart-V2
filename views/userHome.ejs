@@ -271,6 +271,7 @@
                     <th>Layer Description</th>
                     <th>Layer Uploader</th>
                     <th>Layer Uploader Name</th>
+                    <th>Status</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -290,6 +291,7 @@
                     <th>Layer Description</th>
                     <th>Layer Uploader</th>
                     <th>Layer Uploader Name</th>
+                    <th>Status</th>
                 </tr>
                 </tfoot>
             </table>
@@ -303,7 +305,7 @@
 </div>
 <script type='text/javascript'>
     var username = "<%= user.username %>";
-    console.log(username);
+    // console.log(username);
     var scoutingRowSelected, trapRowSelected, DropMenu, queryString1, queryString2;
     var table = $("#dataDisplay").DataTable();
     var UserRole = "<%= user.userrole %>";
@@ -326,11 +328,14 @@
                     "\t\t\t<li><a href=\"/signout\">Sign Out</a></li>";
                 $("#userMenu").empty();
                 $("#userMenu").append(DropMenu)
+
+                var editbutton = document.getElementById("editButton").classList.add('')
             } else if (UserRole === "Regular") {
                 DropMenu = "<li><a href=\"/userprofile\">Profile</a></li>\n" +
                     "\t\t\t<li><a href=\"/signout\">Sign Out</a></li>";
                 $("#userMenu").empty();
                 $("#userMenu").append(DropMenu)
+
             }
 
             table.clear();
@@ -432,12 +437,11 @@
                     console.log(results);
                     for (var i = 0; i < results.length; i++) {
                         if(results[i].userrole === "Regular") {
-                            if (results[i].Status === "Active") {
                                 if (results[i].UID === username) {
                                     table.row.add([
                                         results[i].UID,
                                         results[i].RID,
-                                        results[i].LayerType,
+                                        results[i].LayerCategory,
                                         results[i].CountryName,
                                         results[i].CityName,
                                         results[i].StateName,
@@ -446,27 +450,27 @@
                                         results[i].ThirdLayer,
                                         results[i].Layer_Description,
                                         results[i].Layer_Uploader,
-                                        results[i].Layer_Uploader_name
+                                        results[i].Layer_Uploader_name,
+                                        results[i].Status
                                     ]).draw(false);
                                 }
-                            }
+                        }else{
+                            table.row.add([
+                                results[i].UID,
+                                results[i].RID,
+                                results[i].LayerCategory,
+                                results[i].CountryName,
+                                results[i].CityName,
+                                results[i].StateName,
+                                results[i].FirstLayer,
+                                results[i].SecondLayer,
+                                results[i].ThirdLayer,
+                                results[i].Layer_Description,
+                                results[i].Layer_Uploader,
+                                results[i].Layer_Uploader_name,
+                                results[i].Status
+                            ]).draw(false);
                         }
-                        // }else{
-                        //     table.row.add([
-                        //         results[i].UID,
-                        //         results[i].RID,
-                        //         results[i].LayerType,
-                        //         results[i].CountryName,
-                        //         results[i].CityName,
-                        //         results[i].StateName,
-                        //         results[i].FirstLayer,
-                        //         results[i].SecondLayer,
-                        //         results[i].ThirdLayer,
-                        //         results[i].Layer_Description,
-                        //         results[i].Layer_Uploader,
-                        //         results[i].Layer_Uploader_name
-                        //     ]).draw(false);
-                        // }
                     }
                 }
             });
