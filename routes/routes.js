@@ -329,7 +329,7 @@ module.exports = function (app, passport) {
                 console.log("Error");
             } else {
                 res.render('userHome.ejs', {
-                    user: req.user // get the user out of session and pass to template
+                    user: req.user// get the user out of session and pass to template
                 });
             }
         });
@@ -702,7 +702,7 @@ module.exports = function (app, passport) {
     // we will use route middleware to verify this (the isLoggedIn function)
 
     app.post('/upload', onUpload);
-
+    //Submit New User Profile//
     app.post('/submit',function(req,res){
         console.log (req.body);
         let result = Object.keys(req.body).map(function (key) {
@@ -744,7 +744,7 @@ module.exports = function (app, passport) {
         });
 
     });
-
+    //Submit Request form//
     app.post('/submitL',function (req,res){
         console.log (req.body);
         let result = Object.keys(req.body).map(function (key) {
@@ -765,6 +765,26 @@ module.exports = function (app, passport) {
             }
         }
     });
+
+    //Request form layer category//
+    app.get('/MainCategory', function (req, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        con_CS.query("SELECT FirstLayer, SecondLayer FROM Request_Form GROUP BY FirstLayer, SecondLayer", function (err, results) {
+            if (err) throw err;
+            res.json(results);
+            console.log(results);
+        });
+    });
+
+    // app.get('/Subcategory',function (req,res) {
+    //     res.setHeader("Access-Control-Allow-Origin", "*");
+    //     con_CS.query('SELECT FirstLayer, SecondLayer COUNT (*) AS count FROM Request_Form GROUP BY FirstLayer, SecondLayer',function (err,results,fields) {
+    //         if (err) throw err;
+    //         res.json(results);
+    //         console.log(results);
+    //
+    //     });
+    // });
 
     //check if the layer name is available
     app.get('/SearchLayerName',function (req,res) {
@@ -868,9 +888,6 @@ module.exports = function (app, passport) {
             console.log(results);
         })
     });
-
-    app.delete("/deleteFiles/:uuid", onDeleteFile);
-
 
     // =====================================
     // Gauge SECTION =================
@@ -1178,10 +1195,6 @@ module.exports = function (app, passport) {
     });
     });
 
-    // =====================================
-    // CitySmart Menu Filter SECTION =======
-    // =====================================
-
     app.get('/CountryList', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         con_CS.query("SELECT CountryName FROM LayerMenu GROUP BY CountryName", function (err, results) {
@@ -1217,26 +1230,110 @@ module.exports = function (app, passport) {
         });
     });
 
-    app.get('/ChangeSelectList', function (req, res) {
+    app.get('/recover',function (req,res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query("SELECT Country, City FROM Country2City", function (err, results) {
-            if (err) throw err;
-            res.send(results);
-            res.end();
+        let recoverIDStr = req.query.recoverIDStr;
+        console.log(recoverIDStr);
+        for(let i = 0; i < recoverIDStr.length; i++) {
+            let statement = "UPDATE CitySmart.GeneralFormDatatable SET Status = 'Active' WHERE ID = '" + recoverIDStr[i] + "'";
+            con_CS.query(statement, function (err, results) {
+                if (err) throw err;
+                res.json(results[i]);
+            });
+        }
+    });
+
+    app.get('/approve',function (req,res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        let approveIDStr = req.query.approveIDStr;
+        console.log(approveIDStr);
+        for(let i = 0; i < approveIDStr.length; i++) {
+            let statement = "UPDATE CitySmart.GeneralFormDatatable SET Status = 'Active' WHERE ID = '" + approveIDStr[i] + "'";
+            con_CS.query(statement, function (err, results) {
+                if (err) throw err;
+                res.json(results[i]);
+            });
+        }
+    });
+
+//Put back the photo in the form
+    app.get('/edit', function (req, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+        let editIDSr = req.query.editIDSr;
+        // console.log(editIDSr);
+        let myStat = "SELECT Layer_Uploader, Layer_Uploader_name FROM GeneralFormDatatable WHERE ID = '" + editIDSr + "'";
+        // console.log(myStat);
+
+        let filePath0;
+        con_CS.query(myStat, function (err, results) {
+            // console.log("query statement : " + myStat);
+            if (!results[0].Layer_Uploader && !results[0].Layer_Uploader_name) {
+                console.log("Error");
+            } else {
+                filePath0 = results[0];
+                let JSONresult = JSON.stringify(results, null, "\t");
+                // console.log(JSONresult);
+                res.send(JSONresult);
+                res.end()
+            }
         });
     });
 
-    app.get('/ChangeLayerList', function (req, res) {
+//Delete button
+    app.get('/deleteData', function(req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query("SELECT FirstLayer , SecondLayer , CityName , ClassName FROM LayerMenu", function (err, results) {
+        let transactionID = req.query.transactionIDStr.split(',');
+        console.log(transactionID);
+        for(let i = 0; i < transactionID.length; i++) {
+            let statement = "UPDATE CitySmart.GeneralFormDatatable SET Status = 'Delete' WHERE ID = '" + transactionID[i] + "'";
+            // console.log(statement);
+            con_CS.query(statement, function (err, results) {
+                if (err) throw err;
+                res.json(results[i]);
+            });
+        }
+
+    });
+
+//AddData in table
+    app.get('/AddData',function (req,res){
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        con_CS.query("SELECT * FROM GeneralFormDatatable",function (err,results) {
             if (err) throw err;
-            let layerInfo = JSON.stringify(results, null, "\t");
-            res.send(layerInfo);
-            console.log(res);
-            res.end();
+            res.json(results);
+        })
+    });
+
+//check if the layer name is available
+    app.get('/SearchLayerName',function (req,res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        con_CS.query("SELECT ThirdLayer FROM LayerMenu", function (err, results) {
+            if (err) throw err;
+            res.json(results);
 
         });
     });
+
+
+    app.get('/EditData',function (req,res){
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        con_CS.query("SELECT Full Name, Address Line 1, Address Line 2, City, State/Province/Region, Postal Code/ZIP, Country, Email, Phone Number, Layer Name, Layer Category, Layer Description, Layer Uploader FROM GeneralFormDatatable",function (err,results) {
+            if (err) throw err;
+            console.log(results);
+        })
+    });
+
+    app.get('/SearchLayerName',function (req,res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        con_CS.query("SELECT ThirdLayer FROM LayerMenu", function (err, results) {
+            if (err) throw err;
+            // console.log(results);
+            res.json(results);
+
+        });
+    });
+
+    app.delete("/deleteFiles/:uuid", onDeleteFile);
 
     // =====================================
     // CitySmart Dynamic Menu SECTION ======
@@ -1302,6 +1399,8 @@ module.exports = function (app, passport) {
             let JSONresult = JSON.stringify(result, null, "\t");
 
             res.send(JSONresult);
+            res.end();
+
         });
     });
 
@@ -1314,13 +1413,123 @@ module.exports = function (app, passport) {
             let JSONresult = JSON.stringify(result, null, "\t");
 
             res.send(JSONresult);
-            });
+            res.end();
+
+        });
 
     });
 
-    // =====================================
-    // CitySmart Graphs SECTION ============
-    // =====================================
+    app.get('/times', function (req, res) {
+        con_Wind.query('select * from WS_MT1'
+        ).then(result => {
+            console.log(result.length);
+        res.send(result)
+    }).catch(err => {
+            res.status(500).send(err.stack)
+    })
+    });
+
+    app.get('/ChangeSelectList', function (req, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        con_CS.query("SELECT Country, City FROM Country2City", function (err, results) {
+            if (err) throw err;
+            res.send(results);
+            res.end();
+        });
+    });
+
+    app.get('/ChangeLayerList', function (req, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        con_CS.query("SELECT FirstLayer , SecondLayer , CityName , ClassName FROM LayerMenu", function (err, results) {
+            if (err) throw err;
+            let layerInfo = JSON.stringify(results, null, "\t");
+            res.send(layerInfo);
+            console.log(res);
+            res.end();
+
+        });
+    });
+
+    app.get('/filterUser', function (req, res) {
+        let myStat = 'SELECT Hum_Out FROM WS_MT1';
+
+        console.log(myStat);
+
+        let myQuery = [
+            {
+                fieldVal: req.query.timeFrom,
+                dbCol: "time",
+                op: " >= '",
+                adj: req.query.timeFrom
+            },
+            {
+                fieldVal: req.query.timeTo,
+                dbCol: "time",
+                op: " >= '",
+                adj: req.query.timeTo
+            }
+        ];
+
+        function userQuery() {
+            res.setHeader("Access-Control-Allow-Origin", "*");
+
+            con_Wind.query(myStat, function (err, result, fields) {
+                let status = [{errStatus: ""}];
+
+                if (err) {
+                    console.log(err);
+                    status[0].errStatus = "fail";
+                    res.send(status);
+                    res.end();
+                } else if (result.length === 0) {
+                    status[0].errStatus = "no data entry";
+                    res.send(status);
+                    res.end();
+                } else {
+                    let JSONresult = JSON.stringify(result, null, "\t");
+                    console.log(JSONresult);
+                    res.send(JSONresult);
+                    res.end();
+                }
+            }).then(result => {
+                console.log(result.length);
+            res.send(result)
+            }).catch(err => {
+                res.status(500).send(err.stack)
+            });
+        }
+
+        let j = 0;
+
+        for (let i = 0; i < myQuery.length; i++) {
+            // console.log("i = " + i);
+            // console.log("field Value: " + !!myQuery[i].fieldVal);
+            if (i === myQuery.length - 1) {
+                if (!!myQuery[i].fieldVal) {
+                    if (j === 0) {
+                        myStat += " WHERE " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
+                        j = 1;
+                        userQuery()
+                    } else {
+                        myStat += " AND " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
+                        userQuery()
+                    }
+                } else {
+                    userQuery()
+                }
+            } else {
+                if (!!myQuery[i].fieldVal) {
+                    if (j === 0) {
+                        myStat += " WHERE " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
+                        j = 1;
+                    } else {
+                        myStat += " AND " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
+                    }
+                }
+            }
+        }
+
+    });
 
     let valueEnergy;
     let startDateTime;
@@ -1373,6 +1582,7 @@ module.exports = function (app, passport) {
 
     });
 
+
     let valueWater;
     let query1 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'Calcium_Ion-Selective_Electrode'";
     let query2 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'Ammonium_Ion-Selective_Electrode'";
@@ -1382,6 +1592,8 @@ module.exports = function (app, passport) {
     let query6 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'Turbidity_Sensor'";
     let query7 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'PH_Sensor'";
     let query8 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'Temperature_Probe_(C)'";
+
+//console.log(query1);
 
     app.get('/WaterGraph', function (req, res) {
         valueWater = req.query.keywords;
