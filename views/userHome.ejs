@@ -222,8 +222,9 @@
     <div class="page-header text-center header">
         <h1><span class="fa fa-anchor"></span>User Home </h1><h4><span class="fa fa-user"></span>&nbsp;<strong>Account Name</strong>: <%= user.username %></h4><br>
         <a id= "Request" class="btn btn-default btn-lg">New Request</a>&nbsp;&nbsp;
+        <a id ="Restore" class="btn btn-default btn-lg">Restore</a>&nbsp;&nbsp;
         <div class="dropdown floating-Box">
-            <button class="btn btn-primary btn-lg" data-toggle="dropdown" id="Username"><%= user.firstName%>
+            <button class="btn btn-primary btn-lg" data-toggle="dropdown" id="Username"><%= firstName %>
                 <span class="caret"></span>
             </button>
             <ul id="userMenu" class="dropdown-menu">
@@ -265,8 +266,8 @@
                     <th>Layer City</th>
                     <th>Layer State</th>
                     <th>Layer Country</th>
-                    <th>Layer Category</th>
-                    <th>--SecondLayer---</th>
+                    <th>Main Category</th>
+                    <th>Sub Category</th>
                     <th>Layer Name</th>
                     <th>Layer Description</th>
                     <th>Layer Uploader</th>
@@ -285,8 +286,8 @@
                     <th>Layer City</th>
                     <th>Layer State</th>
                     <th>Layer Country</th>
-                    <th>Layer Category</th>
-                    <th>--SecondLayer---</th>
+                    <th>Main Category</th>
+                    <th>Sub Category</th>
                     <th>Layer Name</th>
                     <th>Layer Description</th>
                     <th>Layer Uploader</th>
@@ -296,7 +297,7 @@
                 </tfoot>
             </table>
             <!-- formal table //approve //recovery-->
-            <button id="editButton" class="btn btn-primary btn-sm" type="button">Edit</button>
+            <button id="editButton" class="btn btn-primary btn-sm" type="button"></button>
             <button id="deleteButton" class="btn btn-primary btn-sm" type="button">Delete</button>
             <!--<button id="approve" class="btn btn-primary btn-sm" value=" Approve ">Approve</button>-->
             <!--<button id="recover" class="btn btn-primary btn-sm" value=" Recover ">Recover</button>-->
@@ -329,18 +330,25 @@
                 $("#userMenu").empty();
                 $("#userMenu").append(DropMenu)
 
-                var editbutton = document.getElementById("editButton").classList.add('')
+                var sta = document.getElementById("editButton").value;
+                sta = "Approve";
+                $("#editButton").empty();
+                $("#editButton").append(sta);
             } else if (UserRole === "Regular") {
                 DropMenu = "<li><a href=\"/userprofile\">Profile</a></li>\n" +
                     "\t\t\t<li><a href=\"/signout\">Sign Out</a></li>";
                 $("#userMenu").empty();
                 $("#userMenu").append(DropMenu)
 
+                var sta1 = document.getElementById("editButton").value;
+                sta1 = "Edit";
+                $("#editButton").empty();
+                $("#editButton").append(sta1)
             }
 
             table.clear();
             table.draw();
-            queryAndDisplay("statusDel=" + "Active" + "&firstName=" + "<%= user.firstName %>" + "&lastName=" + "<%= user.lastName %>");
+            queryAndDisplay("statusDel=" + "Active" + "&firstName=" + "<%= firstName %>" + "&lastName=" + "<%= user.lastName %>");
         });
 
         $('#dataDisplay tbody').on('click', 'tr', function () {
@@ -364,10 +372,6 @@
 
         $("#Request").on("click", function () {
             location.replace('../home/Layer Request form.html');
-        });
-
-        $("#Profile").on("click", function () {
-            location.replace('../views/userprofile1.html');
         });
 
         $("#editButton").on("click", function () {
@@ -398,6 +402,22 @@
                     type: "GET",
                     dataType: 'json',
                     data: transactionIDStr
+                });
+                window.location.reload();
+            } else {
+                return false;
+            }
+        });
+
+        $("#approveButton").on("click", function () {
+            if (confirm("Are you sure you would like to approve this row(s)?") === true) {
+                var approveIDStr = "approveIDStr=" + scoutingTransactionID.concat(trapTransactionID).toString();
+                console.log ("transactionIDStr: " + approveIDStr);
+                $.ajax({
+                    url:'http://localhost:9090/approve',
+                    type:"GET",
+                    dataType:'json',
+                    data:approveIDStr
                 });
                 window.location.reload();
             } else {
@@ -436,7 +456,7 @@
                 success: function (results) {
                     console.log(results);
                     for (var i = 0; i < results.length; i++) {
-                        if(results[i].userrole === "Regular") {
+                        if(UserRole === "Regular") {
                                 if (results[i].UID === username) {
                                     table.row.add([
                                         results[i].UID,

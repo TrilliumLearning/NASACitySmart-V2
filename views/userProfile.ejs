@@ -114,10 +114,24 @@
         <br><br>
         <form id="submit" onsubmit="return checkForm()" action="/userProfile" method="post">
             <div class="form-group">
-                <label class="col-md-4 control-label">Full Name</label>
+                <label class="col-md-4 control-label">Username</label>
                 <div class="col-md-8 inputGroupContainer">
                     <div class="input-group">
-                        <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span><input id="fullName" name="Full_Name" placeholder="Full Name" class="form-control" required value="" type="text"></div>
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span><input id="username" name="user_name" placeholder="User Name" class="form-control" required value="" type="text"></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label">First Name</label>
+                <div class="col-md-8 inputGroupContainer">
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span><input id="firstName" name="First_Name" placeholder="First Name" class="form-control" required value="" type="text"></div>
+                </div>
+            </div>
+            <div class="form-group">
+                <label class="col-md-4 control-label">Last Name</label>
+                <div class="col-md-8 inputGroupContainer">
+                    <div class="input-group">
+                        <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span><input id="lastName" name="Last_Name" placeholder="Last Name" class="form-control" required value="" type="text"></div>
                 </div>
             </div>
             <div class="form-group">
@@ -212,7 +226,7 @@
 <script>
 
     var UserName = "<%= user.username %>";
-    console.log( UserName);
+    // console.log( UserName);
 
     $.ajax({
         url: "/profile",
@@ -220,11 +234,13 @@
         success: function (results) {
             console.log(results);
             for(var i =0; i< results.length; i++) {
-                console.log(results[i].username);
+                // console.log(results[i].username);
                 if (results[i].username === UserName) {
 
                     // document.getElementById('Request ID').value = getvalue[1];
-                    document.getElementById('fullName').value = results[i].firstName + " " + results[i].lastName;
+                    document.getElementById('username').value = results[i].username;
+                    document.getElementById('firstName').value = results[i].firstName;
+                    document.getElementById('lastName').value = results[i].lastName;
                     document.getElementById('addressLine1').value = results[i].Address_Line1;
                     document.getElementById('addressLine2').value = results[i].Address_Line2;
                     document.getElementById('city').value = results[i].City;

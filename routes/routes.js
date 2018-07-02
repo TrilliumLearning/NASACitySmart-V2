@@ -158,14 +158,6 @@ module.exports = function (app, passport) {
         updateDBNredir(myStat, myVal, myErrMsg, "login.ejs", "/userhome", res);
     });
 
-    app.get('/profile',function (req,res) {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query("SELECT * FROM UserProfile", function (err, results) {
-            if (err) throw err;
-            res.json(results);
-        })
-    });
-
     app.get('/forgot', function (req, res) {
         res.render('forgotPassword.ejs', {message: req.flash('forgotPassMessage')});
 
@@ -178,7 +170,7 @@ module.exports = function (app, passport) {
 
         con_CS.query(statement, function (err, results, fields) {
             if (err) {
-                console.log(err);
+                // console.log(err);
                 res.json({"error": true, "message": "An unexpected error occurred !"});
             } else if (results.length === 0) {
                 res.json({"error": true, "message": "Please verify your email address !"});
@@ -200,7 +192,7 @@ module.exports = function (app, passport) {
                             //newUser.id = rows.insertId;
 
                             if (err) {
-                                console.log(err);
+                                // console.log(err);
                                 // res.send("Token Insert Fail!");
                                 // res.end();
                                 res.json({"error": true, "message": "Token Insert Fail !"});
@@ -225,12 +217,12 @@ module.exports = function (app, passport) {
 
                         smtpTrans.sendMail(message, function(error){
                             if(error){
-                                console.log(error.message);
+                                // console.log(error.message);
                                 // alert('Something went wrong! Please double check if your email is valid.');
                                 return;
                             } else {
                                 // res.send('Message sent successfully! Please check your email inbox.');
-                                console.log('Message sent successfully!');
+                                // console.log('Message sent successfully!');
                                 // res.redirect('/login');
                                 res.json({"error": false, "message": "Message sent successfully !"});
                                 // alert('An e-mail has been sent to ' + req.body.username + ' with further instructions.');
@@ -328,16 +320,23 @@ module.exports = function (app, passport) {
     // USER Home Section ===================
     // =====================================
     app.get('/userhome', isLoggedIn, function (req, res) {
-        let myStat = "SELECT userrole FROM Users WHERE username = '" + req.user.username + "';";
+        let myStat = "SELECT userrole FROM UserLogin WHERE username = '" + req.user.username + "';";
+        let state2 = "SELECT firstName FROM UserProfile WHERE username = '" + req.user.username + "';";
 
-        con_CS.query(myStat, function (err, results, fields) {
-            //console.log(results);
-
-            if (!results[0].userrole) {
-                console.log("Error");
-            } else {
-                res.render('userHome.ejs', {
-                    user: req.user // get the user out of session and pass to template
+        con_CS.query(myStat + state2, function (err, results, fields) {
+            // let JSONresult = JSON.stringify(results, null, "\t");
+            // let JSONarray = JSON.parse(JSONresult);
+            // console.log(JSONarray);
+            // console.log(results);
+            // console.log(results[1][0].firstName);
+            if (!results[0][0].userrole) {
+                console.log("Error2");
+            } else if(!results[1][0].firstName){
+                console.log("Error1")
+            }else{
+                res.render('userHome.ejs',  {
+                    user: req.user, // get the user out of session and pass to template
+                    firstName: results[1][0].firstName
                 });
             }
         });
@@ -372,10 +371,109 @@ module.exports = function (app, passport) {
 
     // show the data history ejs
     app.get('/dataHistory', isLoggedIn, function (req, res) {
-        res.render('dataHistory.ejs', {
-            user: req.user // get the user out of session and pass to template
+
+        let state2 = "SELECT firstName FROM UserProfile WHERE username = '" + req.user.username + "';";
+
+        con_CS.query(state2, function (err, results, fields) {
+            console.log(results);
+            if (!results[0].firstName) {
+                console.log("Error2");
+            } else{
+                res.render('dataHistory.ejs', {
+                    user: req.user, // get the user out of session and pass to template
+                    firstName: results[0].firstName //get the firstName our of session ans pass to template
+                });
+            }
         });
+
     });
+
+    app.get('/filterQuery', isLoggedIn, function (req, res) {
+        var scoutingStat = "SELECT UserProfile.firstName, UserProfile.lastName, Request_Form.* FROM Request_Form INNER JOIN UserProfile ON UserProfile.username = Request_Form.UID";
+        // var trapStat = "SELECT UserProfile.username, UserProfile.firstName, UserProfile.lastName, General_Form.*, Detailed_Trap.* FROM Transaction INNER JOIN Users ON UserProfile.username = Transaction.Cr_UN INNER JOIN General_Form ON General_Form.transactionID = Transaction.transactionID INNER JOIN Detailed_Trap ON Detailed_Trap.transactionID = Transaction.transactionID";
+        // console.log(req.query);
+        var myQueryObj = [
+            // {
+            //     fieldVal: req.query.statusDel,
+            //     dbCol: "General_Form.Status_del",
+            //     op: " = '",
+            //     adj: req.query.statusDel,
+            //     table: 1
+            // },
+            // {
+            //     fieldVal: req.query.statusDel,
+            //     dbCol: "Detailed_Scouting.Status_del",
+            //     op: " = '",
+            //     adj: req.query.statusDel,
+            //     table: 2
+            // },
+            // {
+            //     fieldVal: req.query.statusDel,
+            //     dbCol: "Detailed_Trap.Status_del",
+            //     op: " = '",
+            //     adj: req.query.statusDel,
+            //     table: 3
+            // },
+            {
+                fieldVal: req.query.firstName,
+                dbCol: "firstName",
+                op: " = '",
+                adj: req.query.firstName,
+                table: 1
+            },
+            {
+                fieldVal: req.query.lastName,
+                dbCol: "lastName",
+                op: " = '",
+                adj: req.query.lastName,
+                table: 1
+            },
+            // {
+            //     fieldVal: req.query.startDate,
+            //     dbCol: "date",
+            //     op: " >= '",
+            //     adj: req.query.startDate,
+            //     table: 1
+            // },
+            // {
+            //     fieldVal: req.query.endDate,
+            //     dbCol: "date",
+            //     op: " <= '",
+            //     adj: req.query.endDate,
+            //     table: 1
+            // },
+            {
+                fieldVal: req.query.content1,
+                dbCol: req.query.filter1,
+                op: " = '",
+                adj: req.query.filter1,
+                table: req.query.filter1
+            },
+            {
+                fieldVal: req.query.content2,
+                dbCol: req.query.filter2,
+                op: " = '",
+                adj: req.query.filter2,
+                table: req.query.filter2
+            },
+            {
+                fieldVal: req.query.content3,
+                dbCol: req.query.filter3,
+                op: " = '",
+                adj: req.query.filter3,
+                table: req.query.filter3
+            },
+            {
+                fieldVal: req.query.status,
+                dbCol: req.query.status,
+                op: " = '",
+                adj: req.query.status,
+                table: req.query.status
+            }
+        ];
+        QueryStat(myQueryObj, scoutingStat, res)
+    });
+
     // =====================================
     // USER PROFILE  =======================
     // =====================================
@@ -513,7 +611,7 @@ module.exports = function (app, passport) {
     // Filter by search criteria
     app.get('/filterUser', isLoggedIn, function (req, res) {
         myStat = "SELECT * FROM UserLogin";
-
+        mylogin = "SELECT * FROM UserProfile";
         let myQuery = [
             {
                 fieldVal: req.query.dateCreatedFrom,
@@ -540,6 +638,12 @@ module.exports = function (app, passport) {
                 adj: req.query.dateModifiedTo
             },
             {
+                fieldVal: req.query.userrole,
+                dbCol: "userrole",
+                op: " = '",
+                adj: req.query.userrole
+            },
+            {
                 fieldVal: req.query.firstName,
                 dbCol: "firstName",
                 op: " = '",
@@ -550,12 +654,6 @@ module.exports = function (app, passport) {
                 dbCol: "lastName",
                 op: " = '",
                 adj: req.query.lastName
-            },
-            {
-                fieldVal: req.query.userrole,
-                dbCol: "userrole",
-                op: " = '",
-                adj: req.query.userrole
             }
         ];
 
@@ -565,7 +663,7 @@ module.exports = function (app, passport) {
             res.setHeader("Access-Control-Allow-Origin", "*");
             // console.log("Query Statement: " + queryStat);
 
-            con_CS.query(myStat, function (err, results, fields) {
+            con_CS.query(myStat,mylogin, function (err, results, fields) {
 
                 let status = [{errStatus: ""}];
 
@@ -596,10 +694,12 @@ module.exports = function (app, passport) {
                 if (!!myQuery[i].fieldVal) {
                     if (j === 0) {
                         myStat += " WHERE " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
+                        mylogin += " WHERE " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
                         j = 1;
                         userQuery()
                     } else {
                         myStat += " AND " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
+                        mylogin += " AND " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
                         userQuery()
                     }
                 } else {
@@ -609,9 +709,11 @@ module.exports = function (app, passport) {
                 if (!!myQuery[i].fieldVal) {
                     if (j === 0) {
                         myStat += " WHERE " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
+                        mylogin += " WHERE " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
                         j = 1;
                     } else {
                         myStat += " AND " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
+                        mylogin += " AND " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
                     }
                 }
             }
@@ -1221,15 +1323,6 @@ module.exports = function (app, passport) {
         });
     });
 
-    app.get('/ChangeSelectList', function (req, res) {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query("SELECT Country, City FROM Country2City", function (err, results) {
-            if (err) throw err;
-            res.send(results);
-            res.end();
-        });
-    });
-
     app.get('/ChangeLayerList', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         con_CS.query("SELECT FirstLayer , SecondLayer , CityName , ClassName FROM LayerMenu", function (err, results) {
@@ -1603,16 +1696,23 @@ function updateDBNredir(SQLstatement, Value, ErrMsg, failURL, redirURL, res) {
     })
 }
 
-function QueryStat(myObj, scoutingStat, trapStat, res) {
+function QueryStat(myObj, scoutingStat, res) {
+    console.log(myObj);
     let j = 0;
     for (let i = 0; i < myObj.length; i++) {
         //console.log("i = " + i);
         //console.log("field Value: " + !!myObj[i].fieldVal);
+
+        if (myObj[5].adj === "undefined") {
+            console.log("S");
+        }
+
         if (!!myObj[i].adj){
-            if (i === 7 || i === 8 || i === 9) {
-                myObj[i].dbCol = myObj[i].dbCol.substring(1, myObj[i].dbCol.length);
-                myObj[i].table = parseInt(myObj[i].table.substring(0, 1));
-            }
+            console.log(i  + "   " + myObj[i].adj);
+            // if (i === 3 || i === 4 || i === 5) {
+            //     myObj[i].dbCol = myObj[i].dbCol.substring(1, myObj[i].dbCol.length);
+            //     myObj[i].table = parseInt(myObj[i].table.substring(0, 1));
+            // }
 
             let aw;
             if (j === 0) {
@@ -1622,22 +1722,23 @@ function QueryStat(myObj, scoutingStat, trapStat, res) {
                 aw = " AND ";
             }
 
-            if (myObj[i].table === 1) {
-                scoutingStat = editStat(scoutingStat, aw, myObj[i].dbCol, myObj[i].op, myObj[i].fieldVal);
-                trapStat = editStat(trapStat, aw, myObj[i].dbCol, myObj[i].op, myObj[i].fieldVal);
-            } else if (myObj[i].table === 2) {
-                scoutingStat = editStat(scoutingStat, aw, myObj[i].dbCol, myObj[i].op, myObj[i].fieldVal);
-            } else if (myObj[i].table === 3) {
-                trapStat = editStat(trapStat, aw, myObj[i].dbCol, myObj[i].op, myObj[i].fieldVal);
-            }
+            // if (myObj[i].table === 1) {
+            //     scoutingStat = editStat(scoutingStat, aw, myObj[i].dbCol, myObj[i].op, myObj[i].fieldVal);
+            //     console.log(scoutingStat);
+            //     // trapStat = editStat(trapStat, aw, myObj[i].dbCol, myObj[i].op, myObj[i].fieldVal);
+            // } else if (myObj[i].table === 2) {
+            //     scoutingStat = editStat(scoutingStat, aw, myObj[i].dbCol, myObj[i].op, myObj[i].fieldVal);
+            // }
+
+            scoutingStat = editStat(scoutingStat, aw, myObj[i].dbCol, myObj[i].op, myObj[i].fieldVal);
 
             if (i === myObj.length - 1) {
-                let sqlStatement = scoutingStat + "; " + trapStat;
+                let sqlStatement = scoutingStat + "; ";
                 dataList(sqlStatement, res);
             }
         } else {
             if (i === myObj.length - 1) {
-                let sqlStatement = scoutingStat + "; " + trapStat;
+                let sqlStatement = scoutingStat + "; ";
                 dataList(sqlStatement, res);
             }
         }
@@ -1650,9 +1751,8 @@ function QueryStat(myObj, scoutingStat, trapStat, res) {
 }
 
 function dataList(sqlStatement, res) {
-    console.log(sqlStatement);
-
     res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+    console.log(sqlStatement);
     con_CS.query(sqlStatement, function (err, results, fields) {
 
         errStatus = [{errMsg: ""}];
@@ -1662,13 +1762,14 @@ function dataList(sqlStatement, res) {
             errStatus[0].errMsg = "fail";
             res.send(errStatus);
             res.end();
-        } else if (results[0].length === 0 && results[1].length === 0) {
+        } else if (results.length === 0) {
             errStatus[0].errMsg = "no data entry";
             res.send(errStatus);
             res.end();
         } else {
-            let result = results[0].concat(results[1]);
-            let JSONresult = JSON.stringify(result, null, "\t");
+            // console.log(results);
+            // let result = results;
+            let JSONresult = JSON.stringify(results, null, "\t");
             // console.log(JSONresult);
             res.send(JSONresult);
             res.end();
