@@ -317,7 +317,65 @@ module.exports = function (app, passport) {
         ]);
     });
 
+    //show the signout form
+    app.get('/signout', function (req, res) {
+        req.session.destroy();
+        req.logout();
+        res.redirect('/login');
+    });
 
+    // =====================================
+    // USER Home Section ===================
+    // =====================================
+    app.get('/userhome', isLoggedIn, function (req, res) {
+        let myStat = "SELECT userrole FROM Users WHERE username = '" + req.user.username + "';";
+
+        con_CS.query(myStat, function (err, results, fields) {
+            //console.log(results);
+
+            if (!results[0].userrole) {
+                console.log("Error");
+            } else {
+                res.render('userHome.ejs', {
+                    user: req.user // get the user out of session and pass to template
+                });
+            }
+        });
+    });
+
+    app.get('/deleteRow', isLoggedIn, function(req, res) {
+        del_recov("Deleted", "Deletion failed!", "/userHome", req, res);
+    });
+
+    app.get('/recoverRow', isLoggedIn, function(req, res){
+        del_recov("Active", "Recovery failed!", "/userHome", req, res);
+    });
+
+    // =====================================
+    // REQUEST QUERY   =====================
+    // =====================================
+    app.get('/deleteRow2', isLoggedIn, function(req, res) {
+        del_recov("Deleted", "Deletion failed!", "/dataHistory", req, res);
+    });
+
+    app.get('/recoverRow2', isLoggedIn, function(req, res){
+        del_recov("Active", "Recovery failed!", "/dataHistory", req, res);
+    });
+
+    app.get('/recovery2', isLoggedIn, function (req, res) {
+        // render the page and pass in any flash data if it exists
+        res.render('recovery_dataHistory.ejs', {
+            user: req.user,
+            message: req.flash('restoreMessage')
+        });
+    });
+
+    // show the data history ejs
+    app.get('/dataHistory', isLoggedIn, function (req, res) {
+        res.render('dataHistory.ejs', {
+            user: req.user // get the user out of session and pass to template
+        });
+    });
     // =====================================
     // USER PROFILE  =======================
     // =====================================
@@ -325,6 +383,15 @@ module.exports = function (app, passport) {
     // we will use route middleware to verify this (the isLoggedIn function)
 
     // Show user profile page
+    app.get('/profile',function (req,res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        con_CS.query("SELECT * FROM UserProfile", function (err, results) {
+            if (err) throw err;
+            res.json(results);
+        })
+    });
+
+
     app.get('/userProfile', isLoggedIn, function (req, res) {
         res.render('userProfile.ejs', {user: req.user});
     });
@@ -632,8 +699,16 @@ module.exports = function (app, passport) {
         }
     });
 
+    app.get('/recovery', isLoggedIn, function (req, res) {
+        // render the page and pass in any flash data if it exists
+        res.render('recovery.ejs', {
+            user: req.user,
+            message: req.flash('restoreMessage')
+        });
+    });
+
     // =====================================
-    // TRANSACTION SECTION =================
+    // REQUEST FORM SECTION =================
     // =====================================
     // we will want this protected so you have to be logged in to visit
     // we will use route middleware to verify this (the isLoggedIn function)
@@ -654,10 +729,10 @@ module.exports = function (app, passport) {
         for(let i = 0; i < result.length; i++){
             if (i === result.length - 1) {
                 name += result[i][0];
-                value += '"' + result[i][1] + '"';
+                valueSubmit += '"' + result[i][1] + '"';
             } else {
                 name += result[i][0] + ", ";
-                value += '"' + result[i][1] + '"' + ", ";
+                valueSubmit += '"' + result[i][1] + '"' + ", ";
             }
 
         }
@@ -680,6 +755,221 @@ module.exports = function (app, passport) {
             }
         });
 
+    });
+
+    app.post('/submitL',function (req,res){
+        console.log (req.body);
+        let result = Object.keys(req.body).map(function (key) {
+            return [String(key), req.body[key]];
+        });
+        res.setHeader("Access-Control-Allow-Origin", "*");
+
+        let name = "";
+        let valueSubmit = "";
+
+        for(let i = 0; i < result.length; i++){
+            if (i === result.length - 1) {
+                name += result[i][0];
+                valueSubmit += '"' + result[i][1] + '"';
+            } else {
+                name += result[i][0] + ", ";
+                valueSubmit += '"' + result[i][1] + '"' + ", ";
+            }
+        }
+    });
+
+    //check if the layer name is available
+    app.get('/SearchLayerName',function (req,res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        con_CS.query("SELECT ThirdLayer FROM LayerMenu", function (err, results) {
+            if (err) throw err;
+            res.json(results);
+
+        });
+    });
+
+    app.delete("/deleteFiles/:uuid", onDeleteFile);
+
+    app.get('/recover',function (req,res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        let recoverIDStr = req.query.recoverIDStr;
+        console.log(recoverIDStr);
+        for(let i = 0; i < recoverIDStr.length; i++) {
+            let statement = "UPDATE CitySmart.LayerMenu SET Status = 'Active' WHERE ID = '" + recoverIDStr[i] + "'";
+            con_CS.query(statement, function (err, results) {
+                if (err) throw err;
+                res.json(results[i]);
+            });
+        }
+    });
+
+    app.get('/approve',function (req,res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        let approveIDStr = req.query.approveIDStr;
+        console.log(approveIDStr);
+        for(let i = 0; i < approveIDStr.length; i++) {
+            let statement = "UPDATE CitySmart.LayerMenu SET Status = 'Active' WHERE ID = '" + approveIDStr[i] + "'";
+            con_CS.query(statement, function (err, results) {
+                if (err) throw err;
+                res.json(results[i]);
+            });
+        }
+    });
+
+    //Put back the photo in the form
+    app.get('/edit', function (req, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+        let editIDSr = req.query.editIDSr;
+        // console.log(editIDSr);
+        let myStat = "SELECT Layer_Uploader, Layer_Uploader_name FROM LayerMenu WHERE ID = '" + editIDSr + "'";
+        // console.log(myStat);
+
+        let filePath0;
+        con_CS.query(myStat, function (err, results) {
+            // console.log("query statement : " + myStat);
+            if (!results[0].Layer_Uploader && !results[0].Layer_Uploader_name) {
+                console.log("Error");
+            } else {
+                filePath0 = results[0];
+                let JSONresult = JSON.stringify(results, null, "\t");
+                // console.log(JSONresult);
+                res.send(JSONresult);
+                res.end()
+            }
+        });
+    });
+
+    //Delete button
+    app.get('/deleteData', function(req, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        let transactionID = req.query.transactionIDStr.split(',');
+        console.log(transactionID);
+        for(let i = 0; i < transactionID.length; i++) {
+            let statement = "UPDATE CitySmart.LayerMenu SET Status = 'Delete' WHERE ID = '" + transactionID[i] + "'";
+            // console.log(statement);
+            con_CS.query(statement, function (err, results) {
+                if (err) throw err;
+                res.json(results[i]);
+            });
+        }
+
+    });
+
+    //AddData in table
+    app.get('/AddData',function (req,res){
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        con_CS.query('SELECT Request_Form.*, UserLogin.userrole FROM UserLogin INNER JOIN Request_Form ON UserLogin.username = Request_Form.UID',function (err,results) {
+            if (err) throw err;
+            res.json(results);
+            console.log(results);
+        })
+    });
+
+    app.get('/EditData',function (req,res){
+        res.setHeader("Access-Control-Allow-Origin", "*");
+        con_CS.query("SELECT Full Name, Address Line 1, Address Line 2, City, State/Province/Region, Postal Code/ZIP, Country, Email, Phone Number, Layer Name, Layer Category, Layer Description, Layer Uploader FROM LayerMenu",function (err,results) {
+            if (err) throw err;
+            console.log(results);
+        })
+    });
+
+    app.delete("/deleteFiles/:uuid", onDeleteFile);
+
+
+    // =====================================
+    // Gauge SECTION =================
+    // =====================================
+
+    // app.get('/filterUser', function (req, res) {
+    app.get('/gaugeData', function (req, res) {
+        let myStat = 'SELECT Hum_Out FROM WS_MT1';
+
+        console.log(myStat);
+
+        let myQuery = [
+            {
+                fieldVal: req.query.timeFrom,
+                dbCol: "time",
+                op: " >= '",
+                adj: req.query.timeFrom
+            },
+            {
+                fieldVal: req.query.timeTo,
+                dbCol: "time",
+                op: " >= '",
+                adj: req.query.timeTo
+            }
+        ];
+
+        function userQuery() {
+            res.setHeader("Access-Control-Allow-Origin", "*");
+
+            con_Wind.query(myStat, function (err, result, fields) {
+                let status = [{errStatus: ""}];
+
+                if (err) {
+                    console.log(err);
+                    status[0].errStatus = "fail";
+                    res.send(status);
+                    res.end();
+                } else if (result.length === 0) {
+                    status[0].errStatus = "no data entry";
+                    res.send(status);
+                    res.end();
+                } else {
+                    let JSONresult = JSON.stringify(result, null, "\t");
+                    console.log(JSONresult);
+                    res.send(JSONresult);
+                    res.end();
+                }
+            }).then(result => {
+                console.log(result.length);
+                res.send(result)
+            }).catch(err => {
+                res.status(500).send(err.stack)
+            });
+        }
+
+        let j = 0;
+
+        for (let i = 0; i < myQuery.length; i++) {
+            // console.log("i = " + i);
+            // console.log("field Value: " + !!myQuery[i].fieldVal);
+            if (i === myQuery.length - 1) {
+                if (!!myQuery[i].fieldVal) {
+                    if (j === 0) {
+                        myStat += " WHERE " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
+                        j = 1;
+                        userQuery()
+                    } else {
+                        myStat += " AND " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
+                        userQuery()
+                    }
+                } else {
+                    userQuery()
+                }
+            } else {
+                if (!!myQuery[i].fieldVal) {
+                    if (j === 0) {
+                        myStat += " WHERE " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
+                        j = 1;
+                    } else {
+                        myStat += " AND " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
+                    }
+                }
+            }
+        }
+
+    });
+
+    app.get('/times', function (req, res) {
+        con_Wind.query('select * from WS_MT1'
+        ).then(result => {
+            console.log(result.length);
+            res.send(result)
+        }).catch(err => {
+            res.status(500).send(err.stack)
+        })
     });
 
     app.get('/newHum', function (req, res) {
@@ -892,6 +1182,10 @@ module.exports = function (app, passport) {
     });
     });
 
+    // =====================================
+    // CitySmart Menu Filter SECTION =======
+    // =====================================
+
     app.get('/CountryList', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         con_CS.query("SELECT CountryName FROM LayerMenu GROUP BY CountryName", function (err, results) {
@@ -927,123 +1221,30 @@ module.exports = function (app, passport) {
         });
     });
 
-    app.get('/recover',function (req,res) {
+    app.get('/ChangeSelectList', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
-        let recoverIDStr = req.query.recoverIDStr;
-        console.log(recoverIDStr);
-        for(let i = 0; i < recoverIDStr.length; i++) {
-            let statement = "UPDATE CitySmart.GeneralFormDatatable SET Status = 'Active' WHERE ID = '" + recoverIDStr[i] + "'";
-            con_CS.query(statement, function (err, results) {
-                if (err) throw err;
-                res.json(results[i]);
-            });
-        }
-    });
-
-    app.get('/approve',function (req,res) {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        let approveIDStr = req.query.approveIDStr;
-        console.log(approveIDStr);
-        for(let i = 0; i < approveIDStr.length; i++) {
-            let statement = "UPDATE CitySmart.GeneralFormDatatable SET Status = 'Active' WHERE ID = '" + approveIDStr[i] + "'";
-            con_CS.query(statement, function (err, results) {
-                if (err) throw err;
-                res.json(results[i]);
-            });
-        }
-    });
-
-//Put back the photo in the form
-    app.get('/edit', function (req, res) {
-        res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-        let editIDSr = req.query.editIDSr;
-        // console.log(editIDSr);
-        let myStat = "SELECT Layer_Uploader, Layer_Uploader_name FROM GeneralFormDatatable WHERE ID = '" + editIDSr + "'";
-        // console.log(myStat);
-
-        let filePath0;
-        con_CS.query(myStat, function (err, results) {
-            // console.log("query statement : " + myStat);
-            if (!results[0].Layer_Uploader && !results[0].Layer_Uploader_name) {
-                console.log("Error");
-            } else {
-                filePath0 = results[0];
-                let JSONresult = JSON.stringify(results, null, "\t");
-                // console.log(JSONresult);
-                res.send(JSONresult);
-                res.end()
-            }
+        con_CS.query("SELECT Country, City FROM Country2City", function (err, results) {
+            if (err) throw err;
+            res.send(results);
+            res.end();
         });
     });
 
-//Delete button
-    app.get('/deleteData', function(req, res) {
+    app.get('/ChangeLayerList', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
-        let transactionID = req.query.transactionIDStr.split(',');
-        console.log(transactionID);
-        for(let i = 0; i < transactionID.length; i++) {
-            let statement = "UPDATE CitySmart.GeneralFormDatatable SET Status = 'Delete' WHERE ID = '" + transactionID[i] + "'";
-            // console.log(statement);
-            con_CS.query(statement, function (err, results) {
-                if (err) throw err;
-                res.json(results[i]);
-            });
-        }
-
-    });
-
-//AddData in table
-    app.get('/AddData',function (req,res){
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query('SELECT Request_Form.*, UserLogin.userrole FROM UserLogin INNER JOIN Request_Form ON UserLogin.username = Request_Form.UID',function (err,results) {
+        con_CS.query("SELECT FirstLayer , SecondLayer , CityName , ClassName FROM LayerMenu", function (err, results) {
             if (err) throw err;
-            res.json(results);
-            console.log(results);
-        })
-    });
-
-//check if the layer name is available
-    app.get('/SearchLayerName',function (req,res) {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query("SELECT ThirdLayer FROM LayerMenu", function (err, results) {
-            if (err) throw err;
-            res.json(results);
+            let layerInfo = JSON.stringify(results, null, "\t");
+            res.send(layerInfo);
+            console.log(res);
+            res.end();
 
         });
     });
 
-
-    app.post('/submitL',function (req,res){
-        console.log (req.body);
-        let result = Object.keys(req.body).map(function (key) {
-            return [String(key), req.body[key]];
-        });
-        res.setHeader("Access-Control-Allow-Origin", "*");
-
-        let name = "";
-        let valueSubmit = "";
-
-        for(let i = 0; i < result.length; i++){
-            if (i === result.length - 1) {
-                name += result[i][0];
-                valueSubmit += '"' + result[i][1] + '"';
-            } else {
-                name += result[i][0] + ", ";
-                valueSubmit += '"' + result[i][1] + '"' + ", ";
-            }
-        }
-    });
-
-    app.get('/EditData',function (req,res){
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query("SELECT Full Name, Address Line 1, Address Line 2, City, State/Province/Region, Postal Code/ZIP, Country, Email, Phone Number, Layer Name, Layer Category, Layer Description, Layer Uploader FROM GeneralFormDatatable",function (err,results) {
-            if (err) throw err;
-            console.log(results);
-        })
-    });
-
-    app.delete("/deleteFiles/:uuid", onDeleteFile);
-
+    // =====================================
+    // CitySmart Dynamic Menu SECTION ======
+    // =====================================
     app.get('/firstlayer', function (req, res) {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -1105,8 +1306,6 @@ module.exports = function (app, passport) {
             let JSONresult = JSON.stringify(result, null, "\t");
 
             res.send(JSONresult);
-            res.end();
-
         });
     });
 
@@ -1119,123 +1318,13 @@ module.exports = function (app, passport) {
             let JSONresult = JSON.stringify(result, null, "\t");
 
             res.send(JSONresult);
-            res.end();
-
-        });
-
-    });
-
-    app.get('/times', function (req, res) {
-        con_Wind.query('select * from WS_MT1'
-        ).then(result => {
-            console.log(result.length);
-        res.send(result)
-    }).catch(err => {
-            res.status(500).send(err.stack)
-    })
-    });
-
-    app.get('/ChangeSelectList', function (req, res) {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query("SELECT Country, City FROM Country2City", function (err, results) {
-            if (err) throw err;
-            res.send(results);
-            res.end();
-        });
-    });
-
-    app.get('/ChangeLayerList', function (req, res) {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query("SELECT FirstLayer , SecondLayer , CityName , ClassName FROM LayerMenu", function (err, results) {
-            if (err) throw err;
-            let layerInfo = JSON.stringify(results, null, "\t");
-            res.send(layerInfo);
-            console.log(res);
-            res.end();
-
-        });
-    });
-
-    app.get('/filterUser', function (req, res) {
-        let myStat = 'SELECT Hum_Out FROM WS_MT1';
-
-        console.log(myStat);
-
-        let myQuery = [
-            {
-                fieldVal: req.query.timeFrom,
-                dbCol: "time",
-                op: " >= '",
-                adj: req.query.timeFrom
-            },
-            {
-                fieldVal: req.query.timeTo,
-                dbCol: "time",
-                op: " >= '",
-                adj: req.query.timeTo
-            }
-        ];
-
-        function userQuery() {
-            res.setHeader("Access-Control-Allow-Origin", "*");
-
-            con_Wind.query(myStat, function (err, result, fields) {
-                let status = [{errStatus: ""}];
-
-                if (err) {
-                    console.log(err);
-                    status[0].errStatus = "fail";
-                    res.send(status);
-                    res.end();
-                } else if (result.length === 0) {
-                    status[0].errStatus = "no data entry";
-                    res.send(status);
-                    res.end();
-                } else {
-                    let JSONresult = JSON.stringify(result, null, "\t");
-                    console.log(JSONresult);
-                    res.send(JSONresult);
-                    res.end();
-                }
-            }).then(result => {
-                console.log(result.length);
-            res.send(result)
-            }).catch(err => {
-                res.status(500).send(err.stack)
             });
-        }
-
-        let j = 0;
-
-        for (let i = 0; i < myQuery.length; i++) {
-            // console.log("i = " + i);
-            // console.log("field Value: " + !!myQuery[i].fieldVal);
-            if (i === myQuery.length - 1) {
-                if (!!myQuery[i].fieldVal) {
-                    if (j === 0) {
-                        myStat += " WHERE " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
-                        j = 1;
-                        userQuery()
-                    } else {
-                        myStat += " AND " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
-                        userQuery()
-                    }
-                } else {
-                    userQuery()
-                }
-            } else {
-                if (!!myQuery[i].fieldVal) {
-                    if (j === 0) {
-                        myStat += " WHERE " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
-                        j = 1;
-                    } else {
-                        myStat += " AND " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
-                    }
-                }
-            }
-        }
 
     });
+
+    // =====================================
+    // CitySmart Graphs SECTION ============
+    // =====================================
 
     let valueEnergy;
     let startDateTime;
@@ -1409,429 +1498,9 @@ module.exports = function (app, passport) {
         }
     });
 
-    app.get('/userhome', isLoggedIn, function (req, res) {
-        let myStat = "SELECT userrole FROM UserLogin WHERE username = '" + req.user.username + "';";
-
-        con_CS.query(myStat, function (err, results, fields) {
-            //console.log(results);
-
-            if (!results[0].userrole) {
-                console.log("Error");
-            } else {
-                res.render('userHome.ejs', {
-                    user: req.user // get the user out of session and pass to template
-                });
-            }
-        });
-    });
-
-    app.get('/deleteRow2', isLoggedIn, function(req, res) {
-        del_recov("Deleted", "Deletion failed!", "/dataHistory", req, res);
-    });
-
-    app.get('/recoverRow2', isLoggedIn, function(req, res){
-        del_recov("Active", "Recovery failed!", "/dataHistory", req, res);
-    });
-
-    app.get('/deleteRow', isLoggedIn, function(req, res) {
-        del_recov("Deleted", "Deletion failed!", "/userHome", req, res);
-    });
-
-    app.get('/recoverRow', isLoggedIn, function(req, res){
-        del_recov("Active", "Recovery failed!", "/userHome", req, res);
-    });
-
-    // edit on homepage
-    let editTransactionID;
-    let editData;
-    app.get('/sendEditData', isLoggedIn, function(req, res) {
-        editTransactionID = req.query.transactionIDStr;
-        console.log(editTransactionID);
-
-        let scoutingStat = "SELECT UserProfile.firstName, UserProfile.lastName, General_Form.*, Detailed_Scouting.* FROM Transaction INNER JOIN UserProfile ON UserProfile.username = Transaction.Cr_UN INNER JOIN General_Form ON General_Form.transactionID = Transaction.transactionID INNER JOIN Detailed_Scouting ON Detailed_Scouting.transactionID = Transaction.transactionID WHERE Transaction.transactionID = '" + editTransactionID +"';";
-        let trapStat = "SELECT UserProfile.firstName, UserProfile.lastName, General_Form.*, Detailed_Trap.* FROM Transaction INNER JOIN UserProfile ON UserProfile.username = Transaction.Cr_UN INNER JOIN General_Form ON General_Form.transactionID = Transaction.transactionID INNER JOIN Detailed_Trap ON Detailed_Trap.transactionID = Transaction.transactionID WHERE Transaction.transactionID = '" + editTransactionID + "';";
-
-        con_CS.query(scoutingStat + trapStat, function (err, results, fields) {
-
-            if (err) {
-                console.log(err);
-                res.json({"error": true, "message": "Fail"});
-            } else {
-                console.log(results);
-                if (results[0].length > 0) {
-                    editData = results[0][0];
-                    res.json({"error": false, "message": "/editData"});
-                } else if (results[1].length > 0) {
-                    editData = results[1][0];
-                    res.json({"error": false, "message": "/editData"});
-                } else {
-                    res.json({"error": true, "message": "Fail"});
-                }
-            }
-        });
-    });
-    app.get('/edit', isLoggedIn, function (req, res) {
-        // res.render("test.ejs");
-        // console.log("11");
-        res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-
-        let myStat = "SELECT Damage_photo, Damage_photo_name FROM Detailed_Scouting WHERE transactionID = '" + editTransactionID +"';";
-        console.log("This is for editing photos ONLY >:( " + editTransactionID);
-
-        let filePath0;
-        con_CS.query(myStat, function (err, results) {
-            console.log("query statement : " + myStat);
-
-            if (!results[0].Damage_photo && !results[0].Damage_photo_name) {
-                console.log("Error");
-            } else {
-                filePath0 = results[0];
-                let JSONresult = JSON.stringify(results, null, "\t");
-                console.log(JSONresult);
-                res.send(JSONresult);
-                res.end()
-            }
-        });
-    });
-    app.get('/edit2', isLoggedIn, function (req, res) {
-        // res.render("test.ejs");
-        // console.log("11");
-        res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-
-        let myStat = "SELECT Pest_photo, Pest_photo_name FROM Detailed_Scouting WHERE transactionID = '" + editTransactionID +"';";
-        console.log("This is for editing photos ONLY >:( " + editTransactionID);
-
-        let filePath0;
-        con_CS.query(myStat, function (err, results) {
-            console.log("query statement : " + myStat);
-
-            if (!results[0].Pest_photo && !results[0].Pest_photo_name) {
-                console.log("Error");
-            } else {
-                filePath0 = results[0];
-                let JSONresult = JSON.stringify(results, null, "\t");
-                console.log(JSONresult);
-                res.send(JSONresult);
-                res.end()
-            }
-        });
-    });
-    app.delete("/deleteFiles/:uuid", onDeleteFile);
-
-    app.get('/editData', isLoggedIn, function(req, res) {
-        // console.log(editData.transactionID);
-        res.render('dataEdit.ejs', {
-            user: req.user,
-            data: editData, // get the user out of session and pass to template
-            message: req.flash('Data Entry Message')
-        });
-    });
-
-    app.get('/recovery', isLoggedIn, function (req, res) {
-        // render the page and pass in any flash data if it exists
-        res.render('recovery.ejs', {
-            user: req.user,
-            message: req.flash('restoreMessage')
-        });
-    });
-
-    app.get('/recovery2', isLoggedIn, function (req, res) {
-        // render the page and pass in any flash data if it exists
-        res.render('recovery_dataHistory.ejs', {
-            user: req.user,
-            message: req.flash('restoreMessage')
-        });
-    });
-
-    // show the data history ejs
-    app.get('/dataHistory', isLoggedIn, function (req, res) {
-        res.render('dataHistory.ejs', {
-            user: req.user // get the user out of session and pass to template
-        });
-    });
-
-    app.get('/filterQuery', isLoggedIn, function (req, res) {
-        let scoutingStat = "SELECT UserProfile.username, UserProfile.firstName, UserProfile.lastName, General_Form.*, Detailed_Scouting.* FROM Transaction INNER JOIN UserProfile ON UserProfile.username = Transaction.Cr_UN INNER JOIN General_Form ON General_Form.transactionID = Transaction.transactionID INNER JOIN Detailed_Scouting ON Detailed_Scouting.transactionID = Transaction.transactionID";
-        let trapStat = "SELECT UserProfile.username, UserProfile.firstName, UserProfile.lastName, General_Form.*, Detailed_Trap.* FROM Transaction INNER JOIN UserProfile ON UserProfile.username = Transaction.Cr_UN INNER JOIN General_Form ON General_Form.transactionID = Transaction.transactionID INNER JOIN Detailed_Trap ON Detailed_Trap.transactionID = Transaction.transactionID";
-        //console.log(req.query);
-        let myQueryObj = [
-            {
-                fieldVal: req.query.statusDel,
-                dbCol: "General_Form.Status_del",
-                op: " = '",
-                adj: req.query.statusDel,
-                table: 1
-            },
-            {
-                fieldVal: req.query.statusDel,
-                dbCol: "Detailed_Scouting.Status_del",
-                op: " = '",
-                adj: req.query.statusDel,
-                table: 2
-            },
-            {
-                fieldVal: req.query.statusDel,
-                dbCol: "Detailed_Trap.Status_del",
-                op: " = '",
-                adj: req.query.statusDel,
-                table: 3
-            },
-            {
-                fieldVal: req.query.firstName,
-                dbCol: "firstName",
-                op: " = '",
-                adj: req.query.firstName,
-                table: 1
-            },
-            {
-                fieldVal: req.query.lastName,
-                dbCol: "lastName",
-                op: " = '",
-                adj: req.query.lastName,
-                table: 1
-            },
-            {
-                fieldVal: req.query.startDate,
-                dbCol: "date",
-                op: " >= '",
-                adj: req.query.startDate,
-                table: 1
-            },
-            {
-                fieldVal: req.query.endDate,
-                dbCol: "date",
-                op: " <= '",
-                adj: req.query.endDate,
-                table: 1
-            },
-            {
-                fieldVal: req.query.content1,
-                dbCol: req.query.filter1,
-                op: " = '",
-                adj: req.query.filter1,
-                table: req.query.filter1
-            },
-            {
-                fieldVal: req.query.content2,
-                dbCol: req.query.filter2,
-                op: " = '",
-                adj: req.query.filter2,
-                table: req.query.filter2
-            },
-            {
-                fieldVal: req.query.content3,
-                dbCol: req.query.filter3,
-                op: " = '",
-                adj: req.query.filter3,
-                table: req.query.filter3
-            }
-        ];
-        QueryStat(myQueryObj, scoutingStat, trapStat, res)
-    });
-
-    // Prepare and assign new transaction ID
-    app.get('/newEntry', isLoggedIn, function (req, res) {
-        let d = new Date();
-        let utcDateTime = d.getUTCFullYear() + "-" + ('0' + (d.getUTCMonth() + 1)).slice(-2) + "-" + ('0' + d.getUTCDate()).slice(-2);
-        let queryTransID = "SELECT COUNT(transactionID) AS number FROM Transaction WHERE transactionID LIKE '" + utcDateTime + "%';";
-
-        con_CS.query(queryTransID, function (err, results, fields) {
-            transactionID = utcDateTime + "_" + ('0000' + (results[0].number + 1)).slice(-5);
-            if (err) {
-                console.log(err);
-            } else {
-                let insertTransID = "INSERT INTO Transaction (transactionID, Cr_UN) VALUE (" + "'" + transactionID + "', '" + req.user.username + "');";
-                con_CS.query(insertTransID, function (err, results, fields) {
-                    if (err) {
-                        console.log(err);
-                    } else {
-                        // Show general form
-                        res.render('Regular_Datatable.html', {
-                            user: req.user, // get the user out of session and pass to template
-                            message: req.flash('Data Entry Message'),
-                            firstname: req.user.firstName,
-                            lastname: req.user.lastName,
-                            transactionID: transactionID
-                        });
-                    }
-                });
-            }
-        });
-    });
-
-      // Submit general form
-    app.post('/generalForm', isLoggedIn, function (req, res) {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        //console.log(req.body);
-
-        let result = Object.keys(req.body).map(function (key) {
-            return [String(key), req.body[key]];
-        });
-
-        let name = "";
-        let value = "";
-
-        for (let i = 0; i < result.length; i++) {
-            if (result[i][0] === "Latitude_direction" || result[i][0] === "Longitude_direction") {
-                // lati and long
-                name += result[i][0].substring(0, result[i][0].length - 10) + ", ";
-                value += '"' + result[i][1] + " " + result[i + 1][1] + "° " + result[i + 2][1] + "' " + result[i + 3][1] + "''" + '"' + ", ";
-                i = i + 3;
-            } else if (result[i][0] === "Field_size_integer") {
-                // field size
-                name += result[i][0].substring(0, result[i][0].length - 8) + ", ";
-                // one decimal place = divide by 10
-                value += '"' + (parseFloat(result[i][1]) + (result[i + 1][1] / 10)) + '"' + ", ";
-                i = i + 1;
-            } else if (result[i][0] === "Rotation_intercropping_crop") {
-                name += result[i][0] + ", ";
-                let str = result[i][1].toString();
-                str = str.replace(/,/g, "/");
-                value += '"' + str + '"' + ", ";
-            } else {
-                // normal
-                if (result[i][1] !== "") {
-                    name += result[i][0] + ", ";
-                    value += '"' + result[i][1] + '"' + ", ";
-                }
-            }
-        }
-        name = name.substring(0, name.length - 2);
-        value = value.substring(0, value.length - 2);
-
-        // console.log(name);
-        // console.log(value);
-        let deleteStatement = "DELETE FROM General_Form WHERE transactionID = '" + req.body.transactionID + "'; ";
-        let insertStatement = "INSERT INTO General_Form (" + name + ") VALUES (" + value + ");";
-        console.log(insertStatement);
-
-        con_CS.query(deleteStatement + insertStatement, function (err, results, fields) {
-            if (err) {
-                console.log(err);
-                res.json({"error": true, "message": "Insert Error! Check your entry."});
-            } else {
-                res.json({"error": false, "message": "/detailedForm"});
-            }
-        });
-    });
-
-    // Submit detailed form Scouting
-    app.post('/detailedFormScouting', isLoggedIn, function (req, res) {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        console.log(req.body);
-        let result = Object.keys(req.body).map(function (key) {
-            return [String(key), req.body[key]];
-        });
-
-        let name = "";
-        let value = "";
-
-        for (let i = 0; i < result.length; i++) {
-            if (result[i][0] === "Pest_stage" || result[i][0] === "Control_undertaken") {
-                name += result[i][0] + ", ";
-                let str = result[i][1].toString();
-                str = str.replace(/,/g, "/");
-                value += '"' + str + '"' + ", ";
-            } else {
-                name += result[i][0] + ", ";
-                value += '"' + result[i][1] + '"' + ", ";
-            }
-        }
-        name = name.substring(0, name.length - 2);
-        value = value.substring(0, value.length - 2);
-
-        // let path = responseDataUuid.split(";");
-        // //console.log(path);
-        // let damage = "";
-        // let damage_name = "";
-        // let pest = "";
-        //
-        // for (let i = 0; i < path.length - 1; i++) {
-        //     console.log("New paths underway!!!!");
-        //     if (path[i] === "Damage_photo") {
-        //         damage += "https://aworldbridgelabs.com/uploadfiles/" + path[i] + ";";
-        //     } else if (path[i] === "Damage_photo_name") {
-        //         damage_name += path[i] + ";";
-        //     // } else if (path[i].substring(0,10) === "Pest_photo") {
-        //     //     pest += "https://aworldbridgelabs.com/uploadfiles/" + path[i] + ";";
-        //     }
-        // }
-        // //console.log(pest + "  " + damage);
-        // damage = damage.substring(0, damage.length - 1);
-        // damage_name = damage_name.substring(0, damage_name.length - 1);
-        // // pest = pest.substring(0, pest.length - 1);
-        //
-        // name += ", Damage_photo, Damage_photo_name";
-        // value += ", '" + damage + "', '" + damage_name + "'";
-
-        let newImage = {
-            Damage_photo: "https://aworldbridgelabs.com/uploadfiles/" + responseDataUuid,
-            Damage_photo_name: responseDataUuid,
-            Pest_photo: "https://aworldbridgelabs.com/uploadfiles/" + responseDataUuid2,
-            Pest_photo_name: responseDataUuid2
-        };
-
-        console.log("path: " + responseDataUuid + "pest: " + responseDataUuid2);
-        console.log("names: " + responseDataUuid + "pest: " + responseDataUuid2);
-
-        name += ", Damage_photo, Damage_photo_name, Pest_photo, Pest_photo_name";
-        value += ", '" + newImage.Damage_photo + "', '" + newImage.Damage_photo_name + "', '" + newImage.Pest_photo + "', '" + newImage.Pest_photo_name + "'";
-
-        let deleteStatement = "DELETE FROM Detailed_Scouting WHERE transactionID = '" + req.body.transactionID + "'; ";
-        let insertStatement = "INSERT INTO Detailed_Scouting (" + name + ") VALUES (" + value + ");";
-        console.log(insertStatement);
-
-        con_CS.query(deleteStatement + insertStatement, function (err, results, fields) {
-            if (err) {
-                console.log(err);
-                res.json({"error": true, "message": "Insert Error! Check your entry."});
-            } else {
-                res.json({"error": false, "message": "/detailedForm"});
-            }
-        });
-    });
-
-    // Submit detailed form trap
-    app.post('/detailedFormTrap', isLoggedIn, function (req, res) {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        console.log(req.body);
-        let result = Object.keys(req.body).map(function (key) {
-            return [String(key), req.body[key]];
-        });
-
-        let name = "";
-        let value = "";
-
-        for (let i = 0; i < result.length; i++) {
-            name += result[i][0] + ", ";
-            value += '"' + result[i][1] + '"' + ", ";
-        }
-        name = name.substring(0, name.length - 2);
-        value = value.substring(0, value.length - 2);
-
-        let deleteStatement = "DELETE FROM Detailed_Trap WHERE transactionID = '" + req.body.transactionID + "'; ";
-        let insertStatement = "INSERT INTO Detailed_Trap (" + name + ") VALUES (" + value + ");";
-        console.log(insertStatement);
-
-        con_CS.query(deleteStatement + insertStatement, function (err, results, fields) {
-            if (err) {
-                console.log(err);
-                res.json({"error": true, "message": "Insert Error! Check your entry."});
-            } else {
-                res.json({"error": false, "message": "/detailedForm"});
-            }
-        });
-    });
-
     // =====================================
-    // SIGNOUT =============================
+    // Others  =============================
     // =====================================
-    //shouw the signout form
-    app.get('/signout', function (req, res) {
-        req.session.destroy();
-        req.logout();
-        res.redirect('/login');
-    });
     app.get('/scanner',function (req,res) {
         res.render('scanner.ejs')
     });
@@ -1845,7 +1514,7 @@ module.exports = function (app, passport) {
 
 };
 
-// route middleware to make sure
+// Customized Functions Below
 function isLoggedIn(req, res, next) {
 
     // if user is authenticated in the session, carry on
