@@ -17,6 +17,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/file-uploader/5.16.2/all.fine-uploader/all.fine-uploader.min.js"></script>
     <script type = "text/javascript" src="LayerNameSearch.js"></script>
     <script src="../src/jquery.multi-select.js"></script>
+    <script src="../views/Subcategory.js"></script>
     <!--<script src="../src/jquery.form.min.js"></script>-->
     <!-- Change the "src" attribute according to your installation path -->
     <!--<script src="https://cdn.jsdelivr.net/jquery.validation/1.15.1/jquery.validate.min.js"></script>-->
@@ -198,7 +199,7 @@
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group">
                                 <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-list"></i></span>
-                                <select required id="main" class=" form-control" name="FirstLayer">
+                                <select required id="main" class="selectpicker form-control" name="FirstLayer" onchange="ChangeMainCategory(this.value)">
                                     <option value="">SELECT MAIN CATEGORY</option>
                                     <option value="Energy">Energy</option>
                                     <option value="Water">Water</option>
@@ -216,10 +217,9 @@
                         <label class="col-md-4 control-label">Sub-Category</label>
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group">
-                                <span class="input-group-addon" style="max-width: 100%; background: lightgray;"><i class="glyphicon glyphicon-list"></i></span>
-                                <select required id="sub" class="selectpicker form-control" name="SecondLayer" style="background:lightgray;">
+                                <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-list"></i></span>
+                                <select required id="sub" class="selectpicker form-control" name="SecondLayer">
                                     <option value="">SELECT SUBCATEGORY</option>
-                                    <option value="">Museums</option >
                                 </select>
                             </div>
                         </div>

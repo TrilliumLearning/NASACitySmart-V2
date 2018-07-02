@@ -8,10 +8,25 @@
 // category['Risk_Management']
 // category['Education'] = ['Museums','Elementary_School','Academies','Higher_Education','UNESCO_WHS','High_School','Middle_School','Libraries','A_World_Bridge_Sites'];
 
-$.ajax({
-    url: "http://localhost:9086/MainCategory",
-    dataType: 'json',
-    success:function (results) {
-        console.log(results);
+function ChangeMainCategory(Category){
+var subList = document.getElementById("sub");
+while (subList.options.length){
+    subList.remove(0);
+}
+    $.ajax({
+        url: "http://localhost:9086/MainCategory",
+        dataType: 'json',
+        success:function (results) {
+            var option;
+            for (var i = 0; i < results.length; i++) {
+                if (Category === results[i]. FirstLayer) {
+                    option = new Option(results[i].SecondLayer, results[i].SecondLayer);
+                    subList.add(option);
+                    document.getElementById("sub").disabled = false;
+
+                }
+        }
     }
-});
+})
+
+}
