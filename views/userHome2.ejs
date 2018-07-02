@@ -43,6 +43,13 @@
             width:20%;
             font-size:100%;
         }
+        #Request,#Profile{
+            background-color: #2980B9 ;
+            height:55px;
+            border-radius: 4px;
+            color: whitesmoke;
+            margin-top:50px;
+        }
         table{
             height:550px;
             overflow-x: auto;
@@ -221,7 +228,8 @@
     <br><br>
     <div class="page-header text-center header">
         <h1><span class="fa fa-anchor"></span>User Home </h1><h4><span class="fa fa-user"></span>&nbsp;<strong>Account Name</strong>: <%= user.username %></h4><br>
-        <a id= "Request" class="btn btn-default btn-lg">New Request</a>&nbsp;&nbsp;
+        <a href="/newEntry" class="btn btn-default btn-lg">New Request</a>&nbsp;&nbsp;
+        <a href="/dataHistory" class="btn btn-default btn-lg">User Profile</a>&nbsp;&nbsp;
         <div class="dropdown floating-Box">
             <button class="btn btn-primary btn-lg" data-toggle="dropdown" id="Username"><%= user.firstName%>
                 <span class="caret"></span>
@@ -252,9 +260,15 @@
             <input id="lastName" type="text" name="first name" style="background:WhiteSmoke;" value="">
         </div>
     </div>
+	<div class="center">
+		<button id="editButton" class="btn btn-primary btn-sm button" type="button">Edit</button>
+		<button id="deleteButton" class="btn btn-primary btn-sm button" type="button">Delete</button>
+    </div>
     <br>
     <div class="center">
 	    <h4 id="subtitles"><strong>Most Recent Records:</strong></h4>
+        <h4 style="color: #9d9d9d"><strong>Scouting:</strong></h4>
+
         <div id="dvData"  style="width:80%; margin-left:100px; margin-top:50px;">
             <table id="dataDisplay">
                 <thead>
@@ -302,8 +316,6 @@
     </div>
 </div>
 <script type='text/javascript'>
-    var username = "<%= user.username %>";
-    console.log(username);
     var scoutingRowSelected, trapRowSelected, DropMenu, queryString1, queryString2;
     var table = $("#dataDisplay").DataTable();
     var UserRole = "<%= user.userrole %>";
@@ -322,7 +334,7 @@
 
             if (UserRole === "Admin") {
                 DropMenu = "<li><a href=\"/userprofile\">Profile</a></li>\n" +
-                    "\t\t\t<li id = 'Profile' ><a href=\"/userManagement\">User Management</a></li>\n" +
+                    "\t\t\t<li><a href=\"/userManagement\">User Management</a></li>\n" +
                     "\t\t\t<li><a href=\"/signout\">Sign Out</a></li>";
                 $("#userMenu").empty();
                 $("#userMenu").append(DropMenu)
@@ -358,7 +370,7 @@
         });
 
         $("#Request").on("click", function () {
-            location.replace('../home/Layer Request form.html');
+            location.replace('Layer Request form.html');
         });
 
         $("#Profile").on("click", function () {
@@ -389,7 +401,7 @@
                 var transactionIDStr = "transactionIDStr=" + scoutingTransactionID.concat(trapTransactionID).toString();
                 console.log("transactionIDStr: " + transactionIDStr);
                 $.ajax({
-                    url: 'http://localhost:9086/deleteData',
+                    url: 'http://localhost:9091/deleteData',
                     type: "GET",
                     dataType: 'json',
                     data: transactionIDStr
@@ -426,47 +438,26 @@
 
         var queryAndDisplay = function (querystr) {
             $.ajax({
-                url: 'http://localhost:9086/AddData',
+                url: 'http://localhost:9090/AddData',
                 dataType: 'json',
                 success: function (results) {
-                    console.log(results);
                     for (var i = 0; i < results.length; i++) {
-                        if(results[i].userrole === "Regular") {
-                            if (results[i].Status === "Active") {
-                                if (results[i].UID === username) {
-                                    table.row.add([
-                                        results[i].UID,
-                                        results[i].RID,
-                                        results[i].LayerType,
-                                        results[i].CountryName,
-                                        results[i].CityName,
-                                        results[i].StateName,
-                                        results[i].FirstLayer,
-                                        results[i].SecondLayer,
-                                        results[i].ThirdLayer,
-                                        results[i].Layer_Description,
-                                        results[i].Layer_Uploader,
-                                        results[i].Layer_Uploader_name
-                                    ]).draw(false);
-                                }
-                            }
+                        if (results[i].Status === "Active") {
+                            table.row.add([
+                                results[i].UID,
+                                results[i].RID,
+                                results[i].LayerType,
+                                results[i].CountryName,
+                                results[i].CityName,
+                                results[i].StateName,
+                                results[i].FirstLayer,
+                                results[i].SecondLayer,
+                                results[i].ThirdLayer,
+                                results[i].Layer_Description,
+                                results[i].Layer_Uploader,
+                                results[i].Layer_Uploader_name
+                            ]).draw(false);
                         }
-                        // }else{
-                        //     table.row.add([
-                        //         results[i].UID,
-                        //         results[i].RID,
-                        //         results[i].LayerType,
-                        //         results[i].CountryName,
-                        //         results[i].CityName,
-                        //         results[i].StateName,
-                        //         results[i].FirstLayer,
-                        //         results[i].SecondLayer,
-                        //         results[i].ThirdLayer,
-                        //         results[i].Layer_Description,
-                        //         results[i].Layer_Uploader,
-                        //         results[i].Layer_Uploader_name
-                        //     ]).draw(false);
-                        // }
                     }
                 }
             });
