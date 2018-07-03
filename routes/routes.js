@@ -119,6 +119,7 @@ module.exports = function (app, passport) {
         credentials: true
     }));
 
+
     // =====================================
     // LOGIN PAGE===========================
     // =====================================
@@ -176,8 +177,8 @@ module.exports = function (app, passport) {
                 res.json({"error": true, "message": "Please verify your email address !"});
             } else {
                 async.waterfall([
-                    function(done) {
-                        crypto.randomBytes(20, function(err, buf) {
+                    function (done) {
+                        crypto.randomBytes(20, function (err, buf) {
                             token = buf.toString('hex');
                             tokenExpTime();
                             done(err, token, tokenExpire);
@@ -201,7 +202,7 @@ module.exports = function (app, passport) {
                             }
                         });
                     },
-                    function(token, done, err) {
+                    function (token, done, err) {
                         // Message object
                         let message = {
                             from: 'FTAA <aaaa.zhao@g.feitianacademy.org>', // sender info
@@ -215,8 +216,8 @@ module.exports = function (app, passport) {
                             'If you did not request this, please ignore this email and your password will remain unchanged.\n'
                         };
 
-                        smtpTrans.sendMail(message, function(error){
-                            if(error){
+                        smtpTrans.sendMail(message, function (error) {
+                            if (error) {
                                 // console.log(error.message);
                                 // alert('Something went wrong! Please double check if your email is valid.');
                                 return;
@@ -229,40 +230,40 @@ module.exports = function (app, passport) {
                             }
                         });
                     }
-                ], function(err) {
-                        if (err) return next(err);
-                        // res.redirect('/forgot');
-                        res.json({"error": true, "message": "An unexpected error occurred !"});
+                ], function (err) {
+                    if (err) return next(err);
+                    // res.redirect('/forgot');
+                    res.json({"error": true, "message": "An unexpected error occurred !"});
                 });
             }
         });
     });
 
-    app.get('/reset/:token', function(req, res) {
+    app.get('/reset/:token', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
 
         myStat = "SELECT * FROM UserLogin WHERE resetPasswordToken = '" + req.params.token + "'";
 
-        con_CS.query(myStat, function(err, user) {
+        con_CS.query(myStat, function (err, user) {
             dateNtime();
 
             if (!user || dateTime > user[0].resetPasswordExpires) {
                 res.send('Password reset token is invalid or has expired. Please contact Administrator.');
             } else {
-                res.render('reset.ejs', { user: user[0]});
+                res.render('reset.ejs', {user: user[0]});
             }
         });
     });
 
-    app.post('/reset/:token', function(req, res) {
+    app.post('/reset/:token', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
 
         async.waterfall([
-            function(done) {
+            function (done) {
 
                 myStat = "SELECT * FROM UserLogin WHERE resetPasswordToken = '" + req.params.token + "'";
 
-                con_CS.query(myStat, function(err, user) {
+                con_CS.query(myStat, function (err, user) {
                     let userInfo = JSON.stringify(user, null, "\t");
 
                     if (!user) {
@@ -286,7 +287,7 @@ module.exports = function (app, passport) {
                     }
 
                 });
-            }, function(user, done, err) {
+            }, function (user, done, err) {
 
                 let message = {
                     from: 'FTAA <aaaa.zhao@g.feitianacademy.org>',
@@ -297,7 +298,7 @@ module.exports = function (app, passport) {
                 };
 
                 smtpTrans.sendMail(message, function (error) {
-                    if(error){
+                    if (error) {
                         console.log(error.message);
                         // alert('Something went wrong! Please double check if your email is valid.');
                         return;
@@ -331,10 +332,10 @@ module.exports = function (app, passport) {
             // console.log(results[1][0].firstName);
             if (!results[0][0].userrole) {
                 console.log("Error2");
-            } else if(!results[1][0].firstName){
+            } else if (!results[1][0].firstName) {
                 console.log("Error1")
-            }else{
-                res.render('userHome.ejs',  {
+            } else {
+                res.render('userHome.ejs', {
                     user: req.user, // get the user out of session and pass to template
                     firstName: results[1][0].firstName
                 });
@@ -342,22 +343,22 @@ module.exports = function (app, passport) {
         });
     });
 
-    app.get('/deleteRow', isLoggedIn, function(req, res) {
+    app.get('/deleteRow', isLoggedIn, function (req, res) {
         del_recov("Deleted", "Deletion failed!", "/userHome", req, res);
     });
 
-    app.get('/recoverRow', isLoggedIn, function(req, res){
+    app.get('/recoverRow', isLoggedIn, function (req, res) {
         del_recov("Active", "Recovery failed!", "/userHome", req, res);
     });
 
     // =====================================
     // REQUEST QUERY   =====================
     // =====================================
-    app.get('/deleteRow2', isLoggedIn, function(req, res) {
+    app.get('/deleteRow2', isLoggedIn, function (req, res) {
         del_recov("Deleted", "Deletion failed!", "/dataHistory", req, res);
     });
 
-    app.get('/recoverRow2', isLoggedIn, function(req, res){
+    app.get('/recoverRow2', isLoggedIn, function (req, res) {
         del_recov("Active", "Recovery failed!", "/dataHistory", req, res);
     });
 
@@ -378,7 +379,7 @@ module.exports = function (app, passport) {
             console.log(results);
             if (!results[0].firstName) {
                 console.log("Error2");
-            } else{
+            } else {
                 res.render('dataHistory.ejs', {
                     user: req.user, // get the user out of session and pass to template
                     firstName: results[0].firstName //get the firstName our of session ans pass to template
@@ -481,7 +482,7 @@ module.exports = function (app, passport) {
     // we will use route middleware to verify this (the isLoggedIn function)
 
     // Show user profile page
-    app.get('/profile',function (req,res) {
+    app.get('/profile', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         con_CS.query("SELECT * FROM UserProfile", function (err, results) {
             if (err) throw err;
@@ -513,7 +514,7 @@ module.exports = function (app, passport) {
         myVal = [newPass.firstname, newPass.lastname, dateTime, user.username];
 
         con_CS.query(myStat, myVal, mylogin, function (err, rows) {
-            if(err){
+            if (err) {
                 console.log(err);
                 res.json({"error": true, "message": "Fail !"});
             } else {
@@ -556,7 +557,7 @@ module.exports = function (app, passport) {
 
             if (!results[0][0].userrole) {
                 console.log("Error2");
-            } else if(!results[1][0].firstName){
+            } else if (!results[1][0].firstName) {
                 console.log("Error1")
             } else if (results[0][0].userrole === "Admin" || "Regular") {
                 // process the signup form
@@ -737,7 +738,7 @@ module.exports = function (app, passport) {
 
     // Retrieve user data from user management page
     let edit_User, edit_firstName, edit_lastName, edit_userrole, edit_status, edit_city;
-    app.get('/editUserQuery', isLoggedIn, function(req, res) {
+    app.get('/editUserQuery', isLoggedIn, function (req, res) {
 
         // edit_User = req.query.Username;
         edit_firstName = req.query.First_Name;
@@ -751,7 +752,7 @@ module.exports = function (app, passport) {
     });
 
     // Show user edit form
-    app.get('/editUser', isLoggedIn, function(req, res) {
+    app.get('/editUser', isLoggedIn, function (req, res) {
         res.render('userEdit.ejs', {
             user: req.user, // get the user out of session and pass to template
             userName: edit_User,
@@ -763,7 +764,7 @@ module.exports = function (app, passport) {
         });
     });
 
-    app.post('/editUser', isLoggedIn, function(req, res) {
+    app.post('/editUser', isLoggedIn, function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
 
         if (req.body.newPassword !== "") {
@@ -797,7 +798,7 @@ module.exports = function (app, passport) {
 
     });
 
-    app.get('/suspendUser', isLoggedIn, function(req, res) {
+    app.get('/suspendUser', isLoggedIn, function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
         dateNtime();
 
@@ -827,7 +828,7 @@ module.exports = function (app, passport) {
             console.log(results);
             if (!results[0].firstName) {
                 console.log("Error2");
-            } else{
+            } else {
                 res.render('recovery.ejs', {
                     user: req.user,
                     message: req.flash('restoreMessage'),
@@ -845,8 +846,8 @@ module.exports = function (app, passport) {
 
     app.post('/upload', onUpload);
 
-    app.post('/submit',function(req,res){
-        console.log (req.body);
+    app.post('/submit', function (req, res) {
+        console.log(req.body);
         let result = Object.keys(req.body).map(function (key) {
             return [String(key), req.body[key]];
         });
@@ -856,7 +857,7 @@ module.exports = function (app, passport) {
         let name = "";
         let valueSubmit = "";
 
-        for(let i = 0; i < result.length; i++){
+        for (let i = 0; i < result.length; i++) {
             if (i === result.length - 1) {
                 name += result[i][0];
                 valueSubmit += '"' + result[i][1] + '"';
@@ -877,7 +878,7 @@ module.exports = function (app, passport) {
         let statement1 = "INSERT INTO CitySmart.New_Users (" + name + ") VALUES (" + value + ");";
         console.log(statement1);
 
-        con_CS.query(statement1, function(err,result) {
+        con_CS.query(statement1, function (err, result) {
             if (err) {
                 throw err;
             } else {
@@ -887,8 +888,8 @@ module.exports = function (app, passport) {
 
     });
     //Submit Request form//
-    app.post('/submitL',function (req,res){
-        console.log (req.body);
+    app.post('/submitL', function (req, res) {
+        console.log(req.body);
         let result = Object.keys(req.body).map(function (key) {
             return [String(key), req.body[key]];
         });
@@ -897,7 +898,7 @@ module.exports = function (app, passport) {
         let name = "";
         let valueSubmit = "";
 
-        for(let i = 0; i < result.length; i++){
+        for (let i = 0; i < result.length; i++) {
             if (i === result.length - 1) {
                 name += result[i][0];
                 valueSubmit += '"' + result[i][1] + '"';
@@ -912,14 +913,14 @@ module.exports = function (app, passport) {
             Layer_Uploader_name: responseDataUuid
         };
         name += ", Layer_Uploader, Layer_Uploader_name";
-        value += ", '" + newImage.Layer_Uploader + "','" +newImage.Layer_Uploader_name + "'";
-        let filepathname = "http://localhost:9086/uploadfiles/" + responseDataUuid ;
+        value += ", '" + newImage.Layer_Uploader + "','" + newImage.Layer_Uploader_name + "'";
+        let filepathname = "http://localhost:9086/uploadfiles/" + responseDataUuid;
 
 
         let statement2 = "INSERT INTO CitySmart.Request_Form (" + name + ") VALUES (" + value + ");";
         console.log(statement2);
 
-        con_CS.query(statement2, function(err,result) {
+        con_CS.query(statement2, function (err, result) {
             if (err) {
                 throw err;
             } else {
@@ -928,9 +929,11 @@ module.exports = function (app, passport) {
         });
 
     });
+    app.get('/RID', isLoggedIn, function (req, res) {
 
+    });
     //Request ID//
-    app.get('/newRequest', isLoggedIn, function (req,res) {
+    app.get('/newRequest', isLoggedIn, function (req, res) {
         // let myStat = "SELECT userrole FROM Users WHERE username = '" + req.user.username + "';";
         //
         // con_CS.query(myStat, function (err, results, fields) {
@@ -949,8 +952,8 @@ module.exports = function (app, passport) {
         var utcDateTime = d.getUTCFullYear() + "-" + ('0' + (d.getUTCMonth() + 1)).slice(-2) + "-" + ('0' + d.getUTCDate()).slice(-2);
         var queryRID = "SELECT COUNT(RID) AS number FROM Special_ID WHERE RID LIKE '" + utcDateTime + "%';";
 
-        con_CS.query(queryRID,function (err,results,fields) {
-            RID = utcDateTime + "_" + ('000' + (results[0].number + 1)).slice(-5);
+        con_CS.query(queryRID, function (err, results, fields) {
+            RID = utcDateTime + "_" + ('000' + (results[0].number + 1)).slice(-4);
             if (err) {
                 console.log(err);
             } else {
@@ -966,15 +969,12 @@ module.exports = function (app, passport) {
                             user: req.user, // get the user out of session and pass to template
                             RID: RID
                         });
+                        console.log(RID);
                     }
                 });
             }
         });
     });
-
-
-
-
 
 
     //Request form layer category//
@@ -998,7 +998,7 @@ module.exports = function (app, passport) {
     // });
 
     //check if the layer name is available
-    app.get('/SearchLayerName',function (req,res) {
+    app.get('/SearchLayerName', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         con_CS.query("SELECT ThirdLayer FROM LayerMenu", function (err, results) {
             if (err) throw err;
@@ -1022,11 +1022,11 @@ module.exports = function (app, passport) {
     //     }
     // });
 
-    app.get('/approve',function (req,res) {
+    app.get('/approve', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         let approveIDStr = req.query.tID.split(',');
         console.log(approveIDStr);
-        for(let i = 0; i < approveIDStr.length; i++) {
+        for (let i = 0; i < approveIDStr.length; i++) {
             let statement = "UPDATE CitySmart.Request_Form SET Status = 'Active' WHERE RID = '" + approveIDStr[i] + "'";
             console.log(statement);
             con_CS.query(statement, function (err, results) {
@@ -1060,11 +1060,11 @@ module.exports = function (app, passport) {
     // });
 
     //Delete button
-    app.get('/deleteData', function(req, res) {
+    app.get('/deleteData', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         let transactionID = req.query.transactionIDStr.split(',');
         console.log(transactionID);
-        for(let i = 0; i < transactionID.length; i++) {
+        for (let i = 0; i < transactionID.length; i++) {
             let statement = "UPDATE CitySmart.Request_Form SET Status = 'Delete' WHERE RID = '" + transactionID[i] + "'";
             console.log(statement);
             con_CS.query(statement, function (err, results) {
@@ -1076,18 +1076,18 @@ module.exports = function (app, passport) {
     });
 
     //AddData in table
-    app.get('/AddData',function (req,res){
+    app.get('/AddData', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query('SELECT Request_Form.*, UserLogin.userrole FROM UserLogin INNER JOIN Request_Form ON UserLogin.username = Request_Form.UID',function (err,results) {
+        con_CS.query('SELECT Request_Form.*, UserLogin.userrole FROM UserLogin INNER JOIN Request_Form ON UserLogin.username = Request_Form.UID', function (err, results) {
             if (err) throw err;
             res.json(results);
             // console.log(results);
         })
     });
 
-    app.get('/EditData',function (req,res){
+    app.get('/EditData', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query("SELECT Full Name, Address Line 1, Address Line 2, City, State/Province/Region, Postal Code/ZIP, Country, Email, Phone Number, Layer Name, Layer Category, Layer Description, Layer Uploader FROM LayerMenu",function (err,results) {
+        con_CS.query("SELECT Full Name, Address Line 1, Address Line 2, City, State/Province/Region, Postal Code/ZIP, Country, Email, Phone Number, Layer Name, Layer Category, Layer Description, Layer Uploader FROM LayerMenu", function (err, results) {
             if (err) throw err;
             console.log(results);
         })
@@ -1218,10 +1218,10 @@ module.exports = function (app, passport) {
             }
         }).then(result => {
             console.log(result.length);
-        res.send(result)
-    }).catch(err => {
+            res.send(result)
+        }).catch(err => {
             res.status(500).send(err.stack)
-    });
+        });
     });
 
     app.get('/newTemp', function (req, res) {
@@ -1253,10 +1253,10 @@ module.exports = function (app, passport) {
             }
         }).then(result => {
             console.log(result.length);
-        res.send(result)
-    }).catch(err => {
+            res.send(result)
+        }).catch(err => {
             res.status(500).send(err.stack)
-    });
+        });
     });
 
     app.get('/newWind', function (req, res) {
@@ -1288,10 +1288,10 @@ module.exports = function (app, passport) {
             }
         }).then(result => {
             console.log(result.length);
-        res.send(result)
-    }).catch(err => {
+            res.send(result)
+        }).catch(err => {
             res.status(500).send(err.stack)
-    });
+        });
     });
 
     app.get('/allHum', function (req, res) {
@@ -1323,10 +1323,10 @@ module.exports = function (app, passport) {
             }
         }).then(result => {
             console.log(result.length);
-        res.send(result)
-    }).catch(err => {
+            res.send(result)
+        }).catch(err => {
             res.status(500).send(err.stack)
-    });
+        });
     });
 
     app.get('/allTemp', function (req, res) {
@@ -1358,10 +1358,10 @@ module.exports = function (app, passport) {
             }
         }).then(result => {
             console.log(result.length);
-        res.send(result)
-    }).catch(err => {
+            res.send(result)
+        }).catch(err => {
             res.status(500).send(err.stack)
-    });
+        });
     });
 
     app.get('/allWind', function (req, res) {
@@ -1393,10 +1393,10 @@ module.exports = function (app, passport) {
             }
         }).then(result => {
             console.log(result.length);
-        res.send(result)
-    }).catch(err => {
+            res.send(result)
+        }).catch(err => {
             res.status(500).send(err.stack)
-    });
+        });
     });
 
     // =====================================
@@ -1412,9 +1412,9 @@ module.exports = function (app, passport) {
         });
     });
 
-    app.get('/StateList',function (req,res) {
+    app.get('/StateList', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query('SELECT CountryName, StateName, COUNT (*) AS count FROM LayerMenu GROUP BY CountryName, StateName',function (err,results,fields) {
+        con_CS.query('SELECT CountryName, StateName, COUNT (*) AS count FROM LayerMenu GROUP BY CountryName, StateName', function (err, results, fields) {
             if (err) throw err;
             res.json(results);
             console.log(results);
@@ -1422,53 +1422,28 @@ module.exports = function (app, passport) {
         });
     });
 
-    app.get('/CityList',function (req,res) {
+    app.get('/CityList', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query('SELECT StateName, FirstLayer, SecondLayer, CityName FROM LayerMenu',function (err,results) {
+        con_CS.query('SELECT StateName, FirstLayer, SecondLayer, CityName FROM LayerMenu', function (err, results) {
             res.json(results);
             console.log(results);
         });
     });
 
-    app.get('/ChangeCityName',function (req,res) {
+    app.get('/ChangeCityName', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query('SELECT CityName, StateName, COUNT (*) AS count FROM LayerMenu GROUP BY CityName, StateName',function (err,results,fields) {
+        con_CS.query('SELECT CityName, StateName, COUNT (*) AS count FROM LayerMenu GROUP BY CityName, StateName', function (err, results, fields) {
             res.json(results);
             console.log(results);
-        });
-    });
-
-
-    app.get('/approve',function (req,res) {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query("SELECT FirstLayer , SecondLayer , CityName , ClassName FROM LayerMenu", function (err, results) {
-            if (err) throw err;
-            let layerInfo = JSON.stringify(results, null, "\t");
-            res.send(layerInfo);
-            console.log(res);
-            res.end();
-
-        let filePath0;
-        con_CS.query(myStat, function (err, results) {
-            // console.log("query statement : " + myStat);
-            if (!results[0].Layer_Uploader && !results[0].Layer_Uploader_name) {
-                console.log("Error");
-            } else {
-                filePath0 = results[0];
-                let JSONresult = JSON.stringify(results, null, "\t");
-                // console.log(JSONresult);
-                res.send(JSONresult);
-                res.end()
-            }
         });
     });
 
 //Delete button
-    app.get('/deleteData', function(req, res) {
+    app.get('/deleteData', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         let transactionID = req.query.transactionIDStr.split(',');
         console.log(transactionID);
-        for(let i = 0; i < transactionID.length; i++) {
+        for (let i = 0; i < transactionID.length; i++) {
             let statement = "UPDATE CitySmart.GeneralFormDatatable SET Status = 'Delete' WHERE ID = '" + transactionID[i] + "'";
             // console.log(statement);
             con_CS.query(statement, function (err, results) {
@@ -1480,16 +1455,16 @@ module.exports = function (app, passport) {
     });
 
 //AddData in table
-    app.get('/AddData',function (req,res){
+    app.get('/AddData', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query("SELECT * FROM GeneralFormDatatable",function (err,results) {
+        con_CS.query("SELECT * FROM GeneralFormDatatable", function (err, results) {
             if (err) throw err;
             res.json(results);
         })
     });
 
 //check if the layer name is available
-    app.get('/SearchLayerName',function (req,res) {
+    app.get('/SearchLayerName', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         con_CS.query("SELECT ThirdLayer FROM LayerMenu", function (err, results) {
             if (err) throw err;
@@ -1499,15 +1474,15 @@ module.exports = function (app, passport) {
     });
 
 
-    app.get('/EditData',function (req,res){
+    app.get('/EditData', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query("SELECT Full Name, Address Line 1, Address Line 2, City, State/Province/Region, Postal Code/ZIP, Country, Email, Phone Number, Layer Name, Layer Category, Layer Description, Layer Uploader FROM GeneralFormDatatable",function (err,results) {
+        con_CS.query("SELECT Full Name, Address Line 1, Address Line 2, City, State/Province/Region, Postal Code/ZIP, Country, Email, Phone Number, Layer Name, Layer Category, Layer Description, Layer Uploader FROM GeneralFormDatatable", function (err, results) {
             if (err) throw err;
             console.log(results);
         })
     });
 
-    app.get('/SearchLayerName',function (req,res) {
+    app.get('/SearchLayerName', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         con_CS.query("SELECT ThirdLayer FROM LayerMenu", function (err, results) {
             if (err) throw err;
@@ -1543,7 +1518,7 @@ module.exports = function (app, passport) {
     app.get('/secondlayer', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
 
-        con_CS.query("SELECT SecondLayer From LayerMenu", function (err,result) {
+        con_CS.query("SELECT SecondLayer From LayerMenu", function (err, result) {
 
             console.log("recive and processing");
 
@@ -1559,7 +1534,7 @@ module.exports = function (app, passport) {
     app.get('/thirdlayer', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
 
-        con_CS.query("SELECT ThirdLayer From LayerMenu", function (err,result) {
+        con_CS.query("SELECT ThirdLayer From LayerMenu", function (err, result) {
 
             console.log("recive and processing");
 
@@ -1576,7 +1551,7 @@ module.exports = function (app, passport) {
     app.get('/layername', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
 
-        con_CS.query("SELECT LayerName From LayerMenu", function (err,result) {
+        con_CS.query("SELECT LayerName From LayerMenu", function (err, result) {
 
             console.log("recive and processing");
 
@@ -1591,13 +1566,13 @@ module.exports = function (app, passport) {
     app.get('/createlayer', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
 
-        con_CS.query("SELECT * From CitySmart.LayerMenu", function (err,result) {
+        con_CS.query("SELECT * From CitySmart.LayerMenu", function (err, result) {
             console.log("recive and processing");
 
             let JSONresult = JSON.stringify(result, null, "\t");
 
             res.send(JSONresult);
-            });
+        });
 
     });
 
@@ -1620,38 +1595,38 @@ module.exports = function (app, passport) {
         if (valueEnergy === "budget") {
             con_EnergyBudget.query('SELECT sum(Electricity_Usage) as Electricity_Usage FROM "FTAA_Energy"."autogen"."Energy_Budget" WHERE time >= 1473120000000000000 and time <= 1504652400000000000 GROUP BY time(1h)').then(results => {
                 let origin = req.headers.origin;
-            res.setHeader("Access-Control-Allow-Origin", origin);
+                res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
-            //console.log(JSONresult);
+                let JSONresult = JSON.stringify(results, null, "\t");
+                //console.log(JSONresult);
 
-            res.send(JSONresult);
-            res.end();
-        });
+                res.send(JSONresult);
+                res.end();
+            });
         } else if (valueEnergy === "actual") {
             con_EnergyPredic.query('SELECT * FROM "FTAA_Energy"."autogen"."Actual_vs_Prediction"').then(results => {
                 let origin = req.headers.origin;
-            res.setHeader("Access-Control-Allow-Origin", origin);
+                res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
-            //console.log(JSONresult);
+                let JSONresult = JSON.stringify(results, null, "\t");
+                //console.log(JSONresult);
 
-            res.send(JSONresult);
-            res.end();
-        });
+                res.send(JSONresult);
+                res.end();
+            });
         } else {
             let queryDate = 'SELECT Electricity_Usage, Machine_ID, Machine_Name FROM "FTAA_Energy"."autogen"."Energy_Budget" WHERE time >= ' + "'" + startDateTime + "'" + 'AND time < ' + "'" + endDateTime + "'" + " GROUP BY Machine_ID";
             //console.log(queryDate);
             con_EnergyBudget.query(queryDate).then(results => {
                 let origin = req.headers.origin;
-            res.setHeader("Access-Control-Allow-Origin", origin);
+                res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
-            //console.log(JSONresult);
+                let JSONresult = JSON.stringify(results, null, "\t");
+                //console.log(JSONresult);
 
-            res.send(JSONresult);
-            res.end();
-        });
+                res.send(JSONresult);
+                res.end();
+            });
         }
 
     });
@@ -1672,112 +1647,112 @@ module.exports = function (app, passport) {
         if (valueWater === "Calcium") {
             con_Water.query(query1).then(results => {
                 let origin = req.headers.origin;
-            res.setHeader("Access-Control-Allow-Origin", origin);
+                res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
-            console.log(JSONresult);
+                let JSONresult = JSON.stringify(results, null, "\t");
+                console.log(JSONresult);
 
-            res.send(JSONresult);
-            res.end();
-        });
+                res.send(JSONresult);
+                res.end();
+            });
         }
 
         if (valueWater === "Ammonium") {
             con_Water.query(query2).then(results => {
                 let origin = req.headers.origin;
-            res.setHeader("Access-Control-Allow-Origin", origin);
+                res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
-            console.log(JSONresult);
+                let JSONresult = JSON.stringify(results, null, "\t");
+                console.log(JSONresult);
 
-            res.send(JSONresult);
-            res.end();
-        });
+                res.send(JSONresult);
+                res.end();
+            });
         }
 
         if (valueWater === "Potassium") {
             con_Water.query(query3).then(results => {
                 let origin = req.headers.origin;
-            res.setHeader("Access-Control-Allow-Origin", origin);
+                res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
-            console.log(JSONresult);
+                let JSONresult = JSON.stringify(results, null, "\t");
+                console.log(JSONresult);
 
-            res.send(JSONresult);
-            res.end();
-        });
+                res.send(JSONresult);
+                res.end();
+            });
         }
 
         if (valueWater === "Chloride") {
             con_Water.query(query4).then(results => {
                 let origin = req.headers.origin;
-            res.setHeader("Access-Control-Allow-Origin", origin);
+                res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
-            console.log(JSONresult);
+                let JSONresult = JSON.stringify(results, null, "\t");
+                console.log(JSONresult);
 
-            res.send(JSONresult);
-            res.end();
-        });
+                res.send(JSONresult);
+                res.end();
+            });
         }
 
         if (valueWater === "Colorimeter") {
             con_Water.query(query5).then(results => {
                 let origin = req.headers.origin;
-            res.setHeader("Access-Control-Allow-Origin", origin);
+                res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
-            console.log(JSONresult);
+                let JSONresult = JSON.stringify(results, null, "\t");
+                console.log(JSONresult);
 
-            res.send(JSONresult);
-            res.end();
-        });
+                res.send(JSONresult);
+                res.end();
+            });
         }
 
         if (valueWater === "Turbidity") {
             con_Water.query(query6).then(results => {
                 let origin = req.headers.origin;
-            res.setHeader("Access-Control-Allow-Origin", origin);
+                res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
-            console.log(JSONresult);
+                let JSONresult = JSON.stringify(results, null, "\t");
+                console.log(JSONresult);
 
-            res.send(JSONresult);
-            res.end();
-        });
+                res.send(JSONresult);
+                res.end();
+            });
         }
 
         if (valueWater === "pH") {
             con_Water.query(query7).then(results => {
                 let origin = req.headers.origin;
-            res.setHeader("Access-Control-Allow-Origin", origin);
+                res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
-            console.log(JSONresult);
+                let JSONresult = JSON.stringify(results, null, "\t");
+                console.log(JSONresult);
 
-            res.send(JSONresult);
-            res.end();
-        });
+                res.send(JSONresult);
+                res.end();
+            });
         }
 
         if (valueWater === "Temperature") {
             con_Water.query(query8).then(results => {
                 let origin = req.headers.origin;
-            res.setHeader("Access-Control-Allow-Origin", origin);
+                res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
-            console.log(JSONresult);
+                let JSONresult = JSON.stringify(results, null, "\t");
+                console.log(JSONresult);
 
-            res.send(JSONresult);
-            res.end();
-        });
+                res.send(JSONresult);
+                res.end();
+            });
         }
     });
 
     // =====================================
     // Others  =============================
     // =====================================
-    app.get('/scanner',function (req,res) {
+    app.get('/scanner', function (req, res) {
         res.render('scanner.ejs')
     });
 
@@ -1788,430 +1763,433 @@ module.exports = function (app, passport) {
         });
     });
 
-};
 
 // Customized Functions Below
-function isLoggedIn(req, res, next) {
+    function isLoggedIn(req, res, next) {
 
-    // if user is authenticated in the session, carry on
-    if (req.isAuthenticated())
-        return next();
+        // if user is authenticated in the session, carry on
+        if (req.isAuthenticated())
+            return next();
 
-    // if they aren't redirect them to the home page
-    res.redirect('/');
-}
-
-function dateNtime() {
-    today = new Date();
-    date2 = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-    time2 = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-    dateTime = date2 + ' ' + time2;
-}
-
-function tokenExpTime() {
-    today = new Date();
-    date3 = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + (today.getDate()+1);
-    time3 = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-    tokenExpire = date3 + ' ' + time3;
-}
-
-function del_recov(StatusUpd, ErrMsg, targetURL, req, res) {
-
-    transactionID = req.query.transactionIDStr.split(",");
-    console.log(transactionID);
-    let statementGeneral = "UPDATE Request_Form SET Status = '" + StatusUpd + "'";
-    // let statementDetailedS = "UPDATE Detailed_Scouting SET Status = '" + StatusUpd + "'";
-    // let statementDetailedT = "UPDATE Detailed_Trap SET Status = '" + StatusUpd + "'";
-
-    for (let i = 0; i < transactionID.length; i++) {
-        if (i === 0) {
-            statementGeneral += " WHERE RID = '" + transactionID[i] + "'";
-            // statementDetailedS += " WHERE transactionID = '" + transactionID[i] + "'";
-            // statementDetailedT += " WHERE transactionID = '" + transactionID[i] + "'";
-
-            if (i === transactionID.length - 1) {
-                statementGeneral += ";";
-                // statementDetailedS += ";";
-                // statementDetailedT += ";";
-                myStat = statementGeneral;
-                updateDBNres(myStat, "", ErrMsg, targetURL, res);
-            }
-        } else {
-            statementGeneral += " OR RID = '" + transactionID[i] + "'";
-            // statementDetailedS += " OR transactionID = '" + transactionID[i] + "'";
-            // statementDetailedT += " OR transactionID = '" + transactionID[i] + "'";
-
-            if (i === transactionID.length - 1) {
-                statementGeneral += ";";
-                // statementDetailedS += ";";
-                // statementDetailedT += ";";
-                myStat = statementGeneral;
-                updateDBNres(myStat, "", ErrMsg, targetURL, res);
-            }
-        }
+        // if they aren't redirect them to the home page
+        res.redirect('/');
     }
-}
 
-function updateDBNres(SQLstatement, Value, ErrMsg, targetURL, res) {
-    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-    //console.log("Query Statement: " + SQLstatement);
+    function dateNtime() {
+        today = new Date();
+        date2 = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+        time2 = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        dateTime = date2 + ' ' + time2;
+    }
 
-    con_CS.query(SQLstatement, Value, function (err, rows) {
-        if (err) {
-            console.log(err);
-            res.json({"error": true, "message": ErrMsg});
-        } else { res.json({"error": false, "message": targetURL});}
-    })
-}
+    function tokenExpTime() {
+        today = new Date();
+        date3 = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + (today.getDate() + 1);
+        time3 = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        tokenExpire = date3 + ' ' + time3;
+    }
 
-function updateDBNredir(SQLstatement, Value, ErrMsg, failURL, redirURL, res) {
-    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-    //console.log("Query Statement: " + SQLstatement);
+    function del_recov(StatusUpd, ErrMsg, targetURL, req, res) {
 
-    con_CS.query(SQLstatement, Value, function (err, rows) {
-        if (err) {
-            console.log(err);
-            res.render(failURL, {message: req.flash(ErrMsg)});
-        } else {
-            res.redirect(redirURL);
-            // render the page and pass in any flash data if it exists
-        }
-    })
-}
+        transactionID = req.query.transactionIDStr.split(",");
+        console.log(transactionID);
+        let statementGeneral = "UPDATE Request_Form SET Status = '" + StatusUpd + "'";
+        // let statementDetailedS = "UPDATE Detailed_Scouting SET Status = '" + StatusUpd + "'";
+        // let statementDetailedT = "UPDATE Detailed_Trap SET Status = '" + StatusUpd + "'";
 
-function QueryStat(myObj, scoutingStat, res) {
-    // console.log(myObj);
-    let j = 0;
-    for (let i = 0; i < myObj.length; i++) {
-        //console.log("i = " + i);
-        console.log(!!myObj[i].fieldVal);
+        for (let i = 0; i < transactionID.length; i++) {
+            if (i === 0) {
+                statementGeneral += " WHERE RID = '" + transactionID[i] + "'";
+                // statementDetailedS += " WHERE transactionID = '" + transactionID[i] + "'";
+                // statementDetailedT += " WHERE transactionID = '" + transactionID[i] + "'";
 
-        if (!!myObj[i].adj){
-            console.log(i  + "   " + myObj[i].adj);
-            // if (i === 3 || i === 4 || i === 5) {
-            //     myObj[i].dbCol = myObj[i].dbCol.substring(1, myObj[i].dbCol.length);
-            //     myObj[i].table = parseInt(myObj[i].table.substring(0, 1));
-            // }
-
-            let aw;
-            if (j === 0) {
-                aw = " WHERE ";
-                j = 1;
+                if (i === transactionID.length - 1) {
+                    statementGeneral += ";";
+                    // statementDetailedS += ";";
+                    // statementDetailedT += ";";
+                    myStat = statementGeneral;
+                    updateDBNres(myStat, "", ErrMsg, targetURL, res);
+                }
             } else {
-                aw = " AND ";
-            }
+                statementGeneral += " OR RID = '" + transactionID[i] + "'";
+                // statementDetailedS += " OR transactionID = '" + transactionID[i] + "'";
+                // statementDetailedT += " OR transactionID = '" + transactionID[i] + "'";
 
-            // if (myObj[i].table === 1) {
-            //     scoutingStat = editStat(scoutingStat, aw, myObj[i].dbCol, myObj[i].op, myObj[i].fieldVal);
-            //     console.log(scoutingStat);
-            //     // trapStat = editStat(trapStat, aw, myObj[i].dbCol, myObj[i].op, myObj[i].fieldVal);
-            // } else if (myObj[i].table === 2) {
-            //     scoutingStat = editStat(scoutingStat, aw, myObj[i].dbCol, myObj[i].op, myObj[i].fieldVal);
-            // }
-
-            scoutingStat = editStat(scoutingStat, aw, myObj[i].dbCol, myObj[i].op, myObj[i].fieldVal);
-
-            if (i === myObj.length - 1) {
-                let sqlStatement = scoutingStat + "; ";
-                dataList(sqlStatement, res);
-            }
-        } else {
-            if (i === myObj.length - 1) {
-                let sqlStatement = scoutingStat + "; ";
-                dataList(sqlStatement, res);
+                if (i === transactionID.length - 1) {
+                    statementGeneral += ";";
+                    // statementDetailedS += ";";
+                    // statementDetailedT += ";";
+                    myStat = statementGeneral;
+                    updateDBNres(myStat, "", ErrMsg, targetURL, res);
+                }
             }
         }
     }
 
-    function editStat(stat, aw, dbCol, op, fieldVal) {
-        stat += aw + dbCol + op + fieldVal + "'";
-        return stat;
+    function updateDBNres(SQLstatement, Value, ErrMsg, targetURL, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+        //console.log("Query Statement: " + SQLstatement);
+
+        con_CS.query(SQLstatement, Value, function (err, rows) {
+            if (err) {
+                console.log(err);
+                res.json({"error": true, "message": ErrMsg});
+            } else {
+                res.json({"error": false, "message": targetURL});
+            }
+        })
     }
-}
 
-function dataList(sqlStatement, res) {
-    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-    // console.log(sqlStatement);
-    con_CS.query(sqlStatement, function (err, results, fields) {
+    function updateDBNredir(SQLstatement, Value, ErrMsg, failURL, redirURL, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+        //console.log("Query Statement: " + SQLstatement);
 
-        errStatus = [{errMsg: ""}];
+        con_CS.query(SQLstatement, Value, function (err, rows) {
+            if (err) {
+                console.log(err);
+                res.render(failURL, {message: req.flash(ErrMsg)});
+            } else {
+                res.redirect(redirURL);
+                // render the page and pass in any flash data if it exists
+            }
+        })
+    }
 
-        if (err) {
-            consolef.log(err);
-            errStatus[0].errMsg = "fail";
-            res.send(errStatus);
-            res.end();
-        } else if (results.length === 0) {
-            errStatus[0].errMsg = "no data entry";
-            res.send(errStatus);
-            res.end();
-        } else {
-            // console.log(results);
-            // let result = results;
-            let JSONresult = JSON.stringify(results, null, "\t");
-            // console.log(JSONresult);
-            res.send(JSONresult);
-            res.end();
+    function QueryStat(myObj, scoutingStat, res) {
+        // console.log(myObj);
+        let j = 0;
+        for (let i = 0; i < myObj.length; i++) {
+            //console.log("i = " + i);
+            console.log(!!myObj[i].fieldVal);
+
+            if (!!myObj[i].adj) {
+                console.log(i + "   " + myObj[i].adj);
+                // if (i === 3 || i === 4 || i === 5) {
+                //     myObj[i].dbCol = myObj[i].dbCol.substring(1, myObj[i].dbCol.length);
+                //     myObj[i].table = parseInt(myObj[i].table.substring(0, 1));
+                // }
+
+                let aw;
+                if (j === 0) {
+                    aw = " WHERE ";
+                    j = 1;
+                } else {
+                    aw = " AND ";
+                }
+
+                // if (myObj[i].table === 1) {
+                //     scoutingStat = editStat(scoutingStat, aw, myObj[i].dbCol, myObj[i].op, myObj[i].fieldVal);
+                //     console.log(scoutingStat);
+                //     // trapStat = editStat(trapStat, aw, myObj[i].dbCol, myObj[i].op, myObj[i].fieldVal);
+                // } else if (myObj[i].table === 2) {
+                //     scoutingStat = editStat(scoutingStat, aw, myObj[i].dbCol, myObj[i].op, myObj[i].fieldVal);
+                // }
+
+                scoutingStat = editStat(scoutingStat, aw, myObj[i].dbCol, myObj[i].op, myObj[i].fieldVal);
+
+                if (i === myObj.length - 1) {
+                    let sqlStatement = scoutingStat + "; ";
+                    dataList(sqlStatement, res);
+                }
+            } else {
+                if (i === myObj.length - 1) {
+                    let sqlStatement = scoutingStat + "; ";
+                    dataList(sqlStatement, res);
+                }
+            }
         }
-    });
-}
 
-function changeMail(str) {
-    let spliti = str.split("@");
-    let letter1 = spliti[0].substring(0, 1);
-    let letter2 = spliti[0].substring(spliti[0].length - 1, spliti[0].length);
-    let newFirst = letter1;
-    for(i = 0; i < spliti[0].length - 2; i++) {
-        newFirst += "*";
-    }
-    newFirst += letter2;
-
-    let letter3 = spliti[1].substring(0, 1);
-    let extension = letter3;
-    for(i = 0; i < spliti[1].split(".")[0].length - 1; i++) {
-        extension += "*";
-    }
-    extension += "." + spliti[1].split(".")[1];
-    let result = newFirst + "@" + extension;
-
-    return result;
-}
-
-function onUpload(req, res, next) {
-    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-    console.log (req.headers.origin);
-
-    let form = new multiparty.Form();
-
-    form.parse(req, function(err, fields, files) {
-        console.log(fields);
-        console.log("A");
-        let partIndex = fields.qqpartindex;
-
-        // text/plain is required to ensure support for IE9 and older
-        res.set("Content-Type", "text/plain");
-
-        if (partIndex == null) {
-            onSimpleUpload(fields, files[fileInputName][0], res);
+        function editStat(stat, aw, dbCol, op, fieldVal) {
+            stat += aw + dbCol + op + fieldVal + "'";
+            return stat;
         }
-        else {
-            onChunkedUpload(fields, files[fileInputName][0], res);
+    }
+
+    function dataList(sqlStatement, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+        // console.log(sqlStatement);
+        con_CS.query(sqlStatement, function (err, results, fields) {
+
+            errStatus = [{errMsg: ""}];
+
+            if (err) {
+                consolef.log(err);
+                errStatus[0].errMsg = "fail";
+                res.send(errStatus);
+                res.end();
+            } else if (results.length === 0) {
+                errStatus[0].errMsg = "no data entry";
+                res.send(errStatus);
+                res.end();
+            } else {
+                // console.log(results);
+                // let result = results;
+                let JSONresult = JSON.stringify(results, null, "\t");
+                // console.log(JSONresult);
+                res.send(JSONresult);
+                res.end();
+            }
+        });
+    }
+
+    function changeMail(str) {
+        let spliti = str.split("@");
+        let letter1 = spliti[0].substring(0, 1);
+        let letter2 = spliti[0].substring(spliti[0].length - 1, spliti[0].length);
+        let newFirst = letter1;
+        for (i = 0; i < spliti[0].length - 2; i++) {
+            newFirst += "*";
         }
-    });
-    console.log("the other: " + responseDataUuid);
+        newFirst += letter2;
 
-    // return next();
-}
+        let letter3 = spliti[1].substring(0, 1);
+        let extension = letter3;
+        for (i = 0; i < spliti[1].split(".")[0].length - 1; i++) {
+            extension += "*";
+        }
+        extension += "." + spliti[1].split(".")[1];
+        let result = newFirst + "@" + extension;
 
-let responseDataUuid = "",
-    responseDataName = "",
-    responseDataUuid2 = "",
-    responseDataName2 = "";
-function onSimpleUpload(fields, file, res) {
-    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-    responseDataUuid = "";
-
-    let d = new Date(),
-        uuid = d.getUTCFullYear() + "-" + ('0' + (d.getUTCMonth() + 1)).slice(-2) + "-" + ('0' + d.getUTCDate()).slice(-2) + "T" + ('0' + d.getUTCHours()).slice(-2) + ":" + ('0' + d.getUTCMinutes()).slice(-2) + ":" + ('0' + d.getUTCSeconds()).slice(-2) + "Z",
-        responseData = {
-            success: false,
-            newuuid: uuid + "_" + fields.qqfilename
-            // newuuid2: uuid + "_" + fields.qqfilename
-        };
-
-    responseDataUuid = responseData.newuuid;
-    // responseDataUuid2 = responseData.newuuid2;
-
-    file.name = fields.qqfilename;
-    responseDataName = file.name;
-    responseDataName2 = file.name;
-
-    console.log("forth hokage: " + responseDataUuid);
-    console.log("fifth harmony: " + responseDataName);
-    console.log("trials 4 days: " + responseDataUuid2);
-    console.log("pentatonic success: " + responseDataName2);
-
-    if (isValid(file.size)) {
-        moveUploadedFile(file, uuid, function() {
-                responseData.success = true;
-                res.send(responseData);
-            },
-            function() {
-                responseData.error = "Problem copying the file!";
-                res.send(responseData);
-            });
+        return result;
     }
-    else {
-        failWithTooBigFile(responseData, res);
+
+    function onUpload(req, res, next) {
+        res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+        console.log(req.headers.origin);
+
+        let form = new multiparty.Form();
+
+        form.parse(req, function (err, fields, files) {
+            console.log(fields);
+            console.log("A");
+            let partIndex = fields.qqpartindex;
+
+            // text/plain is required to ensure support for IE9 and older
+            res.set("Content-Type", "text/plain");
+
+            if (partIndex == null) {
+                onSimpleUpload(fields, files[fileInputName][0], res);
+            }
+            else {
+                onChunkedUpload(fields, files[fileInputName][0], res);
+            }
+        });
+        console.log("the other: " + responseDataUuid);
+
+        // return next();
     }
-}
 
-function onChunkedUpload(fields, file, res) {
-    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+    let responseDataUuid = "",
+        responseDataName = "",
+        responseDataUuid2 = "",
+        responseDataName2 = "";
 
-    console.log("Z");
-    let size = parseInt(fields.qqtotalfilesize),
-        uuid = fields.qquuid,
-        index = fields.qqpartindex,
-        totalParts = parseInt(fields.qqtotalparts),
-        responseData = {
-            success: false
-        };
+    function onSimpleUpload(fields, file, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+        responseDataUuid = "";
 
-    file.name = fields.qqfilename;
+        let d = new Date(),
+            uuid = d.getUTCFullYear() + "-" + ('0' + (d.getUTCMonth() + 1)).slice(-2) + "-" + ('0' + d.getUTCDate()).slice(-2) + "T" + ('0' + d.getUTCHours()).slice(-2) + ":" + ('0' + d.getUTCMinutes()).slice(-2) + ":" + ('0' + d.getUTCSeconds()).slice(-2) + "Z",
+            responseData = {
+                success: false,
+                newuuid: uuid + "_" + fields.qqfilename
+                // newuuid2: uuid + "_" + fields.qqfilename
+            };
 
-    if (isValid(size)) {
-        storeChunk(file, uuid, index, totalParts, function() {
-                if (index < totalParts - 1) {
+        responseDataUuid = responseData.newuuid;
+        // responseDataUuid2 = responseData.newuuid2;
+
+        file.name = fields.qqfilename;
+        responseDataName = file.name;
+        responseDataName2 = file.name;
+
+        console.log("forth hokage: " + responseDataUuid);
+        console.log("fifth harmony: " + responseDataName);
+        console.log("trials 4 days: " + responseDataUuid2);
+        console.log("pentatonic success: " + responseDataName2);
+
+        if (isValid(file.size)) {
+            moveUploadedFile(file, uuid, function () {
                     responseData.success = true;
                     res.send(responseData);
-                }
-                else {
-                    combineChunks(file, uuid, function() {
-                            responseData.success = true;
-                            res.send(responseData);
-                        },
-                        function() {
-                            responseData.error = "Problem conbining the chunks!";
-                            res.send(responseData);
-                        });
-                }
-            },
-            function(reset) {
-                responseData.error = "Problem storing the chunk!";
-                res.send(responseData);
-            });
-    }
-    else {
-        failWithTooBigFile(responseData, res);
-    }
-}
-
-function failWithTooBigFile(responseData, res) {
-    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-
-    responseData.error = "Too big!";
-    responseData.preventRetry = true;
-    res.send(responseData);
-}
-
-function onDeleteFile(req, res) {
-    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-
-    let uuid = req.params.uuid,
-        dirToDelete = "uploadfiles/" + uuid;
-    console.log(uuid);
-    rimraf(dirToDelete, function(error) {
-        if (error) {
-            console.error("Problem deleting file! " + error);
-            res.status(500);
-        }
-
-        res.send();
-    });
-}
-
-function isValid(size) {
-    return maxFileSize === 0 || size < maxFileSize;
-}
-
-function moveFile(destinationDir, sourceFile, destinationFile, success, failure) {
-    console.log(destinationDir);
-    mkdirp(destinationDir, function(error) {
-        let sourceStream, destStream;
-
-        if (error) {
-            console.error("Problem creating directory " + destinationDir + ": " + error);
-            failure();
+                },
+                function () {
+                    responseData.error = "Problem copying the file!";
+                    res.send(responseData);
+                });
         }
         else {
-            sourceStream = fs.createReadStream(sourceFile);
-            destStream = fs.createWriteStream(destinationFile);
+            failWithTooBigFile(responseData, res);
+        }
+    }
 
-            sourceStream
-                .on("error", function(error) {
-                    console.error("Problem copying file: " + error.stack);
+    function onChunkedUpload(fields, file, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+
+        console.log("Z");
+        let size = parseInt(fields.qqtotalfilesize),
+            uuid = fields.qquuid,
+            index = fields.qqpartindex,
+            totalParts = parseInt(fields.qqtotalparts),
+            responseData = {
+                success: false
+            };
+
+        file.name = fields.qqfilename;
+
+        if (isValid(size)) {
+            storeChunk(file, uuid, index, totalParts, function () {
+                    if (index < totalParts - 1) {
+                        responseData.success = true;
+                        res.send(responseData);
+                    }
+                    else {
+                        combineChunks(file, uuid, function () {
+                                responseData.success = true;
+                                res.send(responseData);
+                            },
+                            function () {
+                                responseData.error = "Problem conbining the chunks!";
+                                res.send(responseData);
+                            });
+                    }
+                },
+                function (reset) {
+                    responseData.error = "Problem storing the chunk!";
+                    res.send(responseData);
+                });
+        }
+        else {
+            failWithTooBigFile(responseData, res);
+        }
+    }
+
+    function failWithTooBigFile(responseData, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+
+        responseData.error = "Too big!";
+        responseData.preventRetry = true;
+        res.send(responseData);
+    }
+
+    function onDeleteFile(req, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+
+        let uuid = req.params.uuid,
+            dirToDelete = "uploadfiles/" + uuid;
+        console.log(uuid);
+        rimraf(dirToDelete, function (error) {
+            if (error) {
+                console.error("Problem deleting file! " + error);
+                res.status(500);
+            }
+
+            res.send();
+        });
+    }
+
+    function isValid(size) {
+        return maxFileSize === 0 || size < maxFileSize;
+    }
+
+    function moveFile(destinationDir, sourceFile, destinationFile, success, failure) {
+        console.log(destinationDir);
+        mkdirp(destinationDir, function (error) {
+            let sourceStream, destStream;
+
+            if (error) {
+                console.error("Problem creating directory " + destinationDir + ": " + error);
+                failure();
+            }
+            else {
+                sourceStream = fs.createReadStream(sourceFile);
+                destStream = fs.createWriteStream(destinationFile);
+
+                sourceStream
+                    .on("error", function (error) {
+                        console.error("Problem copying file: " + error.stack);
+                        destStream.end();
+                        failure();
+                    })
+                    .on("end", function () {
+                        destStream.end();
+                        success();
+                    })
+                    .pipe(destStream);
+            }
+        });
+    }
+
+    function moveUploadedFile(file, uuid, success, failure) {
+        console.log("this is: " + uuid);
+        // let destinationDir = uploadedFilesPath + uuid + "/",
+        let destinationDir = "uploadfiles/",
+            fileDestination = destinationDir + uuid + "_" + file.name;
+
+        moveFile(destinationDir, file.path, fileDestination, success, failure);
+    }
+
+    function storeChunk(file, uuid, index, numChunks, success, failure) {
+        let destinationDir = uploadedFilesPath + uuid + "/" + chunkDirName + "/",
+            chunkFilename = getChunkFilename(index, numChunks),
+            fileDestination = destinationDir + chunkFilename;
+
+        moveFile(destinationDir, file.path, fileDestination, success, failure);
+    }
+
+    function combineChunks(file, uuid, success, failure) {
+        let chunksDir = uploadedFilesPath + uuid + "/" + chunkDirName + "/",
+            destinationDir = uploadedFilesPath + uuid + "/",
+            fileDestination = destinationDir + file.name;
+
+
+        fs.readdir(chunksDir, function (err, fileNames) {
+            let destFileStream;
+
+            if (err) {
+                console.error("Problem listing chunks! " + err);
+                failure();
+            }
+            else {
+                fileNames.sort();
+                destFileStream = fs.createWriteStream(fileDestination, {flags: "a"});
+
+                appendToStream(destFileStream, chunksDir, fileNames, 0, function () {
+                        rimraf(chunksDir, function (rimrafError) {
+                            if (rimrafError) {
+                                console.log("Problem deleting chunks dir! " + rimrafError);
+                            }
+                        });
+                        success();
+                    },
+                    failure);
+            }
+        });
+    }
+
+    function appendToStream(destStream, srcDir, srcFilesnames, index, success, failure) {
+        if (index < srcFilesnames.length) {
+            fs.createReadStream(srcDir + srcFilesnames[index])
+                .on("end", function () {
+                    appendToStream(destStream, srcDir, srcFilesnames, index + 1, success, failure);
+                })
+                .on("error", function (error) {
+                    console.error("Problem appending chunk! " + error);
                     destStream.end();
                     failure();
                 })
-                .on("end", function(){
-                    destStream.end();
-                    success();
-                })
-                .pipe(destStream);
-        }
-    });
-}
-
-function moveUploadedFile(file, uuid, success, failure) {
-    console.log("this is: " + uuid);
-    // let destinationDir = uploadedFilesPath + uuid + "/",
-    let destinationDir = "uploadfiles/",
-        fileDestination = destinationDir + uuid + "_" + file.name;
-
-    moveFile(destinationDir, file.path, fileDestination, success, failure);
-}
-
-function storeChunk(file, uuid, index, numChunks, success, failure) {
-    let destinationDir = uploadedFilesPath + uuid + "/" + chunkDirName + "/",
-        chunkFilename = getChunkFilename(index, numChunks),
-        fileDestination = destinationDir + chunkFilename;
-
-    moveFile(destinationDir, file.path, fileDestination, success, failure);
-}
-
-function combineChunks(file, uuid, success, failure) {
-    let chunksDir = uploadedFilesPath + uuid + "/" + chunkDirName + "/",
-        destinationDir = uploadedFilesPath + uuid + "/",
-        fileDestination = destinationDir + file.name;
-
-
-    fs.readdir(chunksDir, function(err, fileNames) {
-        let destFileStream;
-
-        if (err) {
-            console.error("Problem listing chunks! " + err);
-            failure();
+                .pipe(destStream, {end: false});
         }
         else {
-            fileNames.sort();
-            destFileStream = fs.createWriteStream(fileDestination, {flags: "a"});
-
-            appendToStream(destFileStream, chunksDir, fileNames, 0, function() {
-                    rimraf(chunksDir, function(rimrafError) {
-                        if (rimrafError) {
-                            console.log("Problem deleting chunks dir! " + rimrafError);
-                        }
-                    });
-                    success();
-                },
-                failure);
+            destStream.end();
+            success();
         }
-    });
-}
-
-function appendToStream(destStream, srcDir, srcFilesnames, index, success, failure) {
-    if (index < srcFilesnames.length) {
-        fs.createReadStream(srcDir + srcFilesnames[index])
-            .on("end", function() {
-                appendToStream(destStream, srcDir, srcFilesnames, index + 1, success, failure);
-            })
-            .on("error", function(error) {
-                console.error("Problem appending chunk! " + error);
-                destStream.end();
-                failure();
-            })
-            .pipe(destStream, {end: false});
     }
-    else {
-        destStream.end();
-        success();
+
+    function getChunkFilename(index, count) {
+        let digits = new String(count).length,
+            zeros = new Array(digits + 1).join("0");
+
+        return (zeros + index).slice(-digits);
     }
-}
-
-function getChunkFilename(index, count) {
-    let digits = new String(count).length,
-        zeros = new Array(digits + 1).join("0");
-
-    return (zeros + index).slice(-digits);
 }
