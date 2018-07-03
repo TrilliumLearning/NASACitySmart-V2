@@ -465,10 +465,10 @@ module.exports = function (app, passport) {
             },
             {
                 fieldVal: req.query.status,
-                dbCol: req.query.status,
+                dbCol: "Status",
                 op: " = '",
                 adj: req.query.status,
-                table: req.query.status
+                table: 1
             }
         ];
         QueryStat(myQueryObj, scoutingStat, res)
@@ -547,16 +547,22 @@ module.exports = function (app, passport) {
 
     // Show user management home page
     app.get('/userManagement', isLoggedIn, function (req, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
+
         myStat = "SELECT userrole FROM UserLogin WHERE username = '" + req.user.username + "';";
+        let state2 = "SELECT firstName FROM UserProfile WHERE username = '" + req.user.username + "';";
 
-        con_CS.query(myStat, function (err, results, fields) {
+        con_CS.query(myStat + state2, function (err, results, fields) {
 
-            if (!results[0].userrole) {
-                console.log("Error");
-            } else if (results[0].userrole === "Admin" || "Regular") {
+            if (!results[0][0].userrole) {
+                console.log("Error2");
+            } else if(!results[1][0].firstName){
+                console.log("Error1")
+            } else if (results[0][0].userrole === "Admin" || "Regular") {
                 // process the signup form
                 res.render('userManagement.ejs', {
-                    user: req.user // get the user out of session and pass to template
+                    user: req.user, // get the user out of session and pass to template
+                    firstName: results[1][0].firstName
                 });
             }
         });
@@ -610,8 +616,10 @@ module.exports = function (app, passport) {
 
     // Filter by search criteria
     app.get('/filterUser', isLoggedIn, function (req, res) {
-        myStat = "SELECT * FROM UserLogin";
-        mylogin = "SELECT * FROM UserProfile";
+        // res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+
+        myStat = "SELECT UserProfile.*, UserLogin.* FROM UserLogin INNER JOIN UserProfile ON UserLogin.username = UserProfile.username";
+
         let myQuery = [
             {
                 fieldVal: req.query.dateCreatedFrom,
@@ -654,81 +662,91 @@ module.exports = function (app, passport) {
                 dbCol: "lastName",
                 op: " = '",
                 adj: req.query.lastName
+            },
+            {
+                fieldVal: req.query.status,
+                dbCol: "Status",
+                op: " = '",
+                adj: req.query.status
+            },
+            {
+                fieldVal: req.query.Phone_Number,
+                dbCol: "Phone_Number",
+                op: " = '",
+                adj: req.query.Phone_Number
             }
         ];
+        console.log(req.query.Phone_Number);
+        QueryStat(myQuery, myStat, res);
 
-        // QueryStat(myQueryObj, myStat, res)
+        // function userQuery() {
+        //     res.setHeader("Access-Control-Allow-Origin", "*");
+        //
+        //     con_CS.query(myStat, function (err, results, fields) {
+        //
+        //         let status = [{errStatus: ""}];
+        //
+        //         if (err) {
+        //             console.log(err);
+        //             status[0].errStatus = "fail";
+        //             res.send(status);
+        //             res.end();
+        //         } else if (results.length === 0) {
+        //             status[0].errStatus = "no data entry";
+        //             res.send(status);
+        //             res.end();
+        //         } else {
+        //             let JSONresult = JSON.stringify(results, null, "\t");
+        //             // console.log(JSONresult);
+        //             res.send(JSONresult);
+        //             res.end();
+        //         }
+        //     });
+        // }
 
-        function userQuery() {
-            res.setHeader("Access-Control-Allow-Origin", "*");
-            // console.log("Query Statement: " + queryStat);
-
-            con_CS.query(myStat,mylogin, function (err, results, fields) {
-
-                let status = [{errStatus: ""}];
-
-                if (err) {
-                    console.log(err);
-                    status[0].errStatus = "fail";
-                    res.send(status);
-                    res.end();
-                } else if (results.length === 0) {
-                    status[0].errStatus = "no data entry";
-                    res.send(status);
-                    res.end();
-                } else {
-                    let JSONresult = JSON.stringify(results, null, "\t");
-                    console.log(JSONresult);
-                    res.send(JSONresult);
-                    res.end();
-                }
-            });
-        }
-
-        let j = 0;
-
-        for (let i = 0; i < myQuery.length; i++) {
-            // console.log("i = " + i);
-            // console.log("field Value: " + !!myQuery[i].fieldVal);
-            if (i === myQuery.length - 1) {
-                if (!!myQuery[i].fieldVal) {
-                    if (j === 0) {
-                        myStat += " WHERE " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
-                        mylogin += " WHERE " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
-                        j = 1;
-                        userQuery()
-                    } else {
-                        myStat += " AND " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
-                        mylogin += " AND " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
-                        userQuery()
-                    }
-                } else {
-                    userQuery()
-                }
-            } else {
-                if (!!myQuery[i].fieldVal) {
-                    if (j === 0) {
-                        myStat += " WHERE " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
-                        mylogin += " WHERE " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
-                        j = 1;
-                    } else {
-                        myStat += " AND " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
-                        mylogin += " AND " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
-                    }
-                }
-            }
-        }
+        // let j = 0;
+        //
+        // for (let i = 0; i < myQuery.length; i++) {
+        //     // console.log("i = " + i);
+        //     // console.log("field Value: " + !!myQuery[i].fieldVal);
+        //     if (i === myQuery.length - 1) {
+        //         if (!!myQuery[i].fieldVal) {
+        //             if (j === 0) {
+        //                 myStat += " WHERE " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
+        //                 j = 1;
+        //                 userQuery()
+        //             } else {
+        //                 myStat += " AND " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
+        //                 userQuery()
+        //             }
+        //         } else {
+        //             userQuery()
+        //         }
+        //     } else {
+        //         if (!!myQuery[i].fieldVal) {
+        //             if (j === 0) {
+        //                 myStat += " WHERE " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
+        //                 j = 1;
+        //             } else {
+        //                 myStat += " AND " + myQuery[i].dbCol + myQuery[i].op + myQuery[i].fieldVal + "'";
+        //             }
+        //         }
+        //     }
+        // }
     });
 
     // Retrieve user data from user management page
-    let edit_User, edit_firstName, edit_lastName, edit_userrole, edit_status;
+    let edit_User, edit_firstName, edit_lastName, edit_userrole, edit_status, edit_city;
     app.get('/editUserQuery', isLoggedIn, function(req, res) {
 
-        edit_User = req.query.Username;
+        // edit_User = req.query.Username;
         edit_firstName = req.query.First_Name;
+        edit_city = req.query.City;
         edit_lastName = req.query.Last_Name;
         edit_userrole = req.query.User_Role;
         edit_status = req.query.Status;
+        console.log("1" + edit_city);
+
         res.json({"error": false, "message": "/editUser"});
     });
 
@@ -784,11 +802,13 @@ module.exports = function (app, passport) {
         dateNtime();
 
         let username = req.query.usernameStr.split(",");
+        // console.log(username);
         myStat = "UPDATE UserLogin SET modifiedUser = '" + req.user.username + "', dateModified = '" + dateTime + "',  status = 'Suspended'";
 
         for (let i = 0; i < username.length; i++) {
             if (i === 0) {
                 myStat += " WHERE username = '" + username[i] + "'";
+                console.log(myStat);
                 if (i === username.length - 1) {
                     updateDBNres(myStat, "", "Suspension failed!", "/userManagement", res);
                 }
@@ -802,10 +822,18 @@ module.exports = function (app, passport) {
     });
 
     app.get('/recovery', isLoggedIn, function (req, res) {
-        // render the page and pass in any flash data if it exists
-        res.render('recovery.ejs', {
-            user: req.user,
-            message: req.flash('restoreMessage')
+        let state2 = "SELECT firstName FROM UserProfile WHERE username = '" + req.user.username + "';";
+        con_CS.query(state2, function (err, results, fields) {
+            console.log(results);
+            if (!results[0].firstName) {
+                console.log("Error2");
+            } else{
+                res.render('recovery.ejs', {
+                    user: req.user,
+                    message: req.flash('restoreMessage'),
+                    firstName: results[0].firstName
+                });
+            }
         });
     });
 
@@ -892,54 +920,55 @@ module.exports = function (app, passport) {
 
     app.delete("/deleteFiles/:uuid", onDeleteFile);
 
-    app.get('/recover',function (req,res) {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        let recoverIDStr = req.query.recoverIDStr;
-        console.log(recoverIDStr);
-        for(let i = 0; i < recoverIDStr.length; i++) {
-            let statement = "UPDATE CitySmart.LayerMenu SET Status = 'Active' WHERE ID = '" + recoverIDStr[i] + "'";
-            con_CS.query(statement, function (err, results) {
-                if (err) throw err;
-                res.json(results[i]);
-            });
-        }
-    });
+    // app.get('/recover',function (req,res) {
+    //     res.setHeader("Access-Control-Allow-Origin", "*");
+    //     let recoverIDStr = req.query.recoverIDStr;
+    //     console.log(recoverIDStr);
+    //     for(let i = 0; i < recoverIDStr.length; i++) {
+    //         let statement = "UPDATE CitySmart.LayerMenu SET Status = 'Active' WHERE ID = '" + recoverIDStr[i] + "'";
+    //         con_CS.query(statement, function (err, results) {
+    //             if (err) throw err;
+    //             res.json(results[i]);
+    //         });
+    //     }
+    // });
 
     app.get('/approve',function (req,res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
-        let approveIDStr = req.query.approveIDStr;
+        let approveIDStr = req.query.tID.split(',');
         console.log(approveIDStr);
         for(let i = 0; i < approveIDStr.length; i++) {
-            let statement = "UPDATE CitySmart.LayerMenu SET Status = 'Active' WHERE ID = '" + approveIDStr[i] + "'";
+            let statement = "UPDATE CitySmart.Request_Form SET Status = 'Active' WHERE RID = '" + approveIDStr[i] + "'";
+            console.log(statement);
             con_CS.query(statement, function (err, results) {
                 if (err) throw err;
                 res.json(results[i]);
             });
         }
     });
-
-    //Put back the photo in the form
-    app.get('/edit', function (req, res) {
-        res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-        let editIDSr = req.query.editIDSr;
-        // console.log(editIDSr);
-        let myStat = "SELECT Layer_Uploader, Layer_Uploader_name FROM LayerMenu WHERE ID = '" + editIDSr + "'";
-        // console.log(myStat);
-
-        let filePath0;
-        con_CS.query(myStat, function (err, results) {
-            // console.log("query statement : " + myStat);
-            if (!results[0].Layer_Uploader && !results[0].Layer_Uploader_name) {
-                console.log("Error");
-            } else {
-                filePath0 = results[0];
-                let JSONresult = JSON.stringify(results, null, "\t");
-                // console.log(JSONresult);
-                res.send(JSONresult);
-                res.end()
-            }
-        });
-    });
+    //
+    // //Put back the photo in the form
+    // app.get('/edit', function (req, res) {
+    //     res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+    //     let editIDSr = req.query.editIDSr;
+    //     // console.log(editIDSr);
+    //     let myStat = "SELECT Layer_Uploader, Layer_Uploader_name FROM LayerMenu WHERE RID = '" + editIDSr + "'";
+    //     // console.log(myStat);
+    //
+    //     let filePath0;
+    //     con_CS.query(myStat, function (err, results) {
+    //         // console.log("query statement : " + myStat);
+    //         if (!results[0].Layer_Uploader && !results[0].Layer_Uploader_name) {
+    //             console.log("Error");
+    //         } else {
+    //             filePath0 = results[0];
+    //             let JSONresult = JSON.stringify(results, null, "\t");
+    //             // console.log(JSONresult);
+    //             res.send(JSONresult);
+    //             res.end()
+    //         }
+    //     });
+    // });
 
     //Delete button
     app.get('/deleteData', function(req, res) {
@@ -947,8 +976,8 @@ module.exports = function (app, passport) {
         let transactionID = req.query.transactionIDStr.split(',');
         console.log(transactionID);
         for(let i = 0; i < transactionID.length; i++) {
-            let statement = "UPDATE CitySmart.LayerMenu SET Status = 'Delete' WHERE ID = '" + transactionID[i] + "'";
-            // console.log(statement);
+            let statement = "UPDATE CitySmart.Request_Form SET Status = 'Delete' WHERE RID = '" + transactionID[i] + "'";
+            console.log(statement);
             con_CS.query(statement, function (err, results) {
                 if (err) throw err;
                 res.json(results[i]);
@@ -963,7 +992,7 @@ module.exports = function (app, passport) {
         con_CS.query('SELECT Request_Form.*, UserLogin.userrole FROM UserLogin INNER JOIN Request_Form ON UserLogin.username = Request_Form.UID',function (err,results) {
             if (err) throw err;
             res.json(results);
-            console.log(results);
+            // console.log(results);
         })
     });
 
@@ -1636,33 +1665,33 @@ function del_recov(StatusUpd, ErrMsg, targetURL, req, res) {
 
     transactionID = req.query.transactionIDStr.split(",");
     console.log(transactionID);
-    let statementGeneral = "UPDATE General_Form SET Status_del = '" + StatusUpd + "'";
-    let statementDetailedS = "UPDATE Detailed_Scouting SET Status_del = '" + StatusUpd + "'";
-    let statementDetailedT = "UPDATE Detailed_Trap SET Status_del = '" + StatusUpd + "'";
+    let statementGeneral = "UPDATE Request_Form SET Status = '" + StatusUpd + "'";
+    // let statementDetailedS = "UPDATE Detailed_Scouting SET Status = '" + StatusUpd + "'";
+    // let statementDetailedT = "UPDATE Detailed_Trap SET Status = '" + StatusUpd + "'";
 
     for (let i = 0; i < transactionID.length; i++) {
         if (i === 0) {
-            statementGeneral += " WHERE transactionID = '" + transactionID[i] + "'";
-            statementDetailedS += " WHERE transactionID = '" + transactionID[i] + "'";
-            statementDetailedT += " WHERE transactionID = '" + transactionID[i] + "'";
+            statementGeneral += " WHERE RID = '" + transactionID[i] + "'";
+            // statementDetailedS += " WHERE transactionID = '" + transactionID[i] + "'";
+            // statementDetailedT += " WHERE transactionID = '" + transactionID[i] + "'";
 
             if (i === transactionID.length - 1) {
                 statementGeneral += ";";
-                statementDetailedS += ";";
-                statementDetailedT += ";";
-                myStat = statementGeneral + statementDetailedS + statementDetailedT;
+                // statementDetailedS += ";";
+                // statementDetailedT += ";";
+                myStat = statementGeneral;
                 updateDBNres(myStat, "", ErrMsg, targetURL, res);
             }
         } else {
-            statementGeneral += " OR transactionID = '" + transactionID[i] + "'";
-            statementDetailedS += " OR transactionID = '" + transactionID[i] + "'";
-            statementDetailedT += " OR transactionID = '" + transactionID[i] + "'";
+            statementGeneral += " OR RID = '" + transactionID[i] + "'";
+            // statementDetailedS += " OR transactionID = '" + transactionID[i] + "'";
+            // statementDetailedT += " OR transactionID = '" + transactionID[i] + "'";
 
             if (i === transactionID.length - 1) {
                 statementGeneral += ";";
-                statementDetailedS += ";";
-                statementDetailedT += ";";
-                myStat = statementGeneral + statementDetailedS + statementDetailedT;
+                // statementDetailedS += ";";
+                // statementDetailedT += ";";
+                myStat = statementGeneral;
                 updateDBNres(myStat, "", ErrMsg, targetURL, res);
             }
         }
@@ -1697,15 +1726,11 @@ function updateDBNredir(SQLstatement, Value, ErrMsg, failURL, redirURL, res) {
 }
 
 function QueryStat(myObj, scoutingStat, res) {
-    console.log(myObj);
+    // console.log(myObj);
     let j = 0;
     for (let i = 0; i < myObj.length; i++) {
         //console.log("i = " + i);
-        //console.log("field Value: " + !!myObj[i].fieldVal);
-
-        if (myObj[5].adj === "undefined") {
-            console.log("S");
-        }
+        console.log(!!myObj[i].fieldVal);
 
         if (!!myObj[i].adj){
             console.log(i  + "   " + myObj[i].adj);
@@ -1752,13 +1777,13 @@ function QueryStat(myObj, scoutingStat, res) {
 
 function dataList(sqlStatement, res) {
     res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-    console.log(sqlStatement);
+    // console.log(sqlStatement);
     con_CS.query(sqlStatement, function (err, results, fields) {
 
         errStatus = [{errMsg: ""}];
 
         if (err) {
-            console.log(err);
+            consolef.log(err);
             errStatus[0].errMsg = "fail";
             res.send(errStatus);
             res.end();

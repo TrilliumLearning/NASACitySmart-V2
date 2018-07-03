@@ -222,7 +222,8 @@
     <div class="page-header text-center header">
         <h1><span class="fa fa-anchor"></span>User Home </h1><h4><span class="fa fa-user"></span>&nbsp;<strong>Account Name</strong>: <%= user.username %></h4><br>
         <a id= "Request" class="btn btn-default btn-lg">New Request</a>&nbsp;&nbsp;
-        <a id ="Restore" class="btn btn-default btn-lg">Restore</a>&nbsp;&nbsp;
+        <a href="/recovery" id ="Restore" class="btn btn-default btn-lg">Restore</a>&nbsp;&nbsp;
+        <a href="/dataHistory"class="btn btn-default btn-lg">Search History</a>&nbsp;&nbsp;
         <div class="dropdown floating-Box">
             <button class="btn btn-primary btn-lg" data-toggle="dropdown" id="Username"><%= firstName %>
                 <span class="caret"></span>
@@ -297,7 +298,7 @@
                 </tfoot>
             </table>
             <!-- formal table //approve //recovery-->
-            <button id="editButton" class="btn btn-primary btn-sm" type="button"></button>
+            <button id="editButton" class="btn btn-primary btn-sm" type="button">Edit</button>
             <button id="deleteButton" class="btn btn-primary btn-sm" type="button">Delete</button>
             <!--<button id="approve" class="btn btn-primary btn-sm" value=" Approve ">Approve</button>-->
             <!--<button id="recover" class="btn btn-primary btn-sm" value=" Recover ">Recover</button>-->
@@ -330,10 +331,10 @@
                 $("#userMenu").empty();
                 $("#userMenu").append(DropMenu)
 
-                var sta = document.getElementById("editButton").value;
-                sta = "Approve";
-                $("#editButton").empty();
-                $("#editButton").append(sta);
+                // var sta = document.getElementById("editButton").value;
+                // sta = "Approve";
+                // $("#editButton").empty();
+                // $("#editButton").append(sta);
             } else if (UserRole === "Regular") {
                 DropMenu = "<li><a href=\"/userprofile\">Profile</a></li>\n" +
                     "\t\t\t<li><a href=\"/signout\">Sign Out</a></li>";
@@ -366,7 +367,7 @@
 
             for (var i = 0; i < scoutingRowSelected.length; i++) {
 //                console.log("rowSelected[" + i + "][0]: " + rowSelected[i][0]);
-                scoutingTransactionID.push(scoutingRowSelected[i][0]);
+                scoutingTransactionID.push(scoutingRowSelected[i][1]);
             }
         });
 
@@ -388,7 +389,7 @@
                 localStorage.setItem("getvalue", JSON.stringify(getvalue[0]));
                 // alert(getvalue[i][0]);
                 // alert(getvalue[i][4]);
-                window.location.replace('test1.html');
+                window.location.replace('../home/Layer Request form.html');
                 // console.log(localStorage.getItem("getvalue"));
             }
         });
@@ -409,21 +410,6 @@
             }
         });
 
-        $("#approveButton").on("click", function () {
-            if (confirm("Are you sure you would like to approve this row(s)?") === true) {
-                var approveIDStr = "approveIDStr=" + scoutingTransactionID.concat(trapTransactionID).toString();
-                console.log ("transactionIDStr: " + approveIDStr);
-                $.ajax({
-                    url:'http://localhost:9090/approve',
-                    type:"GET",
-                    dataType:'json',
-                    data:approveIDStr
-                });
-                window.location.reload();
-            } else {
-                return false;
-            }
-        });
 
         // function query() {
         //     var firstName = document.getElementById("firstName").value;
@@ -456,7 +442,8 @@
                 success: function (results) {
                     console.log(results);
                     for (var i = 0; i < results.length; i++) {
-                        if(UserRole === "Regular") {
+                        if (results[i].Status === "Active") {
+                            if (UserRole === "Regular") {
                                 if (results[i].UID === username) {
                                     table.row.add([
                                         results[i].UID,
@@ -474,22 +461,23 @@
                                         results[i].Status
                                     ]).draw(false);
                                 }
-                        }else{
-                            table.row.add([
-                                results[i].UID,
-                                results[i].RID,
-                                results[i].LayerCategory,
-                                results[i].CountryName,
-                                results[i].CityName,
-                                results[i].StateName,
-                                results[i].FirstLayer,
-                                results[i].SecondLayer,
-                                results[i].ThirdLayer,
-                                results[i].Layer_Description,
-                                results[i].Layer_Uploader,
-                                results[i].Layer_Uploader_name,
-                                results[i].Status
-                            ]).draw(false);
+                            } else {
+                                table.row.add([
+                                    results[i].UID,
+                                    results[i].RID,
+                                    results[i].LayerCategory,
+                                    results[i].CountryName,
+                                    results[i].CityName,
+                                    results[i].StateName,
+                                    results[i].FirstLayer,
+                                    results[i].SecondLayer,
+                                    results[i].ThirdLayer,
+                                    results[i].Layer_Description,
+                                    results[i].Layer_Uploader,
+                                    results[i].Layer_Uploader_name,
+                                    results[i].Status
+                                ]).draw(false);
+                            }
                         }
                     }
                 }
