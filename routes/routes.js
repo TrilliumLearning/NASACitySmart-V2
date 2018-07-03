@@ -724,14 +724,8 @@ module.exports = function (app, passport) {
             }
 
         }
-        // let newImage = {
-        //     Layer_Uploader: "http://localhost:9086/uploadfiles/" + responseDataUuid,
-        //     Layer_Uploader_name: responseDataUuid
-        // };
-        // name += ", Layer_Uploader, Layer_Uploader_name";
-        // value += ", '" + newImage.Layer_Uploader + "','" +newImage.Layer_Uploader_name + "'";
 
-        // let filepathname = "http://localhost:9086/uploadfiles/" + responseDataUuid ;
+
         let statement1 = "INSERT INTO CitySmart.New_Users (" + name + ") VALUES (" + value + ");";
         console.log(statement1);
 
@@ -764,6 +758,27 @@ module.exports = function (app, passport) {
                 valueSubmit += '"' + result[i][1] + '"' + ", ";
             }
         }
+
+        let newImage = {
+            Layer_Uploader: "http://localhost:9086/uploadfiles/" + responseDataUuid,
+            Layer_Uploader_name: responseDataUuid
+        };
+        name += ", Layer_Uploader, Layer_Uploader_name";
+        value += ", '" + newImage.Layer_Uploader + "','" +newImage.Layer_Uploader_name + "'";
+        let filepathname = "http://localhost:9086/uploadfiles/" + responseDataUuid ;
+
+
+        let statement2 = "INSERT INTO CitySmart.Request_Form (" + name + ") VALUES (" + value + ");";
+        console.log(statement2);
+
+        con_CS.query(statement2, function(err,result) {
+            if (err) {
+                throw err;
+            } else {
+                res.json("Connected!")
+            }
+        });
+
     });
 
     //Request form layer category//
