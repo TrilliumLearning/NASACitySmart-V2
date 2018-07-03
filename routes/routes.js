@@ -781,6 +781,53 @@ module.exports = function (app, passport) {
 
     });
 
+    //Request ID//
+    app.get('/newRequest', function (req,res) {
+        // let myStat = "SELECT userrole FROM Users WHERE username = '" + req.user.username + "';";
+        //
+        // con_CS.query(myStat, function (err, results, fields) {
+        //     //console.log(results);
+        //
+        //     if (!results[0].userrole) {
+        //         console.log("Error");
+        //     } else {
+        //         res.render('userHome.ejs', {
+        //             user: req.user// get the user out of session and pass to template
+        //         });
+        //     }
+        // });
+
+        var d = new Date();
+        var utcDateTime = d.getUTCFullYear() + "-" + ('0' + (d.getUTCMonth() + 1)).slice(-2) + "-" + ('0' + d.getUTCDate()).slice(-2);
+        var queryRID = "SELECT COUNT(RID) AS number FROM Special_ID WHERE RID LIKE '" + utcDateTime + "%';";
+
+        con_CS.query(queryRID,function (err,results,fields) {
+            RID = utcDateTime + "_" + ('000' + (results[0].number + 1)).slice(-5);
+            if (err) {
+                console.log(err);
+            } else {
+                // console.log(req.user);
+                var insertRID = "INSERT INTO Special_ID (RID, UID) VALUE (" + "'" + RID + "', '" + req.user + "');";
+
+                con_CS.query(insertRID, function (err, results, fields) {
+                    if (err) {
+                        console.log(err);
+                    } else {
+                        res.render('Layer Request Form.ejs', {
+                            user: req.user, // get the user out of session and pass to template
+                            RID: RID
+                        });
+                    }
+                });
+            }
+        });
+    });
+
+
+
+
+
+
     //Request form layer category//
     app.get('/MainCategory', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
