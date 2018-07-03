@@ -333,6 +333,10 @@
             .inputBoxDate {
                 width: 10%;
             }
+            #Phone_Number{
+                font-size: 12px;
+                width:13%;
+            }
         }
 
     </style>
@@ -354,7 +358,7 @@
     <a href="/signup" class="btn btn-default btn-lg adduser">Add User</a>&nbsp;&nbsp;
     <div class="dropdown floating-Box">
         <button class="btn btn-primary btn-lg" type="button" data-toggle="dropdown" id="Username">
-            <%= user.firstName%>
+            <%= firstName%>
             <span class="caret"></span>
         </button>
         <ul id="userMenu" class="dropdown-menu">
@@ -379,11 +383,22 @@
         </div>
         <br>
         <div class="row">
-            <h4 class="floatingBox"><strong>User Name:</strong></h4>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <h4 class="floatingBox"><strong>User:</strong></h4>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <h6 class="floatingBox">First Name:</h6>&nbsp;&nbsp;&nbsp;
             <input class="inputBoxDate" type="text" id="firstName" placeholder="Enter First Name">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <h6 id="123" class="floatingBox">Last Name:</h6>&nbsp;&nbsp;&nbsp;
-            <input class="inputBoxDate" type="text" id="lastName" placeholder="Enter Last Name">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <input class="inputBoxDate" type="text" id="lastName" placeholder="Enter Last Name">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <h6 class="floatingBox">Phone Number:</h6>&nbsp;&nbsp;&nbsp;
+            <input class="inputBoxDate" id="Phone_Number" type="text" placeholder="Enter Phone Number">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+            <div class="center">
+                <h4 class="floatingBox"><strong>Status:&nbsp;</strong></h4>
+                <select id="status">
+                    <option value="">Select the status</option>
+                    <option value="Active">Active</option>
+                    <option value="NLI">Never Logged In</option>
+                    <option value="Suspended">Suspended</option>
+                </select>
+            </div>
             <h4 class="floatingBox" id="Role"><strong>User Role:</strong></h4>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
             <input type="radio" name="userrole" id="Regular" value="Regular">
             <h5 class="floatingBox click">&nbsp;&nbsp;&nbsp;Regular</h5>&nbsp;&nbsp;&nbsp;&nbsp;
@@ -404,17 +419,19 @@
         <table id="dataDisplay" cellspacing="0" width="100%">
             <thead>
             <tr>
-                <th>First_Name</th>
-                <th>Last_Name</th>
-                <th>Username</th>
-                <th>Password</th>
-                <th>User_Role</th>
-                <th>Date_Created</th>
-                <th>Created_By</th>
-                <th>Date_Last_Modified</th>
-                <th>Last_Modified_By</th>
+                <th>User Name</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>User Role</th>
+                <th>Phone Number</th>
+                <th>Country</th>
+                <th>State Province Region</th>
+                <th>City</th>
+                <th>Date Created</th>
+                <th>Modified User</th>
+                <th>Date Modified</th>
+                <th>Last Login Time</th>
                 <th>Status</th>
-                <th>Last_Login_Time</th>
             </tr>
             </thead>
             <tbody>
@@ -422,17 +439,19 @@
             </tbody>
             <tfoot>
             <tr>
-                <th>First_Name</th>
-                <th>Last_Name</th>
-                <th>Username</th>
-                <th>Password</th>
-                <th>User_Role</th>
-                <th>Date_Created</th>
-                <th>Created_By</th>
-                <th>Date_Last_Modified</th>
-                <th>Last_Modified_By</th>
+                <th>User Name</th>
+                <th>First Name</th>
+                <th>Last Name</th>
+                <th>User Role</th>
+                <th>Phone Number</th>
+                <th>Country</th>
+                <th>State Province Region</th>
+                <th>City</th>
+                <th>Date Created</th>
+                <th>Modified User</th>
+                <th>Date Modified</th>
+                <th>Last Login Time</th>
                 <th>Status</th>
-                <th>Last_Login_Time</th>
             </tr>
             </tfoot>
         </table>
@@ -484,7 +503,7 @@
 
                 for (var i = 0; i < rowSelected.length; i ++) {
 //                    console.log("rowSelected[" + i + "][2]: " + rowSelected[i][2]);
-                    rowUserName.push(rowSelected[i][2]);
+                    rowUserName.push(rowSelected[i][0]);
                 }
             });
 
@@ -495,30 +514,12 @@
                 } else if (rowSelected.length === 0) {
                     confirm("No rows have been selected---- please choose ONE.")
                 } else {
-                    var tstring = "";
-
-                    for (var i = 0; i < thArray.length; i++) {
-                        if (i === 0) {
-                            tstring += thArray[i] + "=" + rowSelected[0][i];
-                        } else {
-                            tstring += "&" + thArray[i] + "=" + rowSelected[0][i];
-                        }
-
-                    }
-//                    console.log("tstring for loop: " + tstring);
-
-
-
-                    $.ajax({
-                        url: '/editUserQuery',
-                        type: 'GET',
-                        dataType: 'json',
-                        async: false,
-                        data: tstring,
-                        success: function (result) {
-                            window.location.replace('/editUser')
-                        }
-                    })
+                    var getvalue = table.rows('.selected').data();
+                    // console.log(getvalue);
+                    localStorage.setItem("getvalue",JSON.stringify(getvalue[0]));
+                    // alert(getvalue[i][0]);
+                    // alert(getvalue[i][4]);
+                    window.location.replace('/editUser')
                 }
             });
 
@@ -526,7 +527,7 @@
                 if (confirm("Are you sure you would like to suspend the user(s)?")) {
 
                     var usernameStr = "usernameStr=" + rowUserName.toString();
-//                    console.log("usernameStr: " + usernameStr);
+                   console.log("usernameStr: " + usernameStr);
 
                     $.ajax({
                         url: '/suspendUser',
@@ -535,8 +536,9 @@
                         async: false,
                         data: usernameStr,
                         success: function (result) {
+                            console.log(result);
                             if (!result.error) {
-                                window.location.replace('/userManagement')
+                                // window.location.replace('/userManagement')
                             } else {
                                 alert(result.message);
                             }
@@ -553,20 +555,23 @@
             var dateModifiedTo = document.getElementsByClassName("datePicker")[3].value;
             var firstName = document.getElementById("firstName").value;
             var lastName = document.getElementById("lastName").value;
+            var Phone_Number = document.getElementById("Phone_Number").value;
+            var status = document.getElementById("status").value;
+
             if ($("input[name='userrole']").is(":checked")) {
                 userrole = $("input[name='userrole']:checked").val();
             } else {
                 userrole = "";
             }
 
-            queryString1 = "dateCreatedFrom=" + dateCreatedFrom + "&dateCreatedTo=" + dateCreatedTo + "&dateModifiedFrom=" + dateModifiedFrom + "&dateModifiedTo=" + dateModifiedTo;
-            queryString2 = "&firstName=" + firstName + "&lastName=" + lastName + "&userrole=" + userrole;
+            queryString1 = "dateCreatedFrom=" + dateCreatedFrom + "&dateCreatedTo=" + dateCreatedTo + "&dateModifiedFrom=" + dateModifiedFrom + "&dateModifiedTo=" + dateModifiedTo + "&userrole=" + userrole;
+            queryString2 = "&firstName=" + firstName + "&lastName=" + lastName + "&Phone_Number=" + Phone_Number + "&status=" + status;
 
 
             querystr = queryString1 + queryString2;
             // alert(querystr);
 
-            if (dateCreatedFrom || dateCreatedTo || dateModifiedFrom || dateModifiedTo || firstName || lastName || userrole) {
+            if (dateCreatedFrom || dateCreatedTo || dateModifiedFrom || dateModifiedTo || firstName || lastName || Phone_Number || status || userrole) {
                 table.clear();
                 queryAndDisplay(querystr);
             } else {
@@ -585,19 +590,22 @@
                 async: false,
                 data: querystr,
                 success: function (resp) {
+                    console.log(resp)
                     for (var i = 0; i < resp.length; i++) {
                         table.row.add( [
+                            resp[i].username,
                             resp[i].firstName,
                             resp[i].lastName,
-                            resp[i].username,
-                            resp[i].password,
                             resp[i].userrole,
+                            resp[i].Phone_Number,
+                            resp[i].Country,
+                            resp[i].State_Province_Region,
+                            resp[i].City,
                             resp[i].dateCreated,
-                            resp[i].createdUser,
-                            resp[i].dateModified,
                             resp[i].modifiedUser,
-                            resp[i].status,
-                            resp[i].lastLoginTime
+                            resp[i].dateModified,
+                            resp[i].lastLoginTime,
+                            resp[i].status
                         ] ).draw( false );
                     }
                 }

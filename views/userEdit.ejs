@@ -190,6 +190,14 @@
     </div>
 </div>
 <script>
+    var username = "<%= user.username %>";
+
+    var getvalue = JSON.parse(localStorage.getItem("getvalue"));
+    console.log(getvalue);
+    document.getElementById('username').value = username;
+    document.getElementById('firstName').value = getvalue[0];
+    document.getElementById('lastName').value = getvalue[1];
+
     var password = $("#password");
     var initial = password.is(":checked");
     var change = $("#password_change")[initial ? "removeClass" : "addClass"]("gray");
@@ -218,9 +226,6 @@
 
         $("#UsErRoLe").val(UserRole);
 
-        $("#StAtUs").val(UserStatus);
-
-    });
     function checkForm() {
         var oldP=document.getElementById("currentpassword").value;
         var newP=document.getElementById("newpassword").value;
