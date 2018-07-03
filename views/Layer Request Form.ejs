@@ -297,10 +297,13 @@
 
 <script>
 
+    var username = "<%= user.username %>";
+    console.log(username);
+
     $(document).ready(function() {
 
         $.ajax({
-            url  : 'http://localhost:9086/newEntry',
+            url  : 'http://localhost:9086/newRequest',
             method : "GET",
             dataType: 'json',
             success : function(results){

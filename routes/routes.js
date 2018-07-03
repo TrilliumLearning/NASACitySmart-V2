@@ -782,7 +782,7 @@ module.exports = function (app, passport) {
     });
 
     //Request ID//
-    app.get('/newRequest', function (req,res) {
+    app.get('/newRequest', isLoggedIn, function (req,res) {
         // let myStat = "SELECT userrole FROM Users WHERE username = '" + req.user.username + "';";
         //
         // con_CS.query(myStat, function (err, results, fields) {
@@ -813,6 +813,7 @@ module.exports = function (app, passport) {
                     if (err) {
                         console.log(err);
                     } else {
+                        console.log(req.user);
                         res.render('Layer Request Form.ejs', {
                             user: req.user, // get the user out of session and pass to template
                             RID: RID
