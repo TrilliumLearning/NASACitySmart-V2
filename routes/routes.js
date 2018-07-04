@@ -316,6 +316,23 @@ module.exports = function (app, passport) {
         res.redirect('/login');
     });
 
+    //mover folder
+    fs.rename('./a/exampleFile.png', './b/exampleFile.png', function (err) {
+        if (err) {
+            console.log(err);
+        } else {
+            console.log("success");
+        }
+    });
+
+    // mv('./b/exampleFile.png', './a/exampleFile.png', function (err) {
+    //     if (err) {
+    //         console.log(err);
+    //     } else {
+    //         console.log("success");
+    //     }
+    // });
+
     // =====================================
     // USER Home Section ===================
     // =====================================
@@ -866,14 +883,15 @@ module.exports = function (app, passport) {
             }
 
         }
-        // let newImage = {
-        //     Layer_Uploader: "http://localhost:9086/uploadfiles/" + responseDataUuid,
-        //     Layer_Uploader_name: responseDataUuid
-        // };
-        // name += ", Layer_Uploader, Layer_Uploader_name";
-        // value += ", '" + newImage.Layer_Uploader + "','" +newImage.Layer_Uploader_name + "'";
+        let newImage = {
+            Layer_Uploader: "http://localhost:9086/uploadfiles/" + responseDataUuid,
+            Layer_Uploader_name: responseDataUuid
+        };
+        name += ", Layer_Uploader, Layer_Uploader_name";
+        value += ", '" + newImage.Layer_Uploader + "','" +newImage.Layer_Uploader_name + "'";
 
-        // let filepathname = "http://localhost:9086/uploadfiles/" + responseDataUuid ;
+        let filepathname = "http://localhost:9086/uploadfiles/" + responseDataUuid ;
+
         let statement1 = "INSERT INTO CitySmart.New_Users (" + name + ") VALUES (" + value + ");";
         console.log(statement1);
 
