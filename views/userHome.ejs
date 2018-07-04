@@ -221,9 +221,11 @@
     <br><br>
     <div class="page-header text-center header">
         <h1><span class="fa fa-anchor"></span>User Home </h1><h4><span class="fa fa-user"></span>&nbsp;<strong>Account Name</strong>: <%= user.username %></h4><br>
-        <a id= "Request" class="btn btn-default btn-lg">New Request</a>&nbsp;&nbsp;
+        <a href="/newRequest" id= "Request" class="btn btn-default btn-lg">New Request</a>&nbsp;&nbsp;
+        <a href="/recovery" id ="Restore" class="btn btn-default btn-lg">Restore</a>&nbsp;&nbsp;
+        <a href="/dataHistory"class="btn btn-default btn-lg">Search History</a>&nbsp;&nbsp;
         <div class="dropdown floating-Box">
-            <button class="btn btn-primary btn-lg" data-toggle="dropdown" id="Username"><%= user.firstName%>
+            <button class="btn btn-primary btn-lg" data-toggle="dropdown" id="Username"><%= firstName %>
                 <span class="caret"></span>
             </button>
             <ul id="userMenu" class="dropdown-menu">
@@ -265,12 +267,13 @@
                     <th>Layer City</th>
                     <th>Layer State</th>
                     <th>Layer Country</th>
-                    <th>Layer Category</th>
-                    <th>--SecondLayer---</th>
+                    <th>Main Category</th>
+                    <th>Sub Category</th>
                     <th>Layer Name</th>
                     <th>Layer Description</th>
                     <th>Layer Uploader</th>
                     <th>Layer Uploader Name</th>
+                    <th>Status</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -284,12 +287,13 @@
                     <th>Layer City</th>
                     <th>Layer State</th>
                     <th>Layer Country</th>
-                    <th>Layer Category</th>
-                    <th>--SecondLayer---</th>
+                    <th>Main Category</th>
+                    <th>Sub Category</th>
                     <th>Layer Name</th>
                     <th>Layer Description</th>
                     <th>Layer Uploader</th>
                     <th>Layer Uploader Name</th>
+                    <th>Status</th>
                 </tr>
                 </tfoot>
             </table>
@@ -303,7 +307,7 @@
 </div>
 <script type='text/javascript'>
     var username = "<%= user.username %>";
-    console.log(username);
+    // console.log(username);
     var scoutingRowSelected, trapRowSelected, DropMenu, queryString1, queryString2;
     var table = $("#dataDisplay").DataTable();
     var UserRole = "<%= user.userrole %>";
@@ -326,16 +330,26 @@
                     "\t\t\t<li><a href=\"/signout\">Sign Out</a></li>";
                 $("#userMenu").empty();
                 $("#userMenu").append(DropMenu)
+
+                // var sta = document.getElementById("editButton").value;
+                // sta = "Approve";
+                // $("#editButton").empty();
+                // $("#editButton").append(sta);
             } else if (UserRole === "Regular") {
                 DropMenu = "<li><a href=\"/userprofile\">Profile</a></li>\n" +
                     "\t\t\t<li><a href=\"/signout\">Sign Out</a></li>";
                 $("#userMenu").empty();
                 $("#userMenu").append(DropMenu)
+
+                var sta1 = document.getElementById("editButton").value;
+                sta1 = "Edit";
+                $("#editButton").empty();
+                $("#editButton").append(sta1)
             }
 
             table.clear();
             table.draw();
-            queryAndDisplay("statusDel=" + "Active" + "&firstName=" + "<%= user.firstName %>" + "&lastName=" + "<%= user.lastName %>");
+            queryAndDisplay("statusDel=" + "Active" + "&firstName=" + "<%= firstName %>" + "&lastName=" + "<%= user.lastName %>");
         });
 
         $('#dataDisplay tbody').on('click', 'tr', function () {
@@ -353,17 +367,13 @@
 
             for (var i = 0; i < scoutingRowSelected.length; i++) {
 //                console.log("rowSelected[" + i + "][0]: " + rowSelected[i][0]);
-                scoutingTransactionID.push(scoutingRowSelected[i][0]);
+                scoutingTransactionID.push(scoutingRowSelected[i][1]);
             }
         });
 
-        $("#Request").on("click", function () {
-            location.replace('../home/Layer Request form.html');
-        });
-
-        $("#Profile").on("click", function () {
-            location.replace('../views/userprofile1.html');
-        });
+        // $("#Request").on("click", function () {
+        //     location.replace('../home/Layer Request form.html');
+        // });
 
         $("#editButton").on("click", function () {
             var transactionID = scoutingTransactionID.concat(trapTransactionID);
@@ -379,7 +389,7 @@
                 localStorage.setItem("getvalue", JSON.stringify(getvalue[0]));
                 // alert(getvalue[i][0]);
                 // alert(getvalue[i][4]);
-                window.location.replace('test1.html');
+                window.location.replace('../home/Layer Request form.html');
                 // console.log(localStorage.getItem("getvalue"));
             }
         });
@@ -399,6 +409,7 @@
                 return false;
             }
         });
+
 
         // function query() {
         //     var firstName = document.getElementById("firstName").value;
@@ -431,13 +442,13 @@
                 success: function (results) {
                     console.log(results);
                     for (var i = 0; i < results.length; i++) {
-                        if(results[i].userrole === "Regular") {
-                            if (results[i].Status === "Active") {
+                        if (results[i].Status === "Active") {
+                            if (UserRole === "Regular") {
                                 if (results[i].UID === username) {
                                     table.row.add([
                                         results[i].UID,
                                         results[i].RID,
-                                        results[i].LayerType,
+                                        results[i].LayerCategory,
                                         results[i].CountryName,
                                         results[i].CityName,
                                         results[i].StateName,
@@ -446,27 +457,28 @@
                                         results[i].ThirdLayer,
                                         results[i].Layer_Description,
                                         results[i].Layer_Uploader,
-                                        results[i].Layer_Uploader_name
+                                        results[i].Layer_Uploader_name,
+                                        results[i].Status
                                     ]).draw(false);
                                 }
+                            } else {
+                                table.row.add([
+                                    results[i].UID,
+                                    results[i].RID,
+                                    results[i].LayerCategory,
+                                    results[i].CountryName,
+                                    results[i].CityName,
+                                    results[i].StateName,
+                                    results[i].FirstLayer,
+                                    results[i].SecondLayer,
+                                    results[i].ThirdLayer,
+                                    results[i].Layer_Description,
+                                    results[i].Layer_Uploader,
+                                    results[i].Layer_Uploader_name,
+                                    results[i].Status
+                                ]).draw(false);
                             }
                         }
-                        // }else{
-                        //     table.row.add([
-                        //         results[i].UID,
-                        //         results[i].RID,
-                        //         results[i].LayerType,
-                        //         results[i].CountryName,
-                        //         results[i].CityName,
-                        //         results[i].StateName,
-                        //         results[i].FirstLayer,
-                        //         results[i].SecondLayer,
-                        //         results[i].ThirdLayer,
-                        //         results[i].Layer_Description,
-                        //         results[i].Layer_Uploader,
-                        //         results[i].Layer_Uploader_name
-                        //     ]).draw(false);
-                        // }
                     }
                 }
             });

@@ -69,15 +69,19 @@
         <div style="display:block" class="generalForm">
             <form id="basic"  class="well form-horizontal">
                 <fieldset>
-                    <!--<div>-->
-                    <!--<h4 class="floating-Box"><strong>Full name:&nbsp;&nbsp;</strong></h4><input id="fullName" name="Full_Name" placeholder="Full Name" class="form-control" required value="" type="text">-->
-                    <!--</div>-->
-
                     <div class="form-group">
-                        <label class="col-md-4 control-label">Full Name</label>
+                        <label class="col-md-4 control-label">First Name</label>
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group">
-                                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span><input id="fullName" name="Full_Name" placeholder="Full Name" class="form-control" required value="" type="text">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span><input id="firstName" name="firstName" placeholder="First Name" class="form-control" required value="" type="text">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Last Name</label>
+                        <div class="col-md-8 inputGroupContainer">
+                            <div class="input-group">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span><input id="lastName" name="lastName" placeholder="Last Name" class="form-control" required value="" type="text">
                             </div>
                         </div>
                     </div>
@@ -283,7 +287,7 @@
         var data = $("#basic").serialize() + "&" + $("#pswchange").serialize();
         console.log($("#basic").serialize());
         $.ajax({
-            url  : 'http://localhost:9090/submit',
+            url  : 'http://localhost:9086/submit',
             method : "POST",
             data : data,
             dataType: 'json',
@@ -346,7 +350,8 @@
                 // The key name on the left side is the name attribute
                 // of an input field. Validation rules are defined
                 // on the right side
-                Full_Name: "required",
+                firstName:"required",
+                lastName:"required",
                 Address_Line1: "required",
                 City: "required",
                 State_Province_Region: "required",
@@ -362,7 +367,8 @@
             },
             // Specify validation error messages
             messages: {
-                Full_Name: "Please enter your full name",
+                firstName: "Please enter your first name",
+                lastName:"Please enter your last name",
                 Address_Line1: "Please enter your address",
                 City: "Please enter your city",
                 State_Province_Region: "Please enter your state/province/state",

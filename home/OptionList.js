@@ -2,7 +2,7 @@ $(document).ready(function () {
     var x = document.getElementById("myListCountry");
     var option = document.createElement("option");
     $.ajax({
-        url: "http://localhost:9090/CountryList",
+        url: "http://localhost:9086/CountryList",
         dataType: 'json',
         success: function (results) {
             console.log(results);
