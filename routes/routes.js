@@ -889,14 +889,15 @@ module.exports = function (app, passport) {
     });
     //Submit Request form//
     app.post('/submitL', function (req, res) {
-        console.log(req.body);
         let result = Object.keys(req.body).map(function (key) {
             return [String(key), req.body[key]];
         });
+
         res.setHeader("Access-Control-Allow-Origin", "*");
 
         let name = "";
         let valueSubmit = "";
+        console.log(result);
 
         for (let i = 0; i < result.length; i++) {
             if (i === result.length - 1) {
@@ -907,17 +908,17 @@ module.exports = function (app, passport) {
                 valueSubmit += '"' + result[i][1] + '"' + ", ";
             }
         }
-
+        console.log(valueSubmit);
         let newImage = {
             Layer_Uploader: "http://localhost:9086/uploadfiles/" + responseDataUuid,
             Layer_Uploader_name: responseDataUuid
         };
         name += ", Layer_Uploader, Layer_Uploader_name";
-        value += ", '" + newImage.Layer_Uploader + "','" + newImage.Layer_Uploader_name + "'";
+        valueSubmit += ", '" + newImage.Layer_Uploader + "','" + newImage.Layer_Uploader_name + "'";
         let filepathname = "http://localhost:9086/uploadfiles/" + responseDataUuid;
 
 
-        let statement2 = "INSERT INTO CitySmart.Request_Form (" + name + ") VALUES (" + value + ");";
+        let statement2 = "INSERT INTO CitySmart.Request_Form (" + name + ") VALUES (" + valueSubmit + ");";
         console.log(statement2);
 
         con_CS.query(statement2, function (err, result) {

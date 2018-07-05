@@ -170,7 +170,7 @@
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                                <input id="date" name="Date" class="form-control" required value="" readonly type="text">
+                                <input id="date" name="Date" class="form-control" required readonly type="text" value="" >
                             </div>
                         </div>
                     </div>
@@ -178,7 +178,7 @@
                         <label class="col-md-4 control-label">Request ID</label>
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                                <input id="RID" name="RID" style="background:WhiteSmoke;" readonly class="form-control" required type="text">
+                                <input id="RID" name="RID" style="background:WhiteSmoke;" readonly class="form-control" required type="text" value="">
                             </div>
                         </div>
                     </div>
@@ -186,7 +186,7 @@
                         <label class="col-md-4 control-label">User ID</label>
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span>
-                                <input id="User ID" name="UID" style="background:WhiteSmoke;"  readonly class="form-control" required type="text">
+                                <input id="User ID" name="UID" style="background:WhiteSmoke;"  readonly class="form-control" required type="text" value="">
                             </div>
                         </div>
                     </div>
@@ -195,7 +195,7 @@
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group">
                                 <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-list"></i></span>
-                                <select required id="main" class="selectpicker form-control" name="FirstLayer" onchange="ChangeMainCategory(this.value); Check(this.value); " >
+                                <select required id="main" class="selectpicker form-control" name="FirstLayer" onchange="ChangeMainCategory(this.value); Check(this.value);"  >
                                     <option value="">SELECT MAIN CATEGORY</option>
                                     <option>Energy</option>
                                     <option>Water</option>
@@ -208,7 +208,7 @@
                                     <option value="other">Other(Please specify)</option>
                                 </select>
                                 <div id="ifYes" style="display:none;">
-                                    <input type="text" name="FirstLayer">
+                                    <input type="text" name="Other">
                                 </div>
                             </div>
                         </div>
@@ -218,7 +218,7 @@
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group">
                                 <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-list"></i></span>
-                                <select required id="sub" class="selectpicker form-control" name="SecondLayer">
+                                <select id="sub" class="selectpicker form-control" name="SecondLayer" value="">
                                     <option value="">SELECT SUBCATEGORY</option>
                                 </select>
                             </div>
@@ -228,7 +228,7 @@
                         <label class="col-md-4 control-label">Layer Name</label>
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-pencil"></i></span>
-                                <input id="LayerNameInput" name="Layer_Name" placeholder="Layer Name" class="form-control" required value="" type="text" onchange="SearchLayerName(this.value)"></div>
+                                <input id="LayerNameInput" name="LayerName" value="" placeholder="Layer Name" class="form-control" required  type="text" onchange="SearchLayerName(this.value)"></div>
                         </div>
                     </div>
                     <p id="LayerName1" style="color: palevioletred; margin-left:270px;">Please Enter the Layer Name, the Layer Name must be at least 6 characters</p>
@@ -258,7 +258,7 @@
                         <label class="col-md-4 control-label">Layer Description</label>
                         <div class="col-md-8 inputGroupContainer">
                             <div>
-                                <textarea class="form-control" id="message" name="Layer_Description" placeholder="Enter your description here..." required type="text" rows="6" maxlength="140"></textarea>
+                                <textarea class="form-control" id="message" name="Layer_Description" placeholder="Enter your description here..." required type="text" rows="6" maxlength="140" ></textarea>
                             </div>
                         </div>
                     </div>
@@ -286,10 +286,13 @@
         </div>
         <div class="row">
             <div class="column">
-                <button id="submit" type="submit" value="Submit" form="layer" >Submit</button>
+                <button id="submit" type="submit" value="Submit" form="layer" href="/userHome" >Submit</button>
             </div>
             <div class="column">
                 <button id="clear" type="reset" onclick="window.location.reload()" value="  Clear  ">Clear</button>
+            </div>
+            <div class="column">
+                <button id="cancel" type="button"></button>
             </div>
         </div>
     </div>
@@ -387,7 +390,7 @@
     function submitForm () {
         alert("Submitted!");
         var data =$("#layer").serialize();
-        console.log($("#layer").serialize());
+        console.log(data);
         $.ajax({
             url  : 'http://localhost:9086/submitL',
             method : "post",
@@ -418,7 +421,6 @@
             StateName:"required",
             CountryName:"required",
             FirstLayer:"required",
-            SecondLayer:"required",
             Layer_Description: "required",
             LayerFormat:"required"
 
@@ -430,7 +432,6 @@
             StateName:"Please enter the layer state",
             CountryName:"Please enter the layer country",
             FirstLayer: "Please select the main category",
-            SecondLayer:"Please select the subcategory",
             Layer_Description: "Please write the description of the layer",
             LayerFormat:"Please choose your layer format"
         },
@@ -443,7 +444,6 @@
         // Make sure the form is submitted to the destination defined
         // in the "action" attribute of the form when valid
         submitHandler: function (form) {
-            console.log("456");
             submitForm()
             // form.ajaxSubmit(function(e){
             //     console.log("456");
