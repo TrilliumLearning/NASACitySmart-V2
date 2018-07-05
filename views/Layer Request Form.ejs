@@ -120,18 +120,17 @@
         .column {
             float:right;
             position:relative;
-            right:80px;
             width:10%;
-            padding:10px 40px;
+
         }
         #clear{
             background-color: #31a0ba;
             border-radius:4px;
             font-size:16px;
-            padding:3px 10px 3px 10px;
             -webkit-transition-duration: 0.4s;
             transition-duration: 0.4s;
             color:white;
+            margin-left:6px;
         }
         #clear:hover {
             background-color: #ff758f;
@@ -141,7 +140,6 @@
             background-color: #31a0ba;
             border-radius:4px;
             font-size:16px;
-            padding:3px 10px 3px 10px;
             -webkit-transition-duration: 0.4s;
             transition-duration: 0.4s;
             color:white;
@@ -150,7 +148,18 @@
             background-color: #ff758f;
             color:white;
         }
-
+        #cancel{
+            background-color: #31a0ba;
+            border-radius:4px;
+            font-size:16px;
+            -webkit-transition-duration: 0.4s;
+            transition-duration: 0.4s;
+            color:white;
+        }
+        #cancel:hover{
+            background-color: #ff758f;
+            color:white;
+        }
 
     </style>
 
@@ -286,13 +295,13 @@
         </div>
         <div class="row">
             <div class="column">
-                <button id="submit" type="submit" value="Submit" form="layer" href="/userHome" >Submit</button>
+                <button id="submit" type="submit" value="Submit" form="layer"  >Submit</button>
             </div>
             <div class="column">
                 <button id="clear" type="reset" onclick="window.location.reload()" value="  Clear  ">Clear</button>
             </div>
             <div class="column">
-                <button id="cancel" type="button"></button>
+                <button id="cancel" type="button" onclick="userHome();">Cancel</button>
             </div>
         </div>
     </div>
@@ -341,6 +350,11 @@
             document.getElementById("ifYes").style.display = "block" ;
         } else {
             document.getElementById("ifYes").style.display = "none" ;
+        }
+    }
+    function userHome() {
+        if (confirm("Are you sure you to leave this page? All the data will be cleared accordingly!") === true) {
+            window.location.replace('/userHome')
         }
     }
 
