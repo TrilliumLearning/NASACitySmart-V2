@@ -13,7 +13,6 @@
 
     <script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/file-uploader/5.16.2/all.fine-uploader/all.fine-uploader.min.js"></script>
-    <script type = "text/javascript" src="LayerNameSearch.js"></script>
     <script src="../src/jquery.multi-select.js"></script>
     <script src="../jquery-validation-1.17.0/dist/jquery.validate.js"></script>
     <style>
@@ -24,7 +23,7 @@
             display:inline-block;
         }
         body { padding-top:80px; word-wrap:break-word; }
-        #clear{
+        #cancel{
             background-color: #31a0ba;
             border-radius:4px;
             font-size:14px;
@@ -35,7 +34,7 @@
             float:right;
             margin-right:10px;
         }
-        #clear:hover {
+        #cancel:hover {
             background-color: #ff758f;
             color: white;
         }
@@ -66,14 +65,21 @@
     <div id="container">
         <h1 id="title">User Profile</h1>
         <h2>Basic Form</h2>
-        <div style="display:block" class="generalForm">
+        <div style="display:block; width:111%;" class="generalForm">
             <form id="basic"  class="well form-horizontal">
                 <fieldset>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">User Name</label>
+                        <div class="col-md-8 inputGroupContainer">
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-cloud"></i></span><input id="username" class="form-control" type="text" style="background:WhiteSmoke;" value="<%= user.username%>" readonly></div>
+                            <!--<h4 id="userrole" class="floating-Box"><strong>User Role:&nbsp;&nbsp;</strong></h4>-->
+                        </div>
+                    </div>
                     <div class="form-group">
                         <label class="col-md-4 control-label">First Name</label>
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group">
-                                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span><input id="firstName" name="firstName" placeholder="First Name" class="form-control" required value="" type="text">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span><input id="firstName" name="firstName" placeholder="First Name" class="form-control" value="" type="text">
                             </div>
                         </div>
                     </div>
@@ -81,7 +87,7 @@
                         <label class="col-md-4 control-label">Last Name</label>
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group">
-                                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span><input id="lastName" name="lastName" placeholder="Last Name" class="form-control" required value="" type="text">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-user"></i></span><input id="lastName" name="lastName" placeholder="Last Name" class="form-control"  value="" type="text">
                             </div>
                         </div>
                     </div>
@@ -89,7 +95,7 @@
                         <label class="col-md-4 control-label">Address Line 1</label>
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group">
-                                <span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="addressLine1" name="Address_Line1" placeholder="Address Line 1" class="form-control" required value="" type="text">
+                                <span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="addressLine1" name="Address_Line1" placeholder="Address Line 1" class="form-control" value="" type="text">
                             </div>
                         </div>
                     </div>
@@ -103,37 +109,37 @@
                     <div class="form-group">
                         <label class="col-md-4 control-label">City</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="city" name="City" placeholder="City" class="form-control" required value="" type="text"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="city" name="City" placeholder="City" class="form-control" value="" type="text"></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-4 control-label">State/Province/Region</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="state" name="State_Province_Region" placeholder="State/Province/Region" class="form-control" required value="" type="text"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="state" name="State_Province_Region" placeholder="State/Province/Region" class="form-control" value="" type="text"></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-4 control-label">Postal Code/ZIP</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="postcode" name="PostalCode_ZIP" placeholder="Postal Code/ZIP" class="form-control" required value="" type="text"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="postcode" name="PostalCode_ZIP" placeholder="Postal Code/ZIP" class="form-control" value="" type="text"></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-4 control-label">Country</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="country" name="Country" placeholder="Country" class="form-control" required value="" type="text"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="country" name="Country" placeholder="Country" class="form-control" value="" type="text"></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-4 control-label">Email</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span><input id="email" name="Email" placeholder="Email" class="form-control" required value="" type="text"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span><input id="email" name="Email" placeholder="Email" class="form-control" value="" type="text"></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-4 control-label">Phone Number</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-earphone"></i></span><input id="phoneNumber" name="Phone_Number" placeholder="Phone Number" class="form-control" required value="" type="text"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-earphone"></i></span><input id="phoneNumber" name="Phone_Number" placeholder="Phone Number" class="form-control" value="" type="text"></div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -154,13 +160,6 @@
                         <label class="col-md-4 control-label">Last Modification</label>
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span><input class="form-control" type="text" style="background:WhiteSmoke;" value="<%= user.dateModified %>" readonly></div>
-                            <!--<h4 id="userrole" class="floating-Box"><strong>User Role:&nbsp;&nbsp;</strong></h4>-->
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label">LoginName/Email</label>
-                        <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-cloud"></i></span><input class="form-control" type="text" style="background:WhiteSmoke;" value="<%= user.username%>" readonly></div>
                             <!--<h4 id="userrole" class="floating-Box"><strong>User Role:&nbsp;&nbsp;</strong></h4>-->
                         </div>
                     </div>
@@ -188,19 +187,19 @@
                     <div class="form-group">
                         <label class="col-md-4 control-label">Current Password</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span><input id="currentpassword" name="CurrentPassword"  class="form-control" required value="" type="password"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span><input id="currentpassword" name="CurrentPassword"  class="form-control"  value="" type="password"></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-4 control-label">New Password</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span><input id="newpassword" name="NewPassword" class="form-control" required value="" type="password"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span><input id="newpassword" name="NewPassword" class="form-control" value="" type="password"></div>
                         </div>
                     </div>
                     <div class="form-group">
                         <label class="col-md-4 control-label">Confirm New Password</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span><input id="Confirmpassword" name="ConfirmNewPassword" class="form-control" required value="" type="password"></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-lock"></i></span><input id="Confirmpassword" name="ConfirmNewPassword" class="form-control"  value="" type="password"></div>
                         </div>
                     </div>
                 </fieldset>
@@ -211,12 +210,11 @@
                 <button id="submit" type="submit" value="Submit" form="basic">Submit</button>
             </div>
             <div class="column">
-                <button id="clear" type="reset" onclick="window.location.reload()" value="  Clear  ">Clear</button>
+                <button id="cancel" type="button" onclick="userHome();">Cancel</button>
             </div>
         </div>
     </div>
 </div>
-
 <script>
     var UserName = "<%= user.username %>";
     // console.log( UserName);
@@ -264,6 +262,12 @@
             $("#userMenu").append(DropMenu)
         }
     });
+
+    function userHome() {
+        if (confirm("Are you sure you to leave this page? All the data will be cleared accordingly!") === true) {
+            window.location.replace('/userHome')
+        }
+    }
 
     function checkForm() {
         var oldP=document.getElementById("currentpassword").value;
