@@ -150,8 +150,19 @@
             background-color: #ff758f;
             color:white;
         }
-
-
+        #approve{
+            background-color: #31a0ba;
+            border-radius:4px;
+            font-size:16px;
+            padding:3px 10px 3px 10px;
+            -webkit-transition-duration: 0.4s;
+            transition-duration: 0.4s;
+            color:white;
+            /*margin-right:500px;*/
+            /*position: relative;*/
+            display: inline-block;
+            border-bottom: 1px dotted black;
+        }
     </style>
 
 </head>
@@ -284,6 +295,7 @@
                 </fieldset>
             </form>
         </div>
+        <button id="approve" type="button" data-toggle="tooltip" title="Only for Admin">Approve</button>
         <div class="row">
             <div class="column">
                 <button id="submit" type="submit" value="Submit" form="layer" >Submit</button>
@@ -340,6 +352,41 @@
             document.getElementById("ifYes").style.display = "none" ;
         }
     }
+
+    var photoDiv = $("#photo");
+    photoDiv.empty();
+    var editIDSr = "editIDSr=" + getvalue[2];
+    console.log(editIDSr);
+    $.ajax({
+        url: 'http://localhost:9086/edit',
+        type: 'GET',
+        dataType: 'json',
+        data: editIDSr,
+        success: function (results) {
+            console.log(results);
+            if (!results.error) {
+                globalResults = results;
+                console.log("results: " + globalResults[0].Layer_Uploader);
+
+                var list = [];
+                for (var i = 0; i < globalResults.length; i++) {
+                    var first = {
+                        id: i,
+                        size: 561276,
+                        thumbnailUrl: globalResults[i].Layer_Uploader,
+                        name: globalResults[i].Layer_Uploader_name
+                    };
+                    list.push(first);
+                }
+                // console.log("afwefwe: " + qq.supportedFeatures.imagePreviews === true);
+                // console.log("json object array: " + list[0].thumbnailUrl);
+
+                uploader.addInitialFiles(list);
+            } else {
+                console.log("didn't work :(");
+            }
+        }
+    });
 
     var uploader = new qq.FineUploader({
         element: document.getElementById("uploader"),
@@ -463,9 +510,23 @@
         }
     });
 
-
-
-
+    $("#approve").on("click", function () {
+        if (confirm("Are you sure you would like to approve this data?") === true) {
+           var tID = "tID=" + document.getElementById('Request ID').value;
+           var LUN = "LUN=" + getvalue[13];
+            console.log(LUN);
+            // console.log(tID);
+            $.ajax({
+                url:'http://localhost:9086/approve',
+                type:"GET",
+                dataType:'json',
+                data:tID + '&' + LUN,
+            });
+            // window.location.reload();
+        } else {
+            return false;
+        }
+    });
 
 
 </script>
