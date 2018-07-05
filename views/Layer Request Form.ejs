@@ -216,8 +216,8 @@
                                     <option>Education</option>
                                     <option value="other">Other(Please specify)</option>
                                 </select>
-                                <div id="ifYes" style="display:none;">
-                                    <input type="text" name="Other">
+                                <div id="other1" style="display:none;">
+                                    <input type="text" name="FirstOther">
                                 </div>
                             </div>
                         </div>
@@ -229,7 +229,11 @@
                                 <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-list"></i></span>
                                 <select id="sub" class="selectpicker form-control" name="SecondLayer" value="">
                                     <option value="">SELECT SUBCATEGORY</option>
+                                    <option value="">Other(Please specify)</option>
                                 </select>
+                                <div id="other2" style="display:none;">
+                                    <input type="text" name="SecondOther">
+                                </div>
                             </div>
                         </div>
                     </div>
@@ -347,9 +351,11 @@
     function Check(that){
         console.log(that);
         if (that === "other"){
-            document.getElementById("ifYes").style.display = "block" ;
+            document.getElementById("other1").style.display = "block" ;
+            document.getElementById("other2").style.display = "block" ;
+
         } else {
-            document.getElementById("ifYes").style.display = "none" ;
+            document.getElementById("other1").style.display = "none" ;
         }
     }
     function userHome() {
