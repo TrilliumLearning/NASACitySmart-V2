@@ -1,6 +1,6 @@
 function SearchLayerName(value){
     $.ajax({
-        url: "http://localhost:9086/SearchLayerName",
+        url: "http://localhost:9090/SearchLayerName",
         dataType:"json",
         success: function (results) {
             for(var i = 0; i < results.length; i++) {
