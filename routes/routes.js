@@ -314,7 +314,7 @@ module.exports = function (app, passport) {
     // REQUEST QUERY   =====================
     // =====================================
     app.get('/deleteRow2', isLoggedIn, function(req, res) {
-        del_recov("Deleted", "Deletion failed!", "/dataHistory", req, res);
+        del_recov("Delete", "Deletion failed!", "/dataHistory", req, res);
     });
 
     app.get('/recoverRow2', isLoggedIn, function(req, res){
@@ -530,7 +530,6 @@ module.exports = function (app, passport) {
 
     // show the signup form
     app.get('/signup', isLoggedIn, function (req, res) {
-
         // render the page and pass in any flash data if it exists
         res.render('signup.ejs', {
             user: req.user,
@@ -556,9 +555,8 @@ module.exports = function (app, passport) {
         };
         // console.log(newUser);
         myStat = "INSERT INTO CitySmart.UserLogin ( username, password, userrole, dateCreated, dateModified, createdUser, status) VALUES ( '" + newUser.username + "','" + newUser.password+ "','" + newUser.userrole+ "','" + newUser.dateCreated+ "','" + newUser.dateModified+ "','" + newUser.createdUser + "','" + newUser.status + "');";
-        mylogin = "INSERT INTO CitySmart.UserProfile ( username, firstName, lastName) VALUES ('"+ newUser.username + "','" + newUser.firstName+ "','" + newUser.lastName + "')";
-       console.log(myStat, mylogin);
-        con_CS.query(myStat, mylogin, function (err, rows) {
+        mylogin = "INSERT INTO CitySmart.UserProfile ( username, firstName, lastName) VALUES ('"+ newUser.username + "','" + newUser.firstName+ "','" + newUser.lastName + "');";
+        con_CS.query(myStat + mylogin, function (err, rows) {
             //newUser.id = rows.insertId;
             if (err) {
                 console.log(err);
@@ -600,19 +598,20 @@ module.exports = function (app, passport) {
             status: req.body.status
         };
 
-        myStat = "INSERT INTO UserLogin ( username, password, userrole, dateCreated, dateModified, createdUser, status) VALUES (?,?,?,?,?,?,?)";
-        mylogin = "INSERT INTO UserProfile ( firstName, lastName) VALUES (?,?)";
-        myVal = [newUser.username, newUser.firstName, newUser.lastName, newUser.password, newUser.userrole, newUser.dateCreated, newUser.dateModified, newUser.createdUser, newUser.status];
-        connection.query(myStat, myVal, function (err, rows) {
-
+        myStat = "INSERT INTO CitySmart.UserLogin ( username, password, userrole, dateCreated, dateModified, createdUser, status) VALUES ( '" + newUser.username + "','" + newUser.password+ "','" + newUser.userrole+ "','" + newUser.dateCreated+ "','" + newUser.dateModified+ "','" + newUser.createdUser + "','" + newUser.status + "');";
+        mylogin = "INSERT INTO CitySmart.UserProfile ( username, firstName, lastName) VALUES ('"+ newUser.username + "','" + newUser.firstName+ "','" + newUser.lastName + "');";
+        con_CS.query(myStat + mylogin, function (err, rows) {
             //newUser.id = rows.insertId;
-
             if (err) {
                 console.log(err);
-                res.json({"error": false, "message": "An unexpected error occurred !"});
+                res.json({"error": true, "message": "An unexpected error occurred !"});
                 res.end();
             } else {
-                res.json({"error": false, "message": "Success"});
+                var username = req.body.username;
+                var subject = "Sign Up";
+                var text = 'to sign up an account with this email.';
+                var url = "http://" + req.headers.host + "/verify/";
+                sendToken(username, subject, text, url, res);
             }
         });
     });
@@ -972,20 +971,6 @@ module.exports = function (app, passport) {
     });
     //Request ID//
     app.get('/newRequest', isLoggedIn, function (req, res) {
-        // let myStat = "SELECT userrole FROM Users WHERE username = '" + req.user.username + "';";
-        //
-        // con_CS.query(myStat, function (err, results, fields) {
-        //     //console.log(results);
-        //
-        //     if (!results[0].userrole) {
-        //         console.log("Error");
-        //     } else {
-        //         res.render('userHome.ejs', {
-        //             user: req.user// get the user out of session and pass to template
-        //         });
-        //     }
-        // });
-
         var d = new Date();
         var utcDateTime = d.getUTCFullYear() + "-" + ('0' + (d.getUTCMonth() + 1)).slice(-2) + "-" + ('0' + d.getUTCDate()).slice(-2);
         var queryRID = "SELECT COUNT(RID) AS number FROM Special_ID WHERE RID LIKE '" + utcDateTime + "%';";
@@ -1135,12 +1120,13 @@ module.exports = function (app, passport) {
         })
     });
 
-    app.get('/EditData',function (req,res){
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query("SELECT Full Name, Address Line 1, Address Line 2, City, State/Province/Region, Postal Code/ZIP, Country, Email, Phone Number, Layer Name, Layer Category, Layer Description, Layer Uploader FROM LayerMenu",function (err,results) {
-            if (err) throw err;
-            console.log(results);
-        })
+    app.get('/editdata',function (req,res){
+        // var d = new Date();
+        // var utcDateTime = d.getUTCFullYear() + "-" + ('0' + (d.getUTCMonth() + 1)).slice(-2) + "-" + ('0' + d.getUTCDate()).slice(-2);
+        // var queryRID = "SELECT COUNT(RID) AS number FROM Special_ID WHERE RID LIKE '" + utcDateTime + "%';";
+        res.render('Layer Request Form edit.ejs', {
+            user: req.user
+        });
     });
 
     // =====================================

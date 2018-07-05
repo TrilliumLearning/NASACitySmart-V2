@@ -269,7 +269,9 @@
                     <th>Layer State</th>
                     <th>Layer Country</th>
                     <th>Main Category</th>
+                    <th>Other Main Category</th>
                     <th>Sub Category</th>
+                    <th>Other Sub Category</th>
                     <th>Layer Name</th>
                     <th>Layer Description</th>
                     <th>Layer Format</th>
@@ -291,7 +293,9 @@
                     <th>Layer State</th>
                     <th>Layer Country</th>
                     <th>Main Category</th>
+                    <th>Other Main Category</th>
                     <th>Sub Category</th>
+                    <th>Other Sub Category</th>
                     <th>Layer Name</th>
                     <th>Layer Description</th>
                     <th>Layer Format</th>
@@ -371,7 +375,7 @@
 
             for (var i = 0; i < scoutingRowSelected.length; i++) {
 //                console.log("rowSelected[" + i + "][0]: " + rowSelected[i][0]);
-                scoutingTransactionID.push(scoutingRowSelected[i][1]);
+                scoutingTransactionID.push(scoutingRowSelected[i][2]);
             }
         });
 
@@ -391,9 +395,7 @@
                 var getvalue = table.rows('.selected').data();
                 // console.log(getvalue);
                 localStorage.setItem("getvalue", JSON.stringify(getvalue[0]));
-                // alert(getvalue[i][0]);
-                // alert(getvalue[i][4]);
-                window.location.replace('../home/Layer Request form.html');
+                window.location.replace('/editdata');
                 // console.log(localStorage.getItem("getvalue"));
             }
         });
@@ -446,7 +448,7 @@
                 success: function (results) {
                     console.log(results);
                     for (var i = 0; i < results.length; i++) {
-                        if (results[i].Status === "Active") {
+                        if(results[i].Status === "Active" || results[i].Status === "Pending") {
                             if (UserRole === "Regular") {
                                 if (results[i].UID === username) {
                                     table.row.add([
@@ -458,7 +460,9 @@
                                         results[i].CityName,
                                         results[i].StateName,
                                         results[i].FirstLayer,
+                                        results[i].FirstOther,
                                         results[i].SecondLayer,
+                                        results[i].SecondOther,
                                         results[i].ThirdLayer,
                                         results[i].Layer_Description,
                                         results[i].Layer_Uploader,
@@ -477,7 +481,9 @@
                                     results[i].CityName,
                                     results[i].StateName,
                                     results[i].FirstLayer,
+                                    results[i].FirstOther,
                                     results[i].SecondLayer,
+                                    results[i].SecondOther,
                                     results[i].ThirdLayer,
                                     results[i].Layer_Description,
                                     results[i].Layer_Uploader,

@@ -257,11 +257,11 @@
     <a href="//aworldbridge.com"><img class="banner" src="/pic/NewWBBanner.jpg" /></a>
     <br><br>
     <div class="page-header text-center">
-        <h1><span class="fa fa-anchor"></span> FAW Project -  Search History </h1>
+        <h1><span class="fa fa-anchor"></span> Search History </h1>
         <h4><span class="fa fa-user"></span>&nbsp;<strong>Account Name</strong>: <%= user.username %></h4>
         <br>
         <a href="/userhome" class="btn btn-default btn-lg">User Home</a>&nbsp;&nbsp;
-        <a href="/recovery2" id="restoreButton" class="btn btn-default btn-lg" type="button">Recovery</a>&nbsp;&nbsp;
+        <a href="/recovery2" id="restoreButton" class="btn btn-default btn-lg" type="button">Restore</a>&nbsp;&nbsp;
         <div class="dropdown floating-Box">
             <button class="btn btn-primary btn-lg" type="button" data-toggle="dropdown" id="Username">
                 <%= firstName %>
@@ -358,6 +358,7 @@
             <option value="">Select the status</option>
             <option value="Active">Active</option>
             <option value="Delete">Delete</option>
+            <option value="Pending">Pending</option>
         </select>
     </div><br>
     <div class="center">
@@ -466,7 +467,7 @@
 
             $(this).toggleClass('selected');    //toggle class for the rows selected
             $(this).toggleClass('change');    //toggle class change color
-            changeColor();
+            // changeColor();
 
             rowSelected = table.rows('.selected').data();    //Store all the data for selected rows'
 
@@ -476,7 +477,7 @@
 
             for (var i = 0; i < rowSelected.length; i ++) {
 //                console.log("rowSelected[" + i + "][0]: " + rowSelected[i][0]);
-                transactionID.push(rowSelected[i][0]);
+                transactionID.push(rowSelected[i][1]);
             }
         });
 
@@ -503,7 +504,7 @@
         $("#deleteButton").on("click", function () {
             if (confirm("Are you sure you would like to delete this row(s)?") === true) {
                 var transactionIDStr = "transactionIDStr=" + transactionID.toString();
-                // console.log ("transactionIDStr: " + transactionIDStr);
+                console.log ("transactionIDStr: " + transactionIDStr);
 
                 $.ajax({
                     url: '/deleteRow2',
@@ -512,7 +513,7 @@
                     async: false,
                     data: transactionIDStr,
                     success: function (result) {
-                        window.location.replace('/dataHistory')
+                        // window.location.replace('/dataHistory')
                     }
                 })
             } else { return false;}
@@ -746,25 +747,25 @@
 
     }
 
-    function changeColor() {
-        var row = document.getElementsByClassName("change")[0].innerHTML.trim().split("</td>");
-
-        var latiLong = row[3].substring(4, row[3].length) + "; " + row[4].substring(4, row[4].length);
-
-        for (var i = 0; i < markers.length; i++) {
-            if (markers[i].DMS === latiLong) {
-                if (document.getElementsByClassName("change")[0].classList.contains("selected") && document.getElementsByClassName("change")[0].classList.contains("change")) {
-                    document.getElementsByClassName("change")[0].classList.remove("change");
-                    markers[i].setMap(map);
-                } else if (document.getElementsByClassName("change")[0].classList.contains("change")) {
-                    document.getElementsByClassName("change")[0].classList.remove("change");
-                    markers[i].setMap(null);
-                }
-                break
-            }
-        }
-        //alert(markers.length)
-    }
+    // function changeColor() {
+    //     var row = document.getElementsByClassName("change")[0].innerHTML.trim().split("</td>");
+    //
+    //     var latiLong = row[3].substring(4, row[3].length) + "; " + row[4].substring(4, row[4].length);
+    //
+    //     for (var i = 0; i < markers.length; i++) {
+    //         if (markers[i].DMS === latiLong) {
+    //             if (document.getElementsByClassName("change")[0].classList.contains("selected") && document.getElementsByClassName("change")[0].classList.contains("change")) {
+    //                 document.getElementsByClassName("change")[0].classList.remove("change");
+    //                 markers[i].setMap(map);
+    //             } else if (document.getElementsByClassName("change")[0].classList.contains("change")) {
+    //                 document.getElementsByClassName("change")[0].classList.remove("change");
+    //                 markers[i].setMap(null);
+    //             }
+    //             break
+    //         }
+    //     }
+    //     //alert(markers.length)
+    // }
 
 </script>
 </body>
