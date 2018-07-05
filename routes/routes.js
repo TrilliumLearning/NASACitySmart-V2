@@ -165,75 +165,21 @@ module.exports = function (app, passport) {
 
     app.post('/email', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-        let statement = "SELECT * FROM UserLogin WHERE username = '" + req.body.username + "';";
+        var statement = "SELECT * FROM UserLogin WHERE username = '" + req.body.username + "';";
         //console.log(statement);
 
-        con_CS.query(statement, function (err, results, fields) {
+        connection.query(statement, function (err, results, fields) {
             if (err) {
-                // console.log(err);
+                console.log(err);
                 res.json({"error": true, "message": "An unexpected error occurred !"});
             } else if (results.length === 0) {
                 res.json({"error": true, "message": "Please verify your email address !"});
             } else {
-                async.waterfall([
-                    function(done) {
-                        crypto.randomBytes(20, function(err, buf) {
-                            token = buf.toString('hex');
-                            tokenExpTime();
-                            done(err, token, tokenExpire);
-                        });
-                    },
-                    function (token, tokenExpire, done) {
-                        // con_CS.query( "INSERT INTO Users ( resetPasswordExpires, resetPasswordToken ) VALUES (?,?) WHERE username = '" + req.body,username + "'; ")
-                        myStat = "UPDATE UserLogin SET resetPasswordToken = ?, resetPasswordExpires = ? WHERE username = '" + req.body.username + "' ";
-                        myVal = [token, tokenExpire];
-                        con_CS.query(myStat, myVal, function (err, rows) {
-
-                            //newUser.id = rows.insertId;
-
-                            if (err) {
-                                // console.log(err);
-                                // res.send("Token Insert Fail!");
-                                // res.end();
-                                res.json({"error": true, "message": "Token Insert Fail !"});
-                            } else {
-                                done(err, token);
-                            }
-                        });
-                    },
-                    function(token, done, err) {
-                        // Message object
-                        let message = {
-                            from: 'FTAA <aaaa.zhao@g.feitianacademy.org>', // sender info
-                            to: req.body.username, // Comma separated list of recipients
-                            subject: 'Password Reset', // Subject of the message
-
-                            // plaintext body
-                            text: 'You are receiving this because you (or someone else) have requested the reset of the password for your account.\n\n' +
-                            'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
-                            'http://' + req.headers.host + '/reset/' + token + '\n\n' +
-                            'If you did not request this, please ignore this email and your password will remain unchanged.\n'
-                        };
-
-                        smtpTrans.sendMail(message, function(error){
-                            if(error){
-                                // console.log(error.message);
-                                // alert('Something went wrong! Please double check if your email is valid.');
-                                return;
-                            } else {
-                                // res.send('Message sent successfully! Please check your email inbox.');
-                                // console.log('Message sent successfully!');
-                                // res.redirect('/login');
-                                res.json({"error": false, "message": "Message sent successfully !"});
-                                // alert('An e-mail has been sent to ' + req.body.username + ' with further instructions.');
-                            }
-                        });
-                    }
-                ], function(err) {
-                        if (err) return next(err);
-                        // res.redirect('/forgot');
-                        res.json({"error": true, "message": "An unexpected error occurred !"});
-                });
+                var username = req.body.username;
+                var subject = "Passwprd Reset";
+                var text = 'the reset of the password for your account.';
+                var url = "http://" + req.headers.host + "/reset/";
+                sendToken(username, subject, text, url, res);
             }
         });
     });
@@ -243,10 +189,10 @@ module.exports = function (app, passport) {
 
         myStat = "SELECT * FROM UserLogin WHERE resetPasswordToken = '" + req.params.token + "'";
 
-        con_CS.query(myStat, function(err, user) {
+        connection.query(myStat, function(err, user) {
             dateNtime();
 
-            if (!user || dateTime > user[0].resetPasswordExpires) {
+            if (!user || dateTime > user[0].expires) {
                 res.send('Password reset token is invalid or has expired. Please contact Administrator.');
             } else {
                 res.render('reset.ejs', { user: user[0]});
@@ -256,55 +202,40 @@ module.exports = function (app, passport) {
 
     app.post('/reset/:token', function(req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-
         async.waterfall([
             function(done) {
 
-                myStat = "SELECT * FROM UserLogin WHERE resetPasswordToken = '" + req.params.token + "'";
+                myStat = "SELECT * FROM Users WHERE token = '" + req.params.token + "'";
 
-                con_CS.query(myStat, function(err, user) {
-                    let userInfo = JSON.stringify(user, null, "\t");
+                connection.query(myStat, function(err, user) {
+                    var userInfo = JSON.stringify(user, null, "\t");
 
                     if (!user) {
-                        res.send('Password reset token is invalid or has expired. Please contact Administrator.');
+                        res.json({"error": true, 'message': 'Password reset token is invalid or has expired. Please contact Administrator.'});
                     } else {
-                        let newPass = {
+                        var newPass = {
                             Newpassword: bcrypt.hashSync(req.body.newpassword, null, null),
                             ConfirmPassword: bcrypt.hashSync(req.body.Confirmpassword, null, null)
                         };
 
-                        let passReset = "UPDATE UserLogin SET password = '" + newPass.Newpassword + "' WHERE username = '" + req.body.username + "'";
+                        var passReset = "UPDATE Users SET password = '" + newPass.Newpassword + "' WHERE username = '" + req.body.username + "'";
 
-                        con_CS.query(passReset, function (err, rows) {
+                        connection.query(passReset, function (err, rows) {
                             if (err) {
                                 console.log(err);
-                                res.send("New Password Insert Fail!");
+                                res.json({"error": true, "message": "New Password Insert Fail!"});
                             } else {
-                                done()
+                                var username = req.body.username;
+                                var subject = "Your password has been changed";
+                                var text = 'Hello,\n\n' + 'This is a confirmation that the password for your account, ' + changeMail(username) + ' has just been changed.\n';
+                                done(err, username, subject, text);
                             }
                         });
                     }
 
                 });
-            }, function(user, done, err) {
-
-                let message = {
-                    from: 'FTAA <aaaa.zhao@g.feitianacademy.org>',
-                    to: req.body.username,
-                    subject: 'Your password has been changed',
-                    text: 'Hello,\n\n' +
-                    'This is a confirmation that the password for your account, ' + changeMail(req.body.username) + ' has just been changed.\n'
-                };
-
-                smtpTrans.sendMail(message, function (error) {
-                    if(error){
-                        console.log(error.message);
-                        // alert('Something went wrong! Please double check if your email is valid.');
-                        return;
-                    } else {
-                        res.redirect('/login');
-                    }
-                });
+            }, function(username, subject, text) {
+                successMail(username, subject, text, res);
             }
         ]);
     });
@@ -316,16 +247,8 @@ module.exports = function (app, passport) {
         res.redirect('/login');
     });
 
-    //mover folder
-    fs.rename('./a/exampleFile.png', './b/exampleFile.png', function (err) {
-        if (err) {
-            console.log(err);
-        } else {
-            console.log("success");
-        }
-    });
 
-    // mv('./b/exampleFile.png', './a/exampleFile.png', function (err) {
+    // mv('./b/example.png', './a/example.png', function (err) {
     //     if (err) {
     //         console.log(err);
     //     } else {
@@ -611,24 +534,101 @@ module.exports = function (app, passport) {
             dateModified: req.body.dateCreated,
             status: req.body.status
         };
+        // console.log(newUser);
+        myStat = "INSERT INTO CitySmart.UserLogin ( username, password, userrole, dateCreated, dateModified, createdUser, status) VALUES ( '" + newUser.username + "','" + newUser.password+ "','" + newUser.userrole+ "','" + newUser.dateCreated+ "','" + newUser.dateModified+ "','" + newUser.createdUser + "','" + newUser.status + "');";
+        mylogin = "INSERT INTO CitySmart.UserProfile ( username, firstName, lastName) VALUES ('"+ newUser.username + "','" + newUser.firstName+ "','" + newUser.lastName + "')";
+       console.log(myStat, mylogin);
+        con_CS.query(myStat, mylogin, function (err, rows) {
+            //newUser.id = rows.insertId;
+            if (err) {
+                console.log(err);
+                res.json({"error": true, "message": "An unexpected error occurred !"});
+                res.end();
+            } else {
+                var username = req.body.username;
+                var subject = "Sign Up";
+                var text = 'to sign up an account with this email.';
+                var url = "http://" + req.headers.host + "/verify/";
+                sendToken(username, subject, text, url, res);
+            }
+        });
+    });
 
-        myStat = "INSERT INTO UserLogin ( username, password, userrole, dateCreated, dateModified, createdUser, status) VALUES (?,?,?,?,?,?,?)";
-        mylogin = "INSERT INTO UserProfile ( firstName, lastName) VALUES (?,?)";
+        // show the addUser form
+        app.get('/addUser', isLoggedIn, function (req, res) {
+            // render the page and pass in any flash data if it exists
+            res.render('addUser.ejs', {
+                user: req.user,
+                message: req.flash('addUserMessage')
+            });
+        });
+
+    app.post('/addUser', isLoggedIn, function (req, res) {
+
+        res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+        // connection.query('USE ' + config.Login_db); // Locate Login DB
+
+        var newUser = {
+            username: req.body.username,
+            firstName: req.body.firstName,
+            lastName: req.body.lastName,
+            password: bcrypt.hashSync(req.body.password, null, null),  // use the generateHash function
+            userrole: req.body.userrole,
+            dateCreated: req.body.dateCreated,
+            createdUser: req.body.createdUser,
+            dateModified: req.body.dateCreated,
+            status: req.body.status
+        };
+
+        myStat = "INSERT INTO Users ( username, firstName, lastName, password, userrole, dateCreated, dateModified, createdUser, status) VALUES (?,?,?,?,?,?,?,?,?)";
         myVal = [newUser.username, newUser.firstName, newUser.lastName, newUser.password, newUser.userrole, newUser.dateCreated, newUser.dateModified, newUser.createdUser, newUser.status];
-        con_CS.query(myStat, myVal, mylogin, function (err, rows) {
+        connection.query(myStat, myVal, function (err, rows) {
 
             //newUser.id = rows.insertId;
 
             if (err) {
                 console.log(err);
-                res.send("New User Insert Fail!");
+                res.json({"error": false, "message": "An unexpected error occurred !"});
                 res.end();
             } else {
-                res.render('userHome1.ejs', {
-                    user: req.user // get the user out of session and pass to template
-                });
+                res.json({"error": false, "message": "Success"});
             }
         });
+    });
+
+    app.get('/verify/:token', function(req, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+
+        async.waterfall([
+            function(done) {
+                myStat = "SELECT * FROM UserLogin WHERE resetPasswordToken = '" + req.params.token + "'";
+                connection.query(myStat, function(err, results) {
+                    dateNtime();
+
+                    if (results.length === 0 || dateTime > results[0].expires) {
+                        res.send('Password reset token is invalid or has expired. Please contact Administrator.');
+                    } else {
+                        done(err, results[0].username);
+                    }
+                });
+            }, function(username, done) {
+                myStat = "UPDATE UserLogin SET status = 'Never Logged In' WHERE username = '" + username + "';";
+
+                connection.query(myStat, function(err, user) {
+                    if (err) {
+                        console.log(err);
+                        res.send("An unexpected error occurred !");
+                    } else {
+                        var subject = "Account Activated";
+                        var text = 'Hello,\n\n' + 'This is a confirmation for your account, ' + changeMail(username) + ' has just been activated.\n';
+                        done(err, username, subject, text);
+                    }
+
+                });
+            }, function(username, subject, text) {
+                successMail(username, subject, text, res);
+            }
+        ]);
     });
 
     // Filter by search criteria
@@ -884,13 +884,13 @@ module.exports = function (app, passport) {
 
         }
         let newImage = {
-            Layer_Uploader: "http://localhost:9086/uploadfiles/" + responseDataUuid,
+            Layer_Uploader: "http://localhost:9086/a/" + responseDataUuid,
             Layer_Uploader_name: responseDataUuid
         };
         name += ", Layer_Uploader, Layer_Uploader_name";
         value += ", '" + newImage.Layer_Uploader + "','" +newImage.Layer_Uploader_name + "'";
 
-        let filepathname = "http://localhost:9086/uploadfiles/" + responseDataUuid ;
+        let filepathname = "http://localhost:9086/a/" + responseDataUuid ;
 
         let statement1 = "INSERT INTO CitySmart.New_Users (" + name + ") VALUES (" + value + ");";
         console.log(statement1);
@@ -953,40 +953,53 @@ module.exports = function (app, passport) {
 
     app.get('/approve',function (req,res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
-        let approveIDStr = req.query.tID.split(',');
+
+        let approveIDStr = req.query.tID;
+        let approvepictureStr = req.query.LUN.split(',');
+        console.log(approvepictureStr);
         console.log(approveIDStr);
-        for(let i = 0; i < approveIDStr.length; i++) {
-            let statement = "UPDATE CitySmart.Request_Form SET Status = 'Active' WHERE RID = '" + approveIDStr[i] + "'";
-            console.log(statement);
+        let statement = "UPDATE CitySmart.Request_Form SET Status = 'Active' WHERE RID = '" + approveIDStr + "'";
+        for(let i = 0; i < approvepictureStr.length; i++) {
+            console.log("'./a/" + approvepictureStr + "'");
+            //mover folder
+            fs.rename("./a/" + approvepictureStr[i] + "" , "./b/" + approvepictureStr[i] + "", function (err) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    console.log("success");
+                }
+            });
+            // console.log(statement);
             con_CS.query(statement, function (err, results) {
                 if (err) throw err;
                 res.json(results[i]);
             });
         }
+
     });
     //
-    // //Put back the photo in the form
-    // app.get('/edit', function (req, res) {
-    //     res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-    //     let editIDSr = req.query.editIDSr;
-    //     // console.log(editIDSr);
-    //     let myStat = "SELECT Layer_Uploader, Layer_Uploader_name FROM LayerMenu WHERE RID = '" + editIDSr + "'";
-    //     // console.log(myStat);
-    //
-    //     let filePath0;
-    //     con_CS.query(myStat, function (err, results) {
-    //         // console.log("query statement : " + myStat);
-    //         if (!results[0].Layer_Uploader && !results[0].Layer_Uploader_name) {
-    //             console.log("Error");
-    //         } else {
-    //             filePath0 = results[0];
-    //             let JSONresult = JSON.stringify(results, null, "\t");
-    //             // console.log(JSONresult);
-    //             res.send(JSONresult);
-    //             res.end()
-    //         }
-    //     });
-    // });
+    //Put back the photo in the form
+    app.get('/edit', function (req, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+        let editIDSr = req.query.editIDSr;
+        console.log(editIDSr);
+        let myStat = "SELECT Layer_Uploader, Layer_Uploader_name FROM Request_Form WHERE RID = '" + editIDSr + "'";
+        console.log(myStat);
+
+        let filePath0;
+        con_CS.query(myStat, function (err, results) {
+            // console.log("query statement : " + myStat);
+            if (!results[0].Layer_Uploader && !results[0].Layer_Uploader_name) {
+                console.log("Error");
+            } else {
+                filePath0 = results[0];
+                let JSONresult = JSON.stringify(results, null, "\t");
+                console.log(JSONresult);
+                res.send(JSONresult);
+                res.end()
+            }
+        });
+    });
 
     //Delete button
     app.get('/deleteData', function(req, res) {
@@ -1963,7 +1976,7 @@ function onDeleteFile(req, res) {
     res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
 
     let uuid = req.params.uuid,
-        dirToDelete = "uploadfiles/" + uuid;
+        dirToDelete = "a/" + uuid;
     console.log(uuid);
     rimraf(dirToDelete, function(error) {
         if (error) {
@@ -2010,7 +2023,7 @@ function moveFile(destinationDir, sourceFile, destinationFile, success, failure)
 function moveUploadedFile(file, uuid, success, failure) {
     console.log("this is: " + uuid);
     // let destinationDir = uploadedFilesPath + uuid + "/",
-    let destinationDir = "uploadfiles/",
+    let destinationDir = "a/",
         fileDestination = destinationDir + uuid + "_" + file.name;
 
     moveFile(destinationDir, file.path, fileDestination, success, failure);
@@ -2078,4 +2091,82 @@ function getChunkFilename(index, count) {
         zeros = new Array(digits + 1).join("0");
 
     return (zeros + index).slice(-digits);
+}
+
+function sendToken(username, subject, text, url, res) {
+    async.waterfall([
+        function(done) {
+            crypto.randomBytes(20, function(err, buf) {
+                token = buf.toString('hex');
+                tokenExpTime();
+                done(err, token, tokenExpire);
+            });
+        },
+        function (token, tokenExpire, done) {
+            // connection.query( "INSERT INTO Users ( resetPasswordExpires, resetPasswordToken ) VALUES (?,?) WHERE username = '" + req.body,username + "'; ")
+            myStat = "UPDATE UserLogin SET resetPasswordToken = ?, resetPasswordExpires = ? WHERE username = '" + username + "' ";
+            myVal = [token, tokenExpire];
+            con_CS.query(myStat, myVal, function (err, rows) {
+
+                //newUser.id = rows.insertId;
+
+                if (err) {
+                    console.log(err);
+                    // res.send("Token Insert Fail!");
+                    // res.end();
+                    res.json({"error": true, "message": "Token Insert Fail !"});
+                } else {
+                    done(err, token);
+                }
+            });
+        },
+        function(token, done, err) {
+            // Message object
+            var message = {
+                from: 'FTAA <aaaa.zhao@g.feitianacademy.org>', // sender info
+                to: username, // Comma separated list of recipients
+                subject: subject, // Subject of the message
+
+                // plaintext body
+                text: 'You are receiving this because you (or someone else) have requested ' + text + '\n\n' +
+                'Please click on the following link, or paste this into your browser to complete the process:\n\n' +
+                url + token + '\n\n' +
+                'If you did not request this, please ignore this email.\n'
+            };
+
+            smtpTrans.sendMail(message, function(error){
+                if(error){
+                    console.log(error.message);
+                    res.json({"error": true, "message": "An unexpected error occurred !"});
+                } else {
+                    // res.send('Message sent successfully! Please check your email inbox.');
+                    console.log('Message sent successfully!');
+                    // res.redirect('/login');
+                    res.json({"error": false, "message": "Message sent successfully !"});
+                    // alert('An e-mail has been sent to ' + req.body.username + ' with further instructions.');
+                }
+            });
+        }
+    ], function(err) {
+        if (err) return next(err);
+        // res.redirect('/forgot');
+        res.json({"error": true, "message": "An unexpected error occurred !"});
+    });
+}
+
+function successMail(username, subject, text, res) {
+    var message = {
+        from: 'FTAA <aaaa.zhao@g.feitianacademy.org>',
+        to: username,
+        subject: subject,
+        text: text
+    };
+
+    smtpTrans.sendMail(message, function (error) {
+        if(error){
+            console.log(error.message);
+        } else {
+            res.render('success.ejs', {});
+        }
+    });
 }

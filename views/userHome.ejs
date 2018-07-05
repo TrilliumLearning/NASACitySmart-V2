@@ -261,6 +261,7 @@
             <table id="dataDisplay">
                 <thead>
                 <tr>
+                    <th>Date</th>
                     <th>UID</th>
                     <th>RID</th>
                     <th>Layer Type</th>
@@ -271,6 +272,7 @@
                     <th>Sub Category</th>
                     <th>Layer Name</th>
                     <th>Layer Description</th>
+                    <th>Layer Format</th>
                     <th>Layer Uploader</th>
                     <th>Layer Uploader Name</th>
                     <th>Status</th>
@@ -281,6 +283,7 @@
                 </tbody>
                 <tfoot>
                 <tr>
+                    <th>Date</th>
                     <th>UID</th>
                     <th>RID</th>
                     <th>Layer Type</th>
@@ -291,6 +294,7 @@
                     <th>Sub Category</th>
                     <th>Layer Name</th>
                     <th>Layer Description</th>
+                    <th>Layer Format</th>
                     <th>Layer Uploader</th>
                     <th>Layer Uploader Name</th>
                     <th>Status</th>
@@ -446,6 +450,7 @@
                             if (UserRole === "Regular") {
                                 if (results[i].UID === username) {
                                     table.row.add([
+                                        results[i].Date,
                                         results[i].UID,
                                         results[i].RID,
                                         results[i].LayerCategory,
@@ -457,12 +462,14 @@
                                         results[i].ThirdLayer,
                                         results[i].Layer_Description,
                                         results[i].Layer_Uploader,
+                                        results[i].LayerFormat,
                                         results[i].Layer_Uploader_name,
                                         results[i].Status
                                     ]).draw(false);
                                 }
                             } else {
                                 table.row.add([
+                                    results[i].Date,
                                     results[i].UID,
                                     results[i].RID,
                                     results[i].LayerCategory,
@@ -474,6 +481,7 @@
                                     results[i].ThirdLayer,
                                     results[i].Layer_Description,
                                     results[i].Layer_Uploader,
+                                    results[i].LayerFormat,
                                     results[i].Layer_Uploader_name,
                                     results[i].Status
                                 ]).draw(false);

@@ -296,23 +296,23 @@
         },
         callbacks: {
             onComplete: function (id, name, responseJSON) {
-                // alert(responseJSON.newuuid);
-                // alert(id + "      " + name);
+                alert(responseJSON.newuuid);
+                alert(id + "      " + name);
                 uploader.setUuid(id, responseJSON.newuuid);
-                // $.ajax({
-                //     url: '/submit',
-                //     type: 'POST',
-                //     dataType: 'json',
-                //     async: false,
-                //     success: function (product) {
-                //         if (!product.error) {
-                //             globalPaths = product;
-                //             console.log("results: " + globalPaths[0].Damage_photo);
-                //         } else {
-                //             console.log("you're gonna have a bad time");
-                //         }
-                //     }
-                // })
+                $.ajax({
+                    url: '/submit',
+                    type: 'POST',
+                    dataType: 'json',
+                    async: false,
+                    success: function (product) {
+                        if (!product.error) {
+                            globalPaths = product;
+                            console.log("results: " + globalPaths[0].Damage_photo);
+                        } else {
+                            console.log("you're gonna have a bad time");
+                        }
+                    }
+                })
             }
         },
         validation:{
