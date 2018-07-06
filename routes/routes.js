@@ -713,7 +713,7 @@ module.exports = function (app, passport) {
                 adj: req.query.Phone_Number
             }
         ];
-        console.log(req.query.Phone_Number);
+        // console.log(req.query.status);
         QueryStat(myQuery, myStat, res);
 
         // function userQuery() {
@@ -945,15 +945,6 @@ module.exports = function (app, passport) {
             }
         }
 
-        let newImage = {
-            Layer_Uploader: "http://localhost:9086/uploadfiles/" + responseDataUuid,
-            Layer_Uploader_name: responseDataUuid
-        };
-        name += ", Layer_Uploader, Layer_Uploader_name";
-        value += ", '" + newImage.Layer_Uploader + "','" + newImage.Layer_Uploader_name + "'";
-        let filepathname = "http://localhost:9086/uploadfiles/" + responseDataUuid;
-
-
         let statement2 = "INSERT INTO CitySmart.Request_Form (" + name + ") VALUES (" + value + ");";
         console.log(statement2);
 
@@ -1047,15 +1038,14 @@ module.exports = function (app, passport) {
 
     app.get('/approve',function (req,res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
-
         let approveIDStr = req.query.tID;
         let approvepictureStr = req.query.LUN.split(',');
-        console.log(approvepictureStr);
-        console.log(approveIDStr);
+        let approveinformation = req.query.data;
         let statement = "UPDATE CitySmart.Request_Form SET Status = 'Active' WHERE RID = '" + approveIDStr + "'";
+//UPDATE `CitySmart`.`Request_Form` SET `Layer_Description`='Description1232' WHERE `RID`='201806270002';
+
+       //mover folder
         for(let i = 0; i < approvepictureStr.length; i++) {
-            console.log("'./a/" + approvepictureStr + "'");
-            //mover folder
             fs.rename("./a/" + approvepictureStr[i] + "" , "./b/" + approvepictureStr[i] + "", function (err) {
                 if (err) {
                     console.log(err);
@@ -1069,6 +1059,35 @@ module.exports = function (app, passport) {
                 res.json(results[i]);
             });
         }
+
+        // let result = Object.keys(req.body).map(function (key) {
+        //     return [String(key), req.body[key]];
+        // });
+        // res.setHeader("Access-Control-Allow-Origin", "*");
+        //
+        // let name = "";
+        // let valueSubmit = "";
+        //
+        // for(let i = 0; i < result.length; i++){
+        //     if (i === result.length - 1) {
+        //         name += result[i][0];
+        //         valueSubmit += '"' + result[i][1] + '"';
+        //     } else {
+        //         name += result[i][0] + ", ";
+        //         valueSubmit += '"' + result[i][1] + '"' + ", ";
+        //     }
+        // }
+        //
+        // let statement2 = "INSERT INTO CitySmart.Request_Form (" + name + ") VALUES (" + value + ");";
+        // console.log(statement2);
+        //
+        // con_CS.query(statement2, function (err, result) {
+        //     if (err) {
+        //         throw err;
+        //     } else {
+        //         res.json("Connected!")
+        //     }
+        // });
     });
     //
     //Put back the photo in the form
@@ -1897,10 +1916,10 @@ function QueryStat(myObj, scoutingStat, res) {
     let j = 0;
     for (let i = 0; i < myObj.length; i++) {
         //console.log("i = " + i);
-        console.log(!!myObj[i].fieldVal);
+        // console.log(!!myObj[i].fieldVal);
 
         if (!!myObj[i].adj){
-            console.log(i  + "   " + myObj[i].adj);
+            // console.log(i  + "   " + myObj[i].adj);
             // if (i === 3 || i === 4 || i === 5) {
             //     myObj[i].dbCol = myObj[i].dbCol.substring(1, myObj[i].dbCol.length);
             //     myObj[i].table = parseInt(myObj[i].table.substring(0, 1));

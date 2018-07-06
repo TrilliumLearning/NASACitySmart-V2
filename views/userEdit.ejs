@@ -99,7 +99,7 @@
 <div class="container">
     <div class="text-center">
         <a href="//aworldbridge.com"><img class="banner" src="../pic/NewWBBanner.jpg" style="height:147px" /></a>
-        <h1><span class="fa fa-anchor"></span> FAW/Locust - Edit User(s) </h1>
+        <h1><span class="fa fa-anchor"></span>Edit User(s) </h1>
         <h4><span class="fa fa-user"></span>&nbsp;<strong>Account Name</strong>: <%= user.username %></h4><br>
     </div>
 
@@ -195,8 +195,10 @@
     var getvalue = JSON.parse(localStorage.getItem("getvalue"));
     console.log(getvalue);
     document.getElementById('username').value = username;
-    document.getElementById('firstName').value = getvalue[0];
-    document.getElementById('lastName').value = getvalue[1];
+    document.getElementById('firstName').value = getvalue[1];
+    document.getElementById('lastName').value = getvalue[2];
+    document.getElementById('UsErRoLe').value = getvalue[3];
+    document.getElementById('StAtUs').value = getvalue[12];
 
     var password = $("#password");
     var initial = password.is(":checked");
@@ -218,56 +220,57 @@
         }
     }
 
-    var UserRole = "<%= userrole %>";
-    var UserStatus = "<%= status %>"
+    $(document).ready(function() {
 
-    console.log("aefwefaw: "+ "<%= userrole %>");
-    $(document).ready(function(){
 
-        $("#UsErRoLe").val(UserRole);
 
-    function checkForm() {
-        var oldP=document.getElementById("currentpassword").value;
-        var newP=document.getElementById("newpassword").value;
-        var confirmP =document.getElementById("Confirmpassword").value;
+        function checkForm() {
+            var oldP = document.getElementById("currentpassword").value;
+            var newP = document.getElementById("newpassword").value;
+            var confirmP = document.getElementById("Confirmpassword").value;
 
-        if (newP != "") {
-            if(oldP != "" && confirmP != "") {
-                if(oldP != newP) {
-                    if(newP == confirmP) {
-                        alert ("V");
-                        return true;
+            if (newP != "") {
+                if (oldP != "" && confirmP != "") {
+                    if (oldP != newP) {
+                        if (newP == confirmP) {
+                            alert("V");
+                            return true;
+                        } else {
+                            alert("New password are not matched!");
+                            return false;
+                        }
                     } else {
-                        alert("New password are not matched!");
+                        alert("Please try your new password different from old one!");
                         return false;
                     }
                 } else {
-                    alert("Please try your new password different from old one!");
+                    alert("All password fields are required");
                     return false;
                 }
             } else {
-                alert("All password fields are required");
-                return false;
+                return true
             }
-        } else {return true}
-    }
-    $('#editForm').submit(function(e){
-        e.preventDefault();
-        $.ajax({
-            type: "POST",
-            dataType: 'json',
-            url: $(this).attr( 'action' ),
-            data: $(this).serialize(),
-            success: function(res) {
-                console.log(res);
-                if (!res.error) {
-                    window.location.replace(res.message)
-                } else {
-                    window.location.replace('/userManagement')                }
-            }
-        });
+        }
 
-        return false;
+        $('#editForm').submit(function (e) {
+            e.preventDefault();
+            $.ajax({
+                type: "POST",
+                dataType: 'json',
+                url: $(this).attr('action'),
+                data: $(this).serialize(),
+                success: function (res) {
+                    console.log(res);
+                    if (!res.error) {
+                        window.location.replace(res.message)
+                    } else {
+                        window.location.replace('/userManagement')
+                    }
+                }
+            });
+
+            return false;
+        });
     });
 
 

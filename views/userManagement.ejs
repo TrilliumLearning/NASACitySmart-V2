@@ -396,7 +396,7 @@
                 <select id="status">
                     <option value="">Select the status</option>
                     <option value="Active">Active</option>
-                    <option value="NeverLoggedIn">Never Logged In</option>
+                    <option value="Never Logged In">Never Logged In</option>
                     <option value="Suspended">Suspended</option>
                 </select>
             </div>
@@ -540,7 +540,7 @@
                         success: function (result) {
                             console.log(result);
                             if (!result.error) {
-                                // window.location.replace('/userManagement')
+                                window.location.reload()
                             } else {
                                 alert(result.message);
                             }

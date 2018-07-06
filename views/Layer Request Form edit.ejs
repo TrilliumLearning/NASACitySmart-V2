@@ -212,7 +212,7 @@
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group">
                                 <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-list"></i></span>
-                                <select required id="main" class="selectpicker form-control" name="FirstLayer" onchange="ChangeMainCategory(this.value); Check(this.value); " >
+                                <select required id="main" class="selectpicker form-control" name="FirstLayer" onclick="ChangeMainCategory(this.value); Check(this.value); " >
                                     <option value="">SELECT MAIN CATEGORY</option>
                                     <option>Energy</option>
                                     <option>Water</option>
@@ -301,10 +301,9 @@
                 </fieldset>
             </form>
         </div>
-        <button id="approve" type="button" data-toggle="tooltip" title="Only for Admin">Approve</button>
         <div class="row">
             <div class="column">
-                <button id="submit" type="submit" value="Submit" form="layer" >Submit</button>
+                <button id="approve" type="submit" form="layer" data-toggle="tooltip"  title="Only for Admin" onclick="submitForm()">Approve</button>
             </div>
             <div class="column">
                 <button id="clear" type="reset" onclick="window.location.reload()" value="  Clear  ">Clear</button>
@@ -324,7 +323,7 @@
         document.getElementById('User ID').value = getvalue[1];
         document.getElementById('RID').value = getvalue[2];
         document.getElementById('main').value = getvalue[7];
-        document.getElementById('sub').value = getvalue[9];
+        $("#sub").val('getvalue[9]');
         document.getElementById('LayerNameInput').value = getvalue[11];
         document.getElementById('LayerCityInput').value = getvalue[5];
         document.getElementById('LayerStateInput').value = getvalue[6];
@@ -364,7 +363,7 @@
         dataType: 'json',
         data: editIDSr,
         success: function (results) {
-            console.log(results);
+            // console.log(results);
             if (!results.error) {
                 globalResults = results;
                 console.log("results: " + globalResults[0].Layer_Uploader);
@@ -433,18 +432,47 @@
     });
 
     function submitForm () {
+        if (confirm("Are you sure you would like to approve this data?") === true) {
+            var tID = "tID=" + document.getElementById('RID').value;
+            var LUN = "LUN=" + getvalue[13];
+            var data =$("#layer").serialize();
+            // console.log(LUN);
+            console.log(tID);
+            $.ajax({
+              url:'http://localhost:9086/approve',
+                type:"GET",
+                dataType:'json',
+                data:tID + '&' + LUN + '&' + data,
+            });
+          // window.location.replace('/userHome');
+         } else {
+            return false;
+        }
         alert("Submitted!");
-        var data =$("#layer").serialize();
-        console.log($("#layer").serialize());
+    }
+
+    function ChangeMainCategory(Category){
+        var subList = document.getElementById("sub");
+        while (subList.options.length){
+            subList.remove(0);
+        }
         $.ajax({
-            url  : 'http://localhost:9086/submitL',
-            method : "post",
-            data : data,
+            url: "http://localhost:9086/MainCategory",
             dataType: 'json',
-            success : function(d){
-                console.log(d);
+            success:function (results) {
+                // console.log(results);
+                var option;
+                for (var i = 0; i < results.length; i++) {
+                    if (Category === results[i]. FirstLayer) {
+                        option = new Option(results[i].SecondLayer, results[i].SecondLayer);
+                        subList.add(option);
+                        document.getElementById("sub").disabled = false;
+
+                    }
+                }
             }
-        });
+        })
+
     }
 
     // function clearForm(){
@@ -559,25 +587,6 @@
         //ture --> nothing
 
     }
-
-    $("#approve").on("click", function () {
-        if (confirm("Are you sure you would like to approve this data?") === true) {
-           var tID = "tID=" + document.getElementById('RID').value;
-           var LUN = "LUN=" + getvalue[13];
-            console.log(LUN);
-            // console.log(tID);
-            $.ajax({
-                url:'http://localhost:9086/approve',
-                type:"GET",
-                dataType:'json',
-                data:tID + '&' + LUN,
-            });
-            window.location.replace('/userHome');
-        } else {
-            return false;
-        }
-    });
-
 
 </script>
 </body>
