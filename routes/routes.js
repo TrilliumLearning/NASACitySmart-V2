@@ -868,13 +868,13 @@ module.exports = function (app, passport) {
                 });
             }
         });
-        fs.rename("./a/" + approvepictureStr[i] + "" , "./b/" + approvepictureStr[i] + "", function (err) {
-            if (err) {
-                console.log(err);
-            } else {
-                console.log("success");
-            }
-        });
+        // fs.rename("./a/" + approvepictureStr[i] + "" , "./b/" + approvepictureStr[i] + "", function (err) {
+        //     if (err) {
+        //         console.log(err);
+        //     } else {
+        //         console.log("success");
+        //     }
+        // });
     });
 
     // =====================================
@@ -904,21 +904,16 @@ module.exports = function (app, passport) {
                 name += result[i][0] + ", ";
                 valueSubmit += '"' + result[i][1] + '"' + ", ";
             }
-
         }
-        // let newImage = {
-        //     Layer_Uploader: "http://localhost:9086/uploadfiles/" + responseDataUuid,
-        //     Layer_Uploader_name: responseDataUuid
-        // };
-        // name += ", Layer_Uploader, Layer_Uploader_name";
-        // value += ", '" + newImage.Layer_Uploader + "','" +newImage.Layer_Uploader_name + "'";
-        "UPDATE UserLogin SET password = '" + newPass.Newpassword + "' WHERE username = '" + req.body.username + "'";
+        let value = JSON.parse("[" + valueSubmit + "]");
+        console.log(value);
+        // "UPDATE UserLogin SET password = '" + newPass.Newpassword + "' WHERE username = '" + req.body.username + "'";
 
 
-        let statement1 = "UPDATE CitySmart.UserProfile SET '" + name + " = (" + value + ");"
+        let statement1 = "UPDATE CitySmart.UserProfile SET username = ?, firstName = ?, lastName = ?, Address_Line1 = ?, Address_Line2 = ?, State_Province_Region = ?, Country = ?, PostalCode_ZIP = ?, Phone_Number = ?,  WHERE username = '" + req.user.username + "'";
         console.log(statement1);
 
-        con_CS.query(statement1, function (err, result) {
+        con_CS.query(statement1, [value], function (err, result) {
             if (err) {
                 throw err;
             } else {
@@ -1124,13 +1119,13 @@ module.exports = function (app, passport) {
                 res.json(results[i]);
             });
         }
-        fs.rename("./b/" + approvepictureStr[i] + "" , "./a/" + approvepictureStr[i] + "", function (err) {
-            if (err) {
-                console.log(err);
-            } else {
-                console.log("success");
-            }
-        });
+        // fs.rename("./b/" + approvepictureStr[i] + "" , "./a/" + approvepictureStr[i] + "", function (err) {
+        //     if (err) {
+        //         console.log(err);
+        //     } else {
+        //         console.log("success");
+        //     }
+        // });
 
     });
 

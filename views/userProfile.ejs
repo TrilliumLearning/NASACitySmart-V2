@@ -71,7 +71,7 @@
                     <div class="form-group">
                         <label class="col-md-4 control-label">User Name</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-cloud"></i></span><input id="username" class="form-control" type="text" style="background:WhiteSmoke;" value="<%= user.username%>" readonly></div>
+                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-cloud"></i></span><input id="username" class="form-control" type="text" value="<%= user.username%>"></div>
                             <!--<h4 id="userrole" class="floating-Box"><strong>User Role:&nbsp;&nbsp;</strong></h4>-->
                         </div>
                     </div>
@@ -128,12 +128,6 @@
                         <label class="col-md-4 control-label">Country</label>
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-home"></i></span><input id="country" name="Country" placeholder="Country" class="form-control" value="" type="text"></div>
-                        </div>
-                    </div>
-                    <div class="form-group">
-                        <label class="col-md-4 control-label">Email</label>
-                        <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-envelope"></i></span><input id="email" name="Email" placeholder="Email" class="form-control" value="" type="text"></div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -238,7 +232,6 @@
                     document.getElementById('state').value = results[i].State_Province_Region;
                     document.getElementById('postcode').value = results[i].PostalCode_ZIP;
                     document.getElementById('country').value = results[i].Country;
-                    document.getElementById('email').value = results[i].username;
                     document.getElementById('phoneNumber').value = results[i].Phone_Number;
                 }
             }
