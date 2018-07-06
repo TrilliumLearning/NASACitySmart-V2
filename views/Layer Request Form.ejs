@@ -205,7 +205,7 @@
                             <div class="input-group">
                                 <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-list"></i></span>
                                 <select required id="main" class="selectpicker form-control" name="FirstLayer" onchange="ChangeMainCategory(this.value); Check(this.value);"  >
-                                    <option value="">SELECT MAIN CATEGORY</option>
+                                    <option value="Category">SELECT MAIN CATEGORY</option>
                                     <option>Energy</option>
                                     <option>Water</option>
                                     <option>Agriculture</option>
@@ -228,8 +228,8 @@
                             <div class="input-group">
                                 <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-list"></i></span>
                                 <select id="sub" class="selectpicker form-control" name="SecondLayer" value="">
-                                    <option value="">SELECT SUBCATEGORY</option>
-                                    <option value="">Other(Please specify)</option>
+                                    <option value="Category">SELECT SUBCATEGORY</option>
+                                    <option value="other" id="secondOther">Other(Please specify)</option>
                                 </select>
                                 <div id="other2" style="display:none;">
                                     <input type="text" name="SecondOther">
@@ -353,9 +353,10 @@
         if (that === "other"){
             document.getElementById("other1").style.display = "block" ;
             document.getElementById("other2").style.display = "block" ;
-
         } else {
             document.getElementById("other1").style.display = "none" ;
+            document.getElementById("other2").style.display = "none" ;
+
         }
     }
     function userHome() {

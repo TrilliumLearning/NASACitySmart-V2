@@ -149,21 +149,21 @@
                             <!--<h4 id="userrole" class="floating-Box"><strong>User Role:&nbsp;&nbsp;</strong></h4>-->
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" id="dateCreated">
                         <label class="col-md-4 control-label">Date Created</label>
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span><input class="form-control" type="text" style="background:WhiteSmoke;" value="<%= user.dateCreated %>" readonly></div>
                             <!--<h4 id="userrole" class="floating-Box"><strong>User Role:&nbsp;&nbsp;</strong></h4>-->
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" id="lastModification">
                         <label class="col-md-4 control-label">Last Modification</label>
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-time"></i></span><input class="form-control" type="text" style="background:WhiteSmoke;" value="<%= user.dateModified %>" readonly></div>
                             <!--<h4 id="userrole" class="floating-Box"><strong>User Role:&nbsp;&nbsp;</strong></h4>-->
                         </div>
                     </div>
-                    <div class="form-group">
+                    <div class="form-group" id="lastModified">
                         <label class="col-md-4 control-label">Last Modified by</label>
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group"><span class="input-group-addon"><i class="glyphicon glyphicon-star"></i></span><input class="form-control" type="text" style="background:WhiteSmoke;" value="<%= user.username%>" readonly></div>
@@ -178,10 +178,10 @@
             <input type="checkbox" id="password" name="password" onclick="myFunction()">
         </p>
         <div class="generalForm">
-            <form id="pswchange" onsubmit="return checkForm()" style="display:none" class="well form-horizontal">
+            <form id="pswchange" onsubmit="return checkForm()" style="display:none; width:111%;" class="well form-horizontal">
                 <fieldset>
                     <div>
-                        <label style="font-size:18px">Password Change</label>
+                        <label style="font-size:18px;">Password Change</label>
 
                     </div>
                     <div class="form-group">
@@ -245,21 +245,18 @@
         }
     })
 
+
     var UserRole = "<%= user.userrole %>";
-    var DropMenu;
 
     $(document).ready(function(){
         if (UserRole === "Admin") {
-            DropMenu = "<li><a href=\"/userprofile\">Profile</a></li>\n" +
-                "\t\t\t<li><a href=\"/userManagement\">User Management</a></li>\n" +
-                "\t\t\t<li><a href=\"/signout\">Sign Out</a></li>";
-            $("#userMenu").empty();
-            $("#userMenu").append(DropMenu)
+            document.getElementById('dateCreated').style.display = 'block';
+            document.getElementById('lastModification').style.display = 'block';
+            document.getElementById('lastModified').style.display = 'block';
         } else if ( UserRole === "Regular") {
-            DropMenu = "<li><a href=\"/userprofile\">Profile</a></li>\n" +
-                "\t\t\t<li><a href=\"/signout\">Sign Out</a></li>";
-            $("#userMenu").empty();
-            $("#userMenu").append(DropMenu)
+            document.getElementById('dateCreated').style.display = 'none';
+            document.getElementById('lastModification').style.display = 'none';
+            document.getElementById('lastModified').style.display = 'none';
         }
     });
 
