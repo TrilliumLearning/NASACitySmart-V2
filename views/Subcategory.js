@@ -17,16 +17,29 @@ function ChangeMainCategory(Category){
         url: "http://localhost:9086/MainCategory",
         dataType: 'json',
         success:function (results) {
-            var option;
-            for (var i = 0; i < results.length; i++) {
-                if (Category === results[i]. FirstLayer) {
-                    option = new Option(results[i].SecondLayer, results[i].SecondLayer);
-                    subList.add(option);
-                    document.getElementById("sub").disabled = false;
+                var option;
+                for (var i = 0; i < results.length; i++) {
+                    if(results[i].FirstLayer !=="other" ) {
+                    if (Category === results[i].FirstLayer) {
+                        option = new Option(results[i].SecondLayer, results[i].SecondLayer);
+                        subList.add(option);
+                        document.getElementById("sub").disabled = false;
 
+                    }
                 }
             }
-        }
-    })
+    }
+})
 
 }
+$(document).ready(function () {
+    $("#main").change(function () {
+        var val = $(this).val();
+        console.log(val);
+        if (val == "Category") {
+            $("#sub").html("<option value='Category'>SELECT SUBCATEGORY</option>");
+        }else if(val =="other") {
+            $("#sub").html("<option value='other'>Other(Please specify)</option>");
+        }
+    });
+});
