@@ -123,14 +123,9 @@
             margin-top:20px;
             margin-bottom:20px;
         }
-        .column {
-            float:right;
-            position:relative;
-            right:80px;
-            width:10%;
-            padding:10px 40px;
-        }
+
         #clear{
+            float:right;
             background-color: #31a0ba;
             border-radius:4px;
             font-size:16px;
@@ -138,12 +133,14 @@
             -webkit-transition-duration: 0.4s;
             transition-duration: 0.4s;
             color:white;
+            margin-right:10px;
         }
         #clear:hover {
             background-color: #ff758f;
             color: white;
         }
-        #submit{
+        #cancel{
+            float:right;
             background-color: #31a0ba;
             border-radius:4px;
             font-size:16px;
@@ -151,12 +148,15 @@
             -webkit-transition-duration: 0.4s;
             transition-duration: 0.4s;
             color:white;
+            right:80px;
+            margin-right:10px;
         }
-        #submit:hover{
+        #cancel:hover{
             background-color: #ff758f;
             color:white;
         }
         #approve{
+            float:right;
             background-color: #31a0ba;
             border-radius:4px;
             font-size:16px;
@@ -164,10 +164,10 @@
             -webkit-transition-duration: 0.4s;
             transition-duration: 0.4s;
             color:white;
-            /*margin-right:500px;*/
-            /*position: relative;*/
             display: inline-block;
             border-bottom: 1px dotted black;
+            right:80px;
+            margin-right:10px;
         }
     </style>
 
@@ -213,7 +213,7 @@
                             <div class="input-group">
                                 <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-list"></i></span>
                                 <select required id="main" class="selectpicker form-control" name="FirstLayer" onclick="ChangeMainCategory(this.value); Check(this.value); " >
-                                    <option value="">SELECT MAIN CATEGORY</option>
+                                    <option value="S">SELECT MAIN CATEGORY</option>
                                     <option>Energy</option>
                                     <option>Water</option>
                                     <option>Agriculture</option>
@@ -225,7 +225,7 @@
                                     <option value="other">Other(Please specify)</option>
                                 </select>
                                 <div id="ifYes" style="display:none;">
-                                    <input type="text" name="FirstLayer">
+                                    <input type="text" name="FirstLayerOther">
                                 </div>
                             </div>
                         </div>
@@ -235,8 +235,7 @@
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group">
                                 <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-list"></i></span>
-                                <select required id="sub" class="selectpicker form-control" name="SecondLayer">
-                                    <option value="">SELECT SUBCATEGORY</option>
+                                <select required id="sub" class="selectpicker form-control" name="SecondLayer" disabled>
                                 </select>
                             </div>
                         </div>
@@ -302,12 +301,9 @@
             </form>
         </div>
         <div class="row">
-            <div class="column">
-                <button id="approve" type="submit" form="layer" data-toggle="tooltip"  title="Only for Admin" onclick="submitForm()">Approve</button>
-            </div>
-            <div class="column">
-                <button id="clear" type="reset" onclick="window.location.reload()" value="  Clear  ">Clear</button>
-            </div>
+            <button id="cancel" onclick="userHome();">Cancel</button>
+            <button id="approve" type="submit" form="layer" data-toggle="tooltip"  title="Only for Admin" onclick="submitForm()">Approve</button>
+            <button id="clear" type="reset" onclick="window.location.reload()" value="  Clear  ">Clear</button>
         </div>
     </div>
 </div>
@@ -316,14 +312,16 @@
     var UserRole = "<%= user.userrole %>";
     // console.log(UserRole);
     var getvalue = JSON.parse(localStorage.getItem("getvalue"));
-    // console.log(getvalue);
+    console.log(getvalue);
 
     $(document).ready(function() {
         document.getElementById('date').value = getvalue[0];
         document.getElementById('User ID').value = getvalue[1];
         document.getElementById('RID').value = getvalue[2];
         document.getElementById('main').value = getvalue[7];
-        $("#sub").val('getvalue[9]');
+        //sub has problem
+        // document.getElementById('sub').value = getvalue[9];
+        // document.getElementById('sub').innerHTML = getvalue[9];
         document.getElementById('LayerNameInput').value = getvalue[11];
         document.getElementById('LayerCityInput').value = getvalue[5];
         document.getElementById('LayerStateInput').value = getvalue[6];
@@ -342,6 +340,13 @@
 
         });
 
+        $("#main").change(function () {
+            var val = $(this).val();
+            // console.log(val);
+            if (val == "S") {
+                $("#sub").html("<option value='S'>SELECT SUBCATEGORY</option>");
+            }
+        });
     });
 
     function Check(that){
@@ -436,19 +441,26 @@
             var tID = "tID=" + document.getElementById('RID').value;
             var LUN = "LUN=" + getvalue[13];
             var data =$("#layer").serialize();
-            // console.log(LUN);
-            console.log(tID);
+            console.log(tID + '&' + LUN + '&' + data);
             $.ajax({
               url:'http://localhost:9086/approve',
                 type:"GET",
                 dataType:'json',
-                data:tID + '&' + LUN + '&' + data,
+                data:tID + '&' + LUN,
             });
-          // window.location.replace('/userHome');
+            $.ajax({
+                url  : 'http://localhost:9086/replace',
+                method : "post",
+                data : data,
+                dataType: 'json',
+                success : function(d){
+                    console.log(d);
+                }
+            });
+          window.location.replace('/userHome');
          } else {
             return false;
         }
-        alert("Submitted!");
     }
 
     function ChangeMainCategory(Category){
@@ -467,12 +479,17 @@
                         option = new Option(results[i].SecondLayer, results[i].SecondLayer);
                         subList.add(option);
                         document.getElementById("sub").disabled = false;
-
                     }
                 }
             }
         })
 
+    }
+
+    function userHome() {
+        if (confirm("Are you sure you to leave this page? All the data will be cleared accordingly!") === true) {
+            window.location.replace('/userHome')
+        }
     }
 
     // function clearForm(){
@@ -483,61 +500,61 @@
     // }
 
     // Wait for the DOM to be ready
-    $('#layer').validate({
-        // Specify validation rules
-        rules: {
-            // The key name on the left side is the name attribute
-            // of an input field. Validation rules are defined
-            // on the right side
-            Layer_Name: "required",
-            CityName:"required",
-            StateName:"required",
-            CountryName:"required",
-            FirstLayer:"required",
-            SecondLayer:"required",
-            Layer_Description: "required",
-            LayerFormat:"required"
-
-        },
-        // Specify validation error messages
-        messages: {
-            Layer_Name: "Please enter the layer name",
-            CityName:"Please enter the layer city",
-            StateName:"Please enter the layer state",
-            CountryName:"Please enter the layer country",
-            FirstLayer: "Please select the main category",
-            SecondLayer:"Please select the subcategory",
-            Layer_Description: "Please write the description of the layer",
-            LayerFormat:"Please choose your layer format"
-        },
-
-        // invalidHandler: function(event) {
-        //     console.log("5678");
-        //     $(".error").css("color", "red");
-        // },
-
-        // Make sure the form is submitted to the destination defined
-        // in the "action" attribute of the form when valid
-        submitHandler: function (form) {
-            console.log("456");
-            submitForm()
-            // form.ajaxSubmit(function(e){
-            //     console.log("456");
-            //     //
-            //     // var data = $("#basic").formSerialize() + "&" + $("#layer").formSerialize();
-            //     // console.log($("#basic").formSerialize());
-            //     // $.ajax({
-            //     //     url  : 'http://localhost:9086/submit',
-            //     //     method : "post",
-            //     //     data : data,
-            //     //     dataType: 'json',
-            //     //     success : function(d){
-            //     //         console.log(d);
-            //     //     }
-            //     // });
-            // })
-        }
-    });
+    // $('#layer').validate({
+    //     // Specify validation rules
+    //     rules: {
+    //         // The key name on the left side is the name attribute
+    //         // of an input field. Validation rules are defined
+    //         // on the right side
+    //         Layer_Name: "required",
+    //         CityName:"required",
+    //         StateName:"required",
+    //         CountryName:"required",
+    //         FirstLayer:"required",
+    //         SecondLayer:"required",
+    //         Layer_Description: "required",
+    //         LayerFormat:"required"
+    //
+    //     },
+    //     // Specify validation error messages
+    //     messages: {
+    //         Layer_Name: "Please enter the layer name",
+    //         CityName:"Please enter the layer city",
+    //         StateName:"Please enter the layer state",
+    //         CountryName:"Please enter the layer country",
+    //         FirstLayer: "Please select the main category",
+    //         SecondLayer:"Please select the subcategory",
+    //         Layer_Description: "Please write the description of the layer",
+    //         LayerFormat:"Please choose your layer format"
+    //     },
+    //
+    //     // invalidHandler: function(event) {
+    //     //     console.log("5678");
+    //     //     $(".error").css("color", "red");
+    //     // },
+    //
+    //     // Make sure the form is submitted to the destination defined
+    //     // in the "action" attribute of the form when valid
+    //     submitHandler: function (form) {
+    //         console.log("456");
+    //         submitForm()
+    //         // form.ajaxSubmit(function(e){
+    //         //     console.log("456");
+    //         //     //
+    //         //     // var data = $("#basic").formSerialize() + "&" + $("#layer").formSerialize();
+    //         //     // console.log($("#basic").formSerialize());
+    //         //     // $.ajax({
+    //         //     //     url  : 'http://localhost:9086/submit',
+    //         //     //     method : "post",
+    //         //     //     data : data,
+    //         //     //     dataType: 'json',
+    //         //     //     success : function(d){
+    //         //     //         console.log(d);
+    //         //     //     }
+    //         //     // });
+    //         // })
+    //     }
+    // });
 
     function SearchLayerName(value){
         $.ajax({

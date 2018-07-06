@@ -284,11 +284,6 @@ module.exports = function (app, passport) {
         let state2 = "SELECT firstName FROM UserProfile WHERE username = '" + req.user.username + "';";
 
         con_CS.query(myStat + state2, function (err, results, fields) {
-            // let JSONresult = JSON.stringify(results, null, "\t");
-            // let JSONarray = JSON.parse(JSONresult);
-            // console.log(JSONarray);
-            // console.log(results);
-            // console.log(results[1][0].firstName);
             if (!results[0][0].userrole) {
                 console.log("Error2");
             } else if (!results[1][0].firstName) {
@@ -303,7 +298,7 @@ module.exports = function (app, passport) {
     });
 
     app.get('/deleteRow', isLoggedIn, function (req, res) {
-        del_recov("Deleted", "Deletion failed!", "/userHome", req, res);
+        del_recov("Delete", "Deletion failed!", "/userHome", req, res);
     });
 
     app.get('/recoverRow', isLoggedIn, function (req, res) {
@@ -314,7 +309,7 @@ module.exports = function (app, passport) {
     // REQUEST QUERY   =====================
     // =====================================
     app.get('/deleteRow2', isLoggedIn, function (req, res) {
-        del_recov("Deleted", "Deletion failed!", "/dataHistory", req, res);
+        del_recov("Delete", "Deletion failed!", "/dataHistory", req, res);
     });
 
     app.get('/recoverRow2', isLoggedIn, function (req, res) {
@@ -335,7 +330,7 @@ module.exports = function (app, passport) {
         let state2 = "SELECT firstName FROM UserProfile WHERE username = '" + req.user.username + "';";
 
         con_CS.query(state2, function (err, results, fields) {
-            console.log(results);
+            // console.log(results);
             if (!results[0].firstName) {
                 console.log("Error2");
             } else {
@@ -778,7 +773,7 @@ module.exports = function (app, passport) {
         edit_lastName = req.query.Last_Name;
         edit_userrole = req.query.User_Role;
         edit_status = req.query.Status;
-        console.log("1" + edit_city);
+        // console.log("1" + edit_city);
 
         res.json({"error": false, "message": "/editUser"});
     });
@@ -841,7 +836,7 @@ module.exports = function (app, passport) {
         for (let i = 0; i < username.length; i++) {
             if (i === 0) {
                 myStat += " WHERE username = '" + username[i] + "'";
-                console.log(myStat);
+                // console.log(myStat);
                 if (i === username.length - 1) {
                     updateDBNres(myStat, "", "Suspension failed!", "/userManagement", res);
                 }
@@ -857,7 +852,7 @@ module.exports = function (app, passport) {
     app.get('/recovery', isLoggedIn, function (req, res) {
         let state2 = "SELECT firstName FROM UserProfile WHERE username = '" + req.user.username + "';";
         con_CS.query(state2, function (err, results, fields) {
-            console.log(results);
+            // console.log(results);
             if (!results[0].firstName) {
                 console.log("Error2");
             } else {
@@ -879,7 +874,7 @@ module.exports = function (app, passport) {
     app.post('/upload', onUpload);
 
     app.post('/submit', function (req, res) {
-        console.log(req.body);
+        // console.log(req.body);
         let result = Object.keys(req.body).map(function (key) {
             return [String(key), req.body[key]];
         });
@@ -899,16 +894,9 @@ module.exports = function (app, passport) {
             }
 
         }
-        // let newImage = {
-        //     Layer_Uploader: "http://localhost:9086/uploadfiles/" + responseDataUuid,
-        //     Layer_Uploader_name: responseDataUuid
-        // };
-        // name += ", Layer_Uploader, Layer_Uploader_name";
-        // value += ", '" + newImage.Layer_Uploader + "','" +newImage.Layer_Uploader_name + "'";
-
 
         let statement1 = "INSERT INTO CitySmart.New_Users (" + name + ") VALUES (" + value + ");";
-        console.log(statement1);
+        // console.log(statement1);
 
         con_CS.query(statement1, function (err, result) {
             if (err) {
@@ -939,7 +927,7 @@ module.exports = function (app, passport) {
                 valueSubmit += '"' + result[i][1] + '"' + ", ";
             }
         }
-        console.log(valueSubmit);
+        // console.log("??0"+valueSubmit);
         let newImage = {
             Layer_Uploader: "http://localhost:9086/uploadfiles/" + responseDataUuid,
             Layer_Uploader_name: responseDataUuid
@@ -950,7 +938,7 @@ module.exports = function (app, passport) {
 
 
         let statement2 = "INSERT INTO CitySmart.Request_Form (" + name + ") VALUES (" + valueSubmit + ");";
-        console.log(statement2);
+        // console.log(statement2);
 
         con_CS.query(statement2, function (err, result) {
             if (err) {
@@ -988,7 +976,7 @@ module.exports = function (app, passport) {
                             user: req.user, // get the user out of session and pass to template
                             RID: RID
                         });
-                        console.log(RID);
+                        // console.log(RID);
                     }
                 });
             }
@@ -1002,7 +990,7 @@ module.exports = function (app, passport) {
         con_CS.query("SELECT FirstLayer, SecondLayer FROM Request_Form GROUP BY FirstLayer, SecondLayer", function (err, results) {
             if (err) throw err;
             res.json(results);
-            console.log(results);
+            // console.log(results);
         });
     });
 
@@ -1045,11 +1033,10 @@ module.exports = function (app, passport) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         let approveIDStr = req.query.tID;
         let approvepictureStr = req.query.LUN.split(',');
-        let approveinformation = req.query.data;
-        let statement = "UPDATE CitySmart.Request_Form SET Status = 'Active' WHERE RID = '" + approveIDStr + "'";
-//UPDATE `CitySmart`.`Request_Form` SET `Layer_Description`='Description1232' WHERE `RID`='201806270002';
 
-       //mover folder
+        let statement = "UPDATE CitySmart.Request_Form SET Status = 'Active' WHERE RID = '" + approveIDStr + "'";
+
+       // mover folder
         for(let i = 0; i < approvepictureStr.length; i++) {
             fs.rename("./a/" + approvepictureStr[i] + "" , "./b/" + approvepictureStr[i] + "", function (err) {
                 if (err) {
@@ -1064,36 +1051,46 @@ module.exports = function (app, passport) {
                 res.json(results[i]);
             });
         }
-
-        // let result = Object.keys(req.body).map(function (key) {
-        //     return [String(key), req.body[key]];
-        // });
-        // res.setHeader("Access-Control-Allow-Origin", "*");
-        //
-        // let name = "";
-        // let valueSubmit = "";
-        //
-        // for(let i = 0; i < result.length; i++){
-        //     if (i === result.length - 1) {
-        //         name += result[i][0];
-        //         valueSubmit += '"' + result[i][1] + '"';
-        //     } else {
-        //         name += result[i][0] + ", ";
-        //         valueSubmit += '"' + result[i][1] + '"' + ", ";
-        //     }
-        // }
-        //
-        // let statement2 = "INSERT INTO CitySmart.Request_Form (" + name + ") VALUES (" + value + ");";
-        // console.log(statement2);
-        //
-        // con_CS.query(statement2, function (err, result) {
-        //     if (err) {
-        //         throw err;
-        //     } else {
-        //         res.json("Connected!")
-        //     }
-        // });
     });
+
+    app.post('/replace', function (req, res) {
+        let result = Object.keys(req.body).map(function (key) {
+            return [String(key), req.body[key]];
+        });
+        res.setHeader("Access-Control-Allow-Origin", "*");
+
+        let name = "";
+        let valueSubmit = "";
+
+        for (let i = 0; i < result.length; i++) {
+            if (i === result.length - 1) {
+                name += result[i][0];
+                valueSubmit += '"' + result[i][1] + '"';
+            } else {
+                name += result[i][0] + ", ";
+                valueSubmit += '"' + result[i][1] + '"' + ", ";
+            }
+        }
+
+        let newImage = {
+            Layer_Uploader: "http://localhost:9086/uploadfiles/" + responseDataUuid,
+            Layer_Uploader_name: responseDataUuid
+        };
+        name += ", Layer_Uploader, Layer_Uploader_name";
+        valueSubmit += ", '" + newImage.Layer_Uploader + "','" + newImage.Layer_Uploader_name + "'";
+        let filepathname = "http://localhost:9086/uploadfiles/" + responseDataUuid;
+        var valuearray = valueSubmit.split(",");
+        console.log(valuearray);
+        let statement2 = 'UPDATE CitySmart.Request_Form SET Date = ' + valuearray[0] + ', RID = ' + valuearray[1] + ', UID = ' + valuearray[2] + ', FirstLayer = ' + valuearray[3] + ', SecondLayer = ' + valuearray[5] + ', ThirdLayer = ' + valuearray[6] + ', CityName = ' +valuearray[7] + ', StateName = ' + valuearray[8] +  ', CountryName = ' +valuearray[9] + ', Layer_Description = ' + valuearray[10] + ', LayerFormat = ' + valuearray[11] + ', Layer_Uploader = ' + valuearray[12] + ', Layer_Uploader_name = ' + valuearray[13] + 'WHERE RID =' + valuearray[1] + '' ;
+        con_CS.query(statement2, function (err, result) {
+            if (err) {
+                throw err;
+            } else {
+                res.json("Connected!")
+            }
+        });
+    });
+
     //
     //Put back the photo in the form
     app.get('/edit', function (req, res) {
