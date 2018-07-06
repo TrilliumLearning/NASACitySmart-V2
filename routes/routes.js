@@ -119,10 +119,20 @@ module.exports = function (app, passport) {
         credentials: true
     }));
 
+    // =====================================
+    // CS APP Home Section =================
+    // =====================================
+    app.get('/app', function (req, res) {
+        res.render('CitySmartV2.ejs');
+    });
 
     // =====================================
-    // LOGIN PAGE===========================
+    // LOGIN Section =======================
     // =====================================
+
+    app.get('/request', function (req, res) {
+        res.redirect('/login');
+    });
 
     app.get('/', function (req, res) {
         res.redirect('/login');
@@ -166,12 +176,12 @@ module.exports = function (app, passport) {
 
     app.post('/email', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-        var statement = "SELECT * FROM UserLogin WHERE username = '" + req.body.username + "';";
+        let statement = "SELECT * FROM UserLogin WHERE username = '" + req.body.username + "';";
         //console.log(statement);
 
         con_CS.query(statement, function (err, results, fields) {
             if (err) {
-                console.log(err);
+                // console.log(err);
                 res.json({"error": true, "message": "An unexpected error occurred !"});
             } else if (results.length === 0) {
                 res.json({"error": true, "message": "Please verify your email address !"});
@@ -193,7 +203,7 @@ module.exports = function (app, passport) {
         con_CS.query(myStat, function (err, user) {
             dateNtime();
 
-            if (!user || dateTime > user[0].expires) {
+            if (!user || dateTime > user[0].resetPasswordExpires) {
                 res.send('Password reset token is invalid or has expired. Please contact Administrator.');
             } else {
                 res.render('reset.ejs', {user: user[0]});
@@ -203,25 +213,26 @@ module.exports = function (app, passport) {
 
     app.post('/reset/:token', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+
         async.waterfall([
             function (done) {
 
                 myStat = "SELECT * FROM UserLogin WHERE resetPasswordToken = '" + req.params.token + "'";
 
-                con_CS.query(myStat, function(err, user) {
+                con_CS.query(myStat, function (err, user) {
                     let userInfo = JSON.stringify(user, null, "\t");
 
                     if (!user) {
                         res.json({"error": true, 'message': 'Password reset token is invalid or has expired. Please contact Administrator.'});
                     } else {
-                        var newPass = {
+                        let newPass = {
                             Newpassword: bcrypt.hashSync(req.body.newpassword, null, null),
                             ConfirmPassword: bcrypt.hashSync(req.body.Confirmpassword, null, null)
                         };
 
-                        var passReset = "UPDATE Users SET password = '" + newPass.Newpassword + "' WHERE username = '" + req.body.username + "'";
+                        let passReset = "UPDATE UserLogin SET password = '" + newPass.Newpassword + "' WHERE username = '" + req.body.username + "'";
 
-                        connection.query(passReset, function (err, rows) {
+                        con_CS.query(passReset, function (err, rows) {
                             if (err) {
                                 console.log(err);
                                 res.json({"error": true, "message": "New Password Insert Fail!"});
@@ -235,8 +246,25 @@ module.exports = function (app, passport) {
                     }
 
                 });
-            }, function(username, subject, text) {
-                successMail(username, subject, text, res);
+            }, function (user, done, err) {
+
+                let message = {
+                    from: 'FTAA <aaaa.zhao@g.feitianacademy.org>',
+                    to: req.body.username,
+                    subject: 'Your password has been changed',
+                    text: 'Hello,\n\n' +
+                    'This is a confirmation that the password for your account, ' + changeMail(req.body.username) + ' has just been changed.\n'
+                };
+
+                smtpTrans.sendMail(message, function (error) {
+                    if (error) {
+                        console.log(error.message);
+                        // alert('Something went wrong! Please double check if your email is valid.');
+                        return;
+                    } else {
+                        res.redirect('/login');
+                    }
+                });
             }
         ]);
     });
@@ -247,15 +275,6 @@ module.exports = function (app, passport) {
         req.logout();
         res.redirect('/login');
     });
-
-
-    // mv('./b/example.png', './a/example.png', function (err) {
-    //     if (err) {
-    //         console.log(err);
-    //     } else {
-    //         console.log("success");
-    //     }
-    // });
 
     // =====================================
     // USER Home Section ===================
@@ -511,7 +530,6 @@ module.exports = function (app, passport) {
 
     // show the signup form
     app.get('/signup', isLoggedIn, function (req, res) {
-
         // render the page and pass in any flash data if it exists
         res.render('signup.ejs', {
             user: req.user,
@@ -537,9 +555,8 @@ module.exports = function (app, passport) {
         };
         // console.log(newUser);
         myStat = "INSERT INTO CitySmart.UserLogin ( username, password, userrole, dateCreated, dateModified, createdUser, status) VALUES ( '" + newUser.username + "','" + newUser.password+ "','" + newUser.userrole+ "','" + newUser.dateCreated+ "','" + newUser.dateModified+ "','" + newUser.createdUser + "','" + newUser.status + "');";
-        mylogin = "INSERT INTO CitySmart.UserProfile ( username, firstName, lastName) VALUES ('"+ newUser.username + "','" + newUser.firstName+ "','" + newUser.lastName + "')";
-       console.log(myStat, mylogin);
-        con_CS.query(myStat, mylogin, function (err, rows) {
+        mylogin = "INSERT INTO CitySmart.UserProfile ( username, firstName, lastName) VALUES ('"+ newUser.username + "','" + newUser.firstName+ "','" + newUser.lastName + "');";
+        con_CS.query(myStat + mylogin, function (err, rows) {
             //newUser.id = rows.insertId;
             if (err) {
                 console.log(err);
@@ -581,15 +598,13 @@ module.exports = function (app, passport) {
             status: req.body.status
         };
 
-        myStat = "INSERT INTO Users ( username, firstName, lastName, password, userrole, dateCreated, dateModified, createdUser, status) VALUES (?,?,?,?,?,?,?,?,?)";
-        myVal = [newUser.username, newUser.firstName, newUser.lastName, newUser.password, newUser.userrole, newUser.dateCreated, newUser.dateModified, newUser.createdUser, newUser.status];
-        con_CS.query(myStat, myVal, function (err, rows) {
-
+        myStat = "INSERT INTO CitySmart.UserLogin ( username, password, userrole, dateCreated, dateModified, createdUser, status) VALUES ( '" + newUser.username + "','" + newUser.password+ "','" + newUser.userrole+ "','" + newUser.dateCreated+ "','" + newUser.dateModified+ "','" + newUser.createdUser + "','" + newUser.status + "');";
+        mylogin = "INSERT INTO CitySmart.UserProfile ( username, firstName, lastName) VALUES ('"+ newUser.username + "','" + newUser.firstName+ "','" + newUser.lastName + "');";
+        con_CS.query(myStat + mylogin, function (err, rows) {
             //newUser.id = rows.insertId;
-
             if (err) {
                 console.log(err);
-                res.json({"error": false, "message": "An unexpected error occurred !"});
+                res.json({"error": true, "message": "An unexpected error occurred !"});
                 res.end();
             } else {
                 res.json({"error": false, "message": "Success"});
@@ -904,17 +919,16 @@ module.exports = function (app, passport) {
         });
 
     });
+
     //Submit Request form//
     app.post('/submitL', function (req, res) {
         let result = Object.keys(req.body).map(function (key) {
             return [String(key), req.body[key]];
         });
-
         res.setHeader("Access-Control-Allow-Origin", "*");
 
         let name = "";
         let valueSubmit = "";
-        console.log(result);
 
         for (let i = 0; i < result.length; i++) {
             if (i === result.length - 1) {
@@ -1064,7 +1078,6 @@ module.exports = function (app, passport) {
                 res.json(results[i]);
             });
         }
-
     });
     //
     //Put back the photo in the form
@@ -1116,16 +1129,17 @@ module.exports = function (app, passport) {
         })
     });
 
-    app.get('/EditData', function (req, res) {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query("SELECT Full Name, Address Line 1, Address Line 2, City, State/Province/Region, Postal Code/ZIP, Country, Email, Phone Number, Layer Name, Layer Category, Layer Description, Layer Uploader FROM LayerMenu", function (err, results) {
-            if (err) throw err;
-            console.log(results);
-        })
+    app.get('/editdata',function (req,res){
+        // var d = new Date();
+        // var utcDateTime = d.getUTCFullYear() + "-" + ('0' + (d.getUTCMonth() + 1)).slice(-2) + "-" + ('0' + d.getUTCDate()).slice(-2);
+        // var queryRID = "SELECT COUNT(RID) AS number FROM Special_ID WHERE RID LIKE '" + utcDateTime + "%';";
+        res.render('Layer Request Form edit.ejs', {
+            user: req.user
+        });
     });
 
     // =====================================
-    // Gauge SECTION =================
+    // GAUGE SECTION =================
     // =====================================
 
     // app.get('/filterUser', function (req, res) {
@@ -1589,8 +1603,6 @@ module.exports = function (app, passport) {
             let JSONresult = JSON.stringify(result, null, "\t");
 
             res.send(JSONresult);
-            res.end();
-
         });
     });
 
@@ -1632,7 +1644,6 @@ module.exports = function (app, passport) {
                 //console.log(JSONresult);
 
                 res.send(JSONresult);
-                res.end();
             });
         } else if (valueEnergy === "actual") {
             con_EnergyPredic.query('SELECT * FROM "FTAA_Energy"."autogen"."Actual_vs_Prediction"').then(results => {
@@ -1656,7 +1667,6 @@ module.exports = function (app, passport) {
                 //console.log(JSONresult);
 
                 res.send(JSONresult);
-                res.end();
             });
         }
 
@@ -1944,7 +1954,7 @@ module.exports = function (app, passport) {
             errStatus = [{errMsg: ""}];
 
             if (err) {
-                consolef.log(err);
+                console.log(err);
                 errStatus[0].errMsg = "fail";
                 res.send(errStatus);
                 res.end();
