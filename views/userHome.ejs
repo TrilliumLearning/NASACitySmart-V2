@@ -316,7 +316,7 @@
 <script type='text/javascript'>
     var username = "<%= user.username %>";
     // console.log(username);
-    var scoutingRowSelected, trapRowSelected, DropMenu, queryString1, queryString2;
+    var scoutingRowSelected, DropMenu, transactionpicturename;
     var table = $("#dataDisplay").DataTable();
     var UserRole = "<%= user.userrole %>";
     var scoutingTransactionID = [];
@@ -362,7 +362,7 @@
 
         $('#dataDisplay tbody').on('click', 'tr', function () {
             scoutingTransactionID = [];
-
+            transactionpicturename = [];
             $(this).toggleClass('selected');    //toggle class for the rows selected
             // $(this).toggleClass('change');    //toggle class change color
             // changeColor();
@@ -376,6 +376,7 @@
             for (var i = 0; i < scoutingRowSelected.length; i++) {
 //                console.log("rowSelected[" + i + "][0]: " + rowSelected[i][0]);
                 scoutingTransactionID.push(scoutingRowSelected[i][2]);
+                transactionpicturename.push(scoutingRowSelected[i][15])
             }
         });
 
@@ -403,12 +404,13 @@
         $("#deleteButton").on("click", function () {
             if (confirm("Are you sure you would like to delete this row(s)?") === true) {
                 var transactionIDStr = "transactionIDStr=" + scoutingTransactionID.concat(trapTransactionID).toString();
-                console.log("transactionIDStr: " + transactionIDStr);
+                var pictureStr = "pictureStr=" + transactionpicturename.toString();
+
                 $.ajax({
                     url: 'http://localhost:9086/deleteData',
                     type: "GET",
                     dataType: 'json',
-                    data: transactionIDStr
+                    data: transactionIDStr + '&' + pictureStr
                 });
                 window.location.reload();
             } else {

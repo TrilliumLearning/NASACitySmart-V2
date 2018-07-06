@@ -302,7 +302,19 @@ module.exports = function (app, passport) {
     });
 
     app.get('/recoverRow', isLoggedIn, function (req, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*");
         del_recov("Active", "Recovery failed!", "/userHome", req, res);
+        let pictureStr = req.query.pictureStr.split(',');
+        // mover folder
+        for(let i = 0; i < pictureStr.length; i++) {
+            fs.rename("./a/" + pictureStr[i] + "" , "./b/" + pictureStr[i] + "", function (err) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    console.log("success");
+                }
+            });
+        }
     });
 
     // =====================================
@@ -863,13 +875,6 @@ module.exports = function (app, passport) {
                 });
             }
         });
-        fs.rename("./a/" + approvepictureStr[i] + "" , "./b/" + approvepictureStr[i] + "", function (err) {
-            if (err) {
-                console.log(err);
-            } else {
-                console.log("success");
-            }
-        });
     });
 
     // =====================================
@@ -946,12 +951,12 @@ module.exports = function (app, passport) {
         }
         // console.log("??0"+valueSubmit);
         let newImage = {
-            Layer_Uploader: "http://localhost:9086/uploadfiles/" + responseDataUuid,
+            Layer_Uploader: "http://localhost:63342/NASACitySmart-V2/a/" + responseDataUuid,
             Layer_Uploader_name: responseDataUuid
         };
         name += ", Layer_Uploader, Layer_Uploader_name";
         valueSubmit += ", '" + newImage.Layer_Uploader + "','" + newImage.Layer_Uploader_name + "'";
-        let filepathname = "http://localhost:9086/uploadfiles/" + responseDataUuid;
+        let filepathname = "http://localhost:63342/NASACitySmart-V2/a/" + responseDataUuid;
 
 
         let statement2 = "INSERT INTO CitySmart.Request_Form (" + name + ") VALUES (" + valueSubmit + ");";
@@ -1090,22 +1095,36 @@ module.exports = function (app, passport) {
         }
 
         let newImage = {
-            Layer_Uploader: "http://localhost:9086/uploadfiles/" + responseDataUuid,
+            Layer_Uploader: "http://localhost:63342/NASACitySmart-V2/a/" + responseDataUuid,
             Layer_Uploader_name: responseDataUuid
         };
         name += ", Layer_Uploader, Layer_Uploader_name";
         valueSubmit += ", '" + newImage.Layer_Uploader + "','" + newImage.Layer_Uploader_name + "'";
-        let filepathname = "http://localhost:9086/uploadfiles/" + responseDataUuid;
+        let filepathname = "http://localhost:63342/NASACitySmart-V2/a/" + responseDataUuid;
         var valuearray = valueSubmit.split(",");
-        console.log(valuearray);
-        let statement2 = 'UPDATE CitySmart.Request_Form SET Date = ' + valuearray[0] + ', RID = ' + valuearray[1] + ', UID = ' + valuearray[2] + ', FirstLayer = ' + valuearray[3] + ', SecondLayer = ' + valuearray[5] + ', ThirdLayer = ' + valuearray[6] + ', CityName = ' +valuearray[7] + ', StateName = ' + valuearray[8] +  ', CountryName = ' +valuearray[9] + ', Layer_Description = ' + valuearray[10] + ', LayerFormat = ' + valuearray[11] + ', Layer_Uploader = ' + valuearray[12] + ', Layer_Uploader_name = ' + valuearray[13] + 'WHERE RID =' + valuearray[1] + '' ;
-        con_CS.query(statement2, function (err, result) {
-            if (err) {
-                throw err;
-            } else {
-                res.json("Connected!")
-            }
-        });
+        console.log(valuearray[3]);
+        let statement2 = 'UPDATE CitySmart.Request_Form SET Date = ' + valuearray[0] + ', RID = ' + valuearray[1] + ', UID = ' + valuearray[2] + ', FirstLayer = ' + valuearray[3] + ', FirstOther = ' + valuearray[4] + ', SecondLayer = ' + valuearray[5] + ', SecondOther = ' + valuearray[6] + ', LayerName = ' + valuearray[7] + ', CityName = ' +valuearray[8] + ', StateName = ' + valuearray[9] +  ', CountryName = ' +valuearray[10] + ', Layer_Description = ' + valuearray[11] + ', LayerFormat = ' + valuearray[12] +  ' WHERE RID =' + valuearray[1] + ';' ;
+        if(valuearray[3] === '"other"'){
+            console.log("work?");
+            let statement = "INSERT INTO CitySmart.LayerMenu VALUES (" + valuearray[7] + "," + valuearray[0] + "," + valuearray[4] + "," + valuearray[6] + "," + valuearray[7] + "," + valuearray[10] + "," + valuearray[8] + "," + valuearray[9] + ", 'Active');";
+            con_CS.query(statement2 + statement, function (err, result) {
+                if (err) {
+                    throw err;
+                } else {
+                    res.json("Connected!")
+                }
+            });
+        }else{
+            console.log("now?");
+            let statement = "INSERT INTO CitySmart.LayerMenu VALUES (" + valuearray[7] + "," + valuearray[0] + "," + valuearray[3] + "," + valuearray[5] + "," + valuearray[7] + "," + valuearray[10] + "," + valuearray[8] + "," + valuearray[9] + ", 'Active');";
+            con_CS.query(statement2 + statement, function (err, result) {
+                if (err) {
+                    throw err;
+                } else {
+                    res.json("Connected!")
+                }
+            });
+        }
     });
 
     //
@@ -1125,7 +1144,6 @@ module.exports = function (app, passport) {
             } else {
                 filePath0 = results[0];
                 let JSONresult = JSON.stringify(results, null, "\t");
-                console.log(JSONresult);
                 res.send(JSONresult);
                 res.end()
             }
@@ -1136,22 +1154,22 @@ module.exports = function (app, passport) {
     app.get('/deleteData', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         let transactionID = req.query.transactionIDStr.split(',');
-        console.log(transactionID);
+        let pictureStr = req.query.pictureStr.split(',');
         for (let i = 0; i < transactionID.length; i++) {
             let statement = "UPDATE CitySmart.Request_Form SET Status = 'Delete' WHERE RID = '" + transactionID[i] + "'";
-            console.log(statement);
+            fs.rename("./b/" + pictureStr[i] + "" , "./a/" + pictureStr[i] + "", function (err) {
+                if (err) {
+                    console.log(err);
+                } else {
+                    console.log("success");
+                }
+            });
             con_CS.query(statement, function (err, results) {
                 if (err) throw err;
                 res.json(results[i]);
             });
         }
-        fs.rename("./b/" + approvepictureStr[i] + "" , "./a/" + approvepictureStr[i] + "", function (err) {
-            if (err) {
-                console.log(err);
-            } else {
-                console.log("success");
-            }
-        });
+
 
     });
 
