@@ -2,7 +2,7 @@
 <!doctype html>
 <html>
 <head>
-    <title>FAW/Locust Project - User Profile</title>
+	<title>FAW/Locust Project - User Profile</title>
     <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="../css/style_final.css" type="text/css">
     <link rel="stylesheet" href="../css/multi-select.css" media="screen" type="text/css">
@@ -218,28 +218,37 @@
 </div>
 
 <script>
-    var password = $("#password");
-    var initial = password.is(":checked");
-    var change = $("#password_change")[initial ? "removeClass" : "addClass"]("gray");
-    var changeInputs = change.find("input").attr("disabled", !initial);
+    var UserName = "<%= user.username %>";
+    // console.log( UserName);
 
-    password.click(function(){
-        change[this.checked ? "removeClass" : "addClass"]("gray")
-        changeInputs.attr("disabled", !this.checked);
-    });
+    $.ajax({
+        url: "/profile",
+        dataType: 'json',
+        success: function (results) {
+            console.log(results);
+            for(var i =0; i< results.length; i++) {
+                // console.log(results[i].username);
+                if (results[i].username === UserName) {
+
+                    // document.getElementById('Request ID').value = getvalue[1];
+                    document.getElementById('username').value = results[i].username;
+                    document.getElementById('firstName').value = results[i].firstName;
+                    document.getElementById('lastName').value = results[i].lastName;
+                    document.getElementById('addressLine1').value = results[i].Address_Line1;
+                    document.getElementById('addressLine2').value = results[i].Address_Line2;
+                    document.getElementById('city').value = results[i].City;
+                    document.getElementById('state').value = results[i].State_Province_Region;
+                    document.getElementById('postcode').value = results[i].PostalCode_ZIP;
+                    document.getElementById('country').value = results[i].Country;
+                    document.getElementById('email').value = results[i].username;
+                    document.getElementById('phoneNumber').value = results[i].Phone_Number;
+                }
+            }
+        }
+    })
 
     var UserRole = "<%= user.userrole %>";
     var DropMenu;
-
-    function myFunction(){
-        var checkbox = document.getElementById("password");
-        var text = document.getElementById("pswchange");
-        if (checkbox.checked == true){
-            text.style.display = "block";
-        } else{
-            text.style.display = "none";
-        }
-    }
 
     $(document).ready(function(){
         if (UserRole === "Admin") {
@@ -282,6 +291,41 @@
         } else {return true}
     }
 
+    var password = $("#password");
+    var initial = password.is(":checked");
+    var change = $("#password_change")[initial ? "removeClass" : "addClass"]("gray");
+    var changeInputs = change.find("input").attr("disabled", !initial);
+
+    password.click(function(){
+        change[this.checked ? "removeClass" : "addClass"]("gray");
+        changeInputs.attr("disabled", !this.checked);
+    });
+
+    function myFunction(){
+        var checkbox = document.getElementById("password");
+        var text = document.getElementById("pswchange");
+        if (checkbox.checked == true){
+            text.style.display = "block";
+        } else{
+            text.style.display = "none";
+        }
+    }
+
+    $(document).ready(function(){
+        if (UserRole === "Admin") {
+            DropMenu = "<li><a href=\"/userprofile\">Profile</a></li>\n" +
+                "\t\t\t<li><a href=\"/userManagement\">User Management</a></li>\n" +
+                "\t\t\t<li><a href=\"/signout\">Sign Out</a></li>";
+            $("#userMenu").empty();
+            $("#userMenu").append(DropMenu)
+        } else if ( UserRole === "Regular") {
+            DropMenu = "<li><a href=\"/userprofile\">Profile</a></li>\n" +
+                "\t\t\t<li><a href=\"/signout\">Sign Out</a></li>";
+            $("#userMenu").empty();
+            $("#userMenu").append(DropMenu)
+        }
+    });
+
     function submitForm () {
         alert("Submitted!");
         var data = $("#basic").serialize() + "&" + $("#pswchange").serialize();
@@ -296,93 +340,6 @@
             }
         });
     }
-
-    // function submit(e) {
-    //     e.preventDefault();
-    //     $.ajax({
-    //         type: "post",
-    //         url: "http://localhost:9086/submit",
-    //         dataType: 'json',
-    //         data: $("#pswchange").serialize(),
-    //         success: function (result) {
-    //             if (!result.error) {
-    //                 document.getElementById("modal-footer").style.display = "none";
-    //
-    //                 document.getElementById("modal-header").style.backgroundColor = "#5cb85c";
-    //                 document.getElementById("close").innerHTML = "<a href='/userhome'>&times</a>";
-    //
-    //                 document.getElementById("header").innerHTML = "Congratulations, Your Data Entry is Successfully Complete !";
-    //                 document.getElementById("body").innerHTML = "<br>Click X to return to the Home Page.<br>";
-    //
-    //                 document.getElementById("modal").style.display = "block";
-    //             } else {
-    //                 alert(result.message);
-    //             }
-    //         }
-    //     })
-    // }
-
-    // $('#submit').submit(function(e) {
-    //     // Prevent form submission
-    //     e.preventDefault();
-    //
-    //     $.ajax({
-    //         type: "post",
-    //         url: "/userProfile",
-    //         dataType: 'json',
-    //         data: $(this).serialize(),
-    //         success: function (result) {
-    //             if (!result.error) {
-    //                 alert("SUCCESS");
-    //                 window.location.replace('/userHome')
-    //             } else {
-    //                 alert(result.message);
-    //             }
-    //         }
-    //     })
-    // });
-    $(function() {
-        // Initialize form validation on the registration form.
-        // It has the name attribute "registration"
-        $('#basic').validate({
-            // Specify validation rules
-            rules: {
-                // The key name on the left side is the name attribute
-                // of an input field. Validation rules are defined
-                // on the right side
-                firstName:"required",
-                lastName:"required",
-                Address_Line1: "required",
-                City: "required",
-                State_Province_Region: "required",
-                PostalCode_ZIP: "required",
-                Country: "required",
-                Email: {
-                    required: true,
-                    // Specify that email should be validated
-                    // by the built-in "email" rule
-                    email: true
-                },
-                Phone_Number: "required"
-            },
-            // Specify validation error messages
-            messages: {
-                firstName: "Please enter your first name",
-                lastName:"Please enter your last name",
-                Address_Line1: "Please enter your address",
-                City: "Please enter your city",
-                State_Province_Region: "Please enter your state/province/state",
-                PostalCode_ZIP: "Please enter your postal code/ZIP",
-                Country: "Please enter your country",
-                Email: "Please enter a valid email address",
-                Phone_Number: "Please enter your phone number"
-            },
-            submitHandler: function (form) {
-                console.log("123");
-                submitForm()
-            }
-        })
-    })
 
 </script>
 

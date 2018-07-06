@@ -176,7 +176,7 @@ module.exports = function (app, passport) {
 
     app.post('/email', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-        var statement = "SELECT * FROM UserLogin WHERE username = '" + req.body.username + "';";
+        let statement = "SELECT * FROM UserLogin WHERE username = '" + req.body.username + "';";
         //console.log(statement);
 
         con_CS.query(statement, function (err, results, fields) {
@@ -195,37 +195,37 @@ module.exports = function (app, passport) {
         });
     });
 
-    app.get('/reset/:token', function(req, res) {
+    app.get('/reset/:token', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
 
         myStat = "SELECT * FROM UserLogin WHERE resetPasswordToken = '" + req.params.token + "'";
 
-        con_CS.query(myStat, function(err, user) {
+        con_CS.query(myStat, function (err, user) {
             dateNtime();
 
-            if (!user || dateTime > user[0].expires) {
+            if (!user || dateTime > user[0].resetPasswordExpires) {
                 res.send('Password reset token is invalid or has expired. Please contact Administrator.');
             } else {
-                res.render('reset.ejs', { user: user[0]});
+                res.render('reset.ejs', {user: user[0]});
             }
         });
     });
 
-    app.post('/reset/:token', function(req, res) {
+    app.post('/reset/:token', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
 
         async.waterfall([
-            function(done) {
+            function (done) {
 
                 myStat = "SELECT * FROM UserLogin WHERE resetPasswordToken = '" + req.params.token + "'";
 
-                con_CS.query(myStat, function(err, user) {
+                con_CS.query(myStat, function (err, user) {
                     let userInfo = JSON.stringify(user, null, "\t");
 
                     if (!user) {
                         res.json({"error": true, 'message': 'Password reset token is invalid or has expired. Please contact Administrator.'});
                     } else {
-                        var newPass = {
+                        let newPass = {
                             Newpassword: bcrypt.hashSync(req.body.newpassword, null, null),
                             ConfirmPassword: bcrypt.hashSync(req.body.Confirmpassword, null, null)
                         };
@@ -246,7 +246,7 @@ module.exports = function (app, passport) {
                     }
 
                 });
-            }, function(user, done, err) {
+            }, function (user, done, err) {
 
                 let message = {
                     from: 'FTAA <aaaa.zhao@g.feitianacademy.org>',
@@ -257,7 +257,7 @@ module.exports = function (app, passport) {
                 };
 
                 smtpTrans.sendMail(message, function (error) {
-                    if(error){
+                    if (error) {
                         console.log(error.message);
                         // alert('Something went wrong! Please double check if your email is valid.');
                         return;
@@ -291,10 +291,10 @@ module.exports = function (app, passport) {
             // console.log(results[1][0].firstName);
             if (!results[0][0].userrole) {
                 console.log("Error2");
-            } else if(!results[1][0].firstName){
+            } else if (!results[1][0].firstName) {
                 console.log("Error1")
-            }else{
-                res.render('userHome.ejs',  {
+            } else {
+                res.render('userHome.ejs', {
                     user: req.user, // get the user out of session and pass to template
                     firstName: results[1][0].firstName
                 });
@@ -302,22 +302,22 @@ module.exports = function (app, passport) {
         });
     });
 
-    app.get('/deleteRow', isLoggedIn, function(req, res) {
+    app.get('/deleteRow', isLoggedIn, function (req, res) {
         del_recov("Deleted", "Deletion failed!", "/userHome", req, res);
     });
 
-    app.get('/recoverRow', isLoggedIn, function(req, res){
+    app.get('/recoverRow', isLoggedIn, function (req, res) {
         del_recov("Active", "Recovery failed!", "/userHome", req, res);
     });
 
     // =====================================
     // REQUEST QUERY   =====================
     // =====================================
-    app.get('/deleteRow2', isLoggedIn, function(req, res) {
-        del_recov("Delete", "Deletion failed!", "/dataHistory", req, res);
+    app.get('/deleteRow2', isLoggedIn, function (req, res) {
+        del_recov("Deleted", "Deletion failed!", "/dataHistory", req, res);
     });
 
-    app.get('/recoverRow2', isLoggedIn, function(req, res){
+    app.get('/recoverRow2', isLoggedIn, function (req, res) {
         del_recov("Active", "Recovery failed!", "/dataHistory", req, res);
     });
 
@@ -338,7 +338,7 @@ module.exports = function (app, passport) {
             console.log(results);
             if (!results[0].firstName) {
                 console.log("Error2");
-            } else{
+            } else {
                 res.render('dataHistory.ejs', {
                     user: req.user, // get the user out of session and pass to template
                     firstName: results[0].firstName //get the firstName our of session ans pass to template
@@ -441,7 +441,7 @@ module.exports = function (app, passport) {
     // we will use route middleware to verify this (the isLoggedIn function)
 
     // Show user profile page
-    app.get('/profile',function (req,res) {
+    app.get('/profile', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         con_CS.query("SELECT * FROM UserProfile", function (err, results) {
             if (err) throw err;
@@ -473,7 +473,7 @@ module.exports = function (app, passport) {
         myVal = [newPass.firstname, newPass.lastname, dateTime, user.username];
 
         con_CS.query(myStat, myVal, mylogin, function (err, rows) {
-            if(err){
+            if (err) {
                 console.log(err);
                 res.json({"error": true, "message": "Fail !"});
             } else {
@@ -516,7 +516,7 @@ module.exports = function (app, passport) {
 
             if (!results[0][0].userrole) {
                 console.log("Error2");
-            } else if(!results[1][0].firstName){
+            } else if (!results[1][0].firstName) {
                 console.log("Error1")
             } else if (results[0][0].userrole === "Admin" || "Regular") {
                 // process the signup form
@@ -607,11 +607,7 @@ module.exports = function (app, passport) {
                 res.json({"error": true, "message": "An unexpected error occurred !"});
                 res.end();
             } else {
-                var username = req.body.username;
-                var subject = "Sign Up";
-                var text = 'to sign up an account with this email.';
-                var url = "http://" + req.headers.host + "/verify/";
-                sendToken(username, subject, text, url, res);
+                res.json({"error": false, "message": "Success"});
             }
         });
     });
@@ -774,7 +770,7 @@ module.exports = function (app, passport) {
 
     // Retrieve user data from user management page
     let edit_User, edit_firstName, edit_lastName, edit_userrole, edit_status, edit_city;
-    app.get('/editUserQuery', isLoggedIn, function(req, res) {
+    app.get('/editUserQuery', isLoggedIn, function (req, res) {
 
         // edit_User = req.query.Username;
         edit_firstName = req.query.First_Name;
@@ -788,7 +784,7 @@ module.exports = function (app, passport) {
     });
 
     // Show user edit form
-    app.get('/editUser', isLoggedIn, function(req, res) {
+    app.get('/editUser', isLoggedIn, function (req, res) {
         res.render('userEdit.ejs', {
             user: req.user, // get the user out of session and pass to template
             userName: edit_User,
@@ -800,7 +796,7 @@ module.exports = function (app, passport) {
         });
     });
 
-    app.post('/editUser', isLoggedIn, function(req, res) {
+    app.post('/editUser', isLoggedIn, function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
 
         if (req.body.newPassword !== "") {
@@ -834,7 +830,7 @@ module.exports = function (app, passport) {
 
     });
 
-    app.get('/suspendUser', isLoggedIn, function(req, res) {
+    app.get('/suspendUser', isLoggedIn, function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
         dateNtime();
 
@@ -864,7 +860,7 @@ module.exports = function (app, passport) {
             console.log(results);
             if (!results[0].firstName) {
                 console.log("Error2");
-            } else{
+            } else {
                 res.render('recovery.ejs', {
                     user: req.user,
                     message: req.flash('restoreMessage'),
@@ -882,8 +878,8 @@ module.exports = function (app, passport) {
 
     app.post('/upload', onUpload);
 
-    app.post('/submit',function(req,res){
-        console.log (req.body);
+    app.post('/submit', function (req, res) {
+        console.log(req.body);
         let result = Object.keys(req.body).map(function (key) {
             return [String(key), req.body[key]];
         });
@@ -893,7 +889,7 @@ module.exports = function (app, passport) {
         let name = "";
         let valueSubmit = "";
 
-        for(let i = 0; i < result.length; i++){
+        for (let i = 0; i < result.length; i++) {
             if (i === result.length - 1) {
                 name += result[i][0];
                 valueSubmit += '"' + result[i][1] + '"';
@@ -903,19 +899,18 @@ module.exports = function (app, passport) {
             }
 
         }
-        let newImage = {
-            Layer_Uploader: "http://localhost:9086/a/" + responseDataUuid,
-            Layer_Uploader_name: responseDataUuid
-        };
-        name += ", Layer_Uploader, Layer_Uploader_name";
-        value += ", '" + newImage.Layer_Uploader + "','" +newImage.Layer_Uploader_name + "'";
+        // let newImage = {
+        //     Layer_Uploader: "http://localhost:9086/uploadfiles/" + responseDataUuid,
+        //     Layer_Uploader_name: responseDataUuid
+        // };
+        // name += ", Layer_Uploader, Layer_Uploader_name";
+        // value += ", '" + newImage.Layer_Uploader + "','" +newImage.Layer_Uploader_name + "'";
 
-        let filepathname = "http://localhost:9086/a/" + responseDataUuid ;
 
         let statement1 = "INSERT INTO CitySmart.New_Users (" + name + ") VALUES (" + value + ");";
         console.log(statement1);
 
-        con_CS.query(statement1, function(err,result) {
+        con_CS.query(statement1, function (err, result) {
             if (err) {
                 throw err;
             } else {
@@ -924,9 +919,9 @@ module.exports = function (app, passport) {
         });
 
     });
+
     //Submit Request form//
     app.post('/submitL', function (req, res) {
-        console.log(req.body);
         let result = Object.keys(req.body).map(function (key) {
             return [String(key), req.body[key]];
         });
@@ -935,7 +930,7 @@ module.exports = function (app, passport) {
         let name = "";
         let valueSubmit = "";
 
-        for(let i = 0; i < result.length; i++){
+        for (let i = 0; i < result.length; i++) {
             if (i === result.length - 1) {
                 name += result[i][0];
                 valueSubmit += '"' + result[i][1] + '"';
@@ -944,8 +939,17 @@ module.exports = function (app, passport) {
                 valueSubmit += '"' + result[i][1] + '"' + ", ";
             }
         }
+        console.log(valueSubmit);
+        let newImage = {
+            Layer_Uploader: "http://localhost:9086/uploadfiles/" + responseDataUuid,
+            Layer_Uploader_name: responseDataUuid
+        };
+        name += ", Layer_Uploader, Layer_Uploader_name";
+        valueSubmit += ", '" + newImage.Layer_Uploader + "','" + newImage.Layer_Uploader_name + "'";
+        let filepathname = "http://localhost:9086/uploadfiles/" + responseDataUuid;
 
-        let statement2 = "INSERT INTO CitySmart.Request_Form (" + name + ") VALUES (" + value + ");";
+
+        let statement2 = "INSERT INTO CitySmart.Request_Form (" + name + ") VALUES (" + valueSubmit + ");";
         console.log(statement2);
 
         con_CS.query(statement2, function (err, result) {
@@ -962,6 +966,7 @@ module.exports = function (app, passport) {
     });
     //Request ID//
     app.get('/newRequest', isLoggedIn, function (req, res) {
+
         var d = new Date();
         var utcDateTime = d.getUTCFullYear() + "-" + ('0' + (d.getUTCMonth() + 1)).slice(-2) + "-" + ('0' + d.getUTCDate()).slice(-2);
         var queryRID = "SELECT COUNT(RID) AS number FROM Special_ID WHERE RID LIKE '" + utcDateTime + "%';";
@@ -1012,7 +1017,7 @@ module.exports = function (app, passport) {
     // });
 
     //check if the layer name is available
-    app.get('/SearchLayerName',function (req,res) {
+    app.get('/SearchLayerName', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         con_CS.query("SELECT ThirdLayer FROM LayerMenu", function (err, results) {
             if (err) throw err;
@@ -1036,7 +1041,7 @@ module.exports = function (app, passport) {
     //     }
     // });
 
-    app.get('/approve',function (req,res) {
+    app.get('/approve', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         let approveIDStr = req.query.tID;
         let approvepictureStr = req.query.LUN.split(',');
@@ -1114,11 +1119,11 @@ module.exports = function (app, passport) {
     });
 
     //Delete button
-    app.get('/deleteData', function(req, res) {
+    app.get('/deleteData', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         let transactionID = req.query.transactionIDStr.split(',');
         console.log(transactionID);
-        for(let i = 0; i < transactionID.length; i++) {
+        for (let i = 0; i < transactionID.length; i++) {
             let statement = "UPDATE CitySmart.Request_Form SET Status = 'Delete' WHERE RID = '" + transactionID[i] + "'";
             console.log(statement);
             con_CS.query(statement, function (err, results) {
@@ -1130,9 +1135,9 @@ module.exports = function (app, passport) {
     });
 
     //AddData in table
-    app.get('/AddData',function (req,res){
+    app.get('/AddData', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query('SELECT Request_Form.*, UserLogin.userrole FROM UserLogin INNER JOIN Request_Form ON UserLogin.username = Request_Form.UID',function (err,results) {
+        con_CS.query('SELECT Request_Form.*, UserLogin.userrole FROM UserLogin INNER JOIN Request_Form ON UserLogin.username = Request_Form.UID', function (err, results) {
             if (err) throw err;
             res.json(results);
             // console.log(results);
@@ -1606,27 +1611,26 @@ module.exports = function (app, passport) {
     app.get('/layername', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
 
-        con_CS.query("SELECT LayerName From LayerMenu", function (err,result) {
+        con_CS.query("SELECT LayerName From LayerMenu", function (err, result) {
 
             console.log("recive and processing");
 
             let JSONresult = JSON.stringify(result, null, "\t");
 
             res.send(JSONresult);
-            res.end();
         });
     });
 
     app.get('/createlayer', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
 
-        con_CS.query("SELECT * From CitySmart.LayerMenu", function (err,result) {
+        con_CS.query("SELECT * From CitySmart.LayerMenu", function (err, result) {
             console.log("recive and processing");
 
             let JSONresult = JSON.stringify(result, null, "\t");
 
             res.send(JSONresult);
-            });
+        });
 
     });
 
@@ -1649,42 +1653,39 @@ module.exports = function (app, passport) {
         if (valueEnergy === "budget") {
             con_EnergyBudget.query('SELECT sum(Electricity_Usage) as Electricity_Usage FROM "FTAA_Energy"."autogen"."Energy_Budget" WHERE time >= 1473120000000000000 and time <= 1504652400000000000 GROUP BY time(1h)').then(results => {
                 let origin = req.headers.origin;
-            res.setHeader("Access-Control-Allow-Origin", origin);
+                res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
-            //console.log(JSONresult);
+                let JSONresult = JSON.stringify(results, null, "\t");
+                //console.log(JSONresult);
 
-            res.send(JSONresult);
-            res.end();
-        });
+                res.send(JSONresult);
+            });
         } else if (valueEnergy === "actual") {
             con_EnergyPredic.query('SELECT * FROM "FTAA_Energy"."autogen"."Actual_vs_Prediction"').then(results => {
                 let origin = req.headers.origin;
-            res.setHeader("Access-Control-Allow-Origin", origin);
+                res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
-            //console.log(JSONresult);
+                let JSONresult = JSON.stringify(results, null, "\t");
+                //console.log(JSONresult);
 
-            res.send(JSONresult);
-            res.end();
-        });
+                res.send(JSONresult);
+                res.end();
+            });
         } else {
             let queryDate = 'SELECT Electricity_Usage, Machine_ID, Machine_Name FROM "FTAA_Energy"."autogen"."Energy_Budget" WHERE time >= ' + "'" + startDateTime + "'" + 'AND time < ' + "'" + endDateTime + "'" + " GROUP BY Machine_ID";
             //console.log(queryDate);
             con_EnergyBudget.query(queryDate).then(results => {
                 let origin = req.headers.origin;
-            res.setHeader("Access-Control-Allow-Origin", origin);
+                res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
-            //console.log(JSONresult);
+                let JSONresult = JSON.stringify(results, null, "\t");
+                //console.log(JSONresult);
 
-            res.send(JSONresult);
-            res.end();
-        });
+                res.send(JSONresult);
+            });
         }
 
     });
-
 
     let valueWater;
     let query1 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'Calcium_Ion-Selective_Electrode'";
@@ -1696,120 +1697,118 @@ module.exports = function (app, passport) {
     let query7 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'PH_Sensor'";
     let query8 = 'SELECT * FROM "FTAA_Water"."autogen"."Water_Experiment" WHERE "Element" = ' + "'Temperature_Probe_(C)'";
 
-//console.log(query1);
-
     app.get('/WaterGraph', function (req, res) {
         valueWater = req.query.keywords;
         console.log(valueWater);
         if (valueWater === "Calcium") {
             con_Water.query(query1).then(results => {
                 let origin = req.headers.origin;
-            res.setHeader("Access-Control-Allow-Origin", origin);
+                res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
-            console.log(JSONresult);
+                let JSONresult = JSON.stringify(results, null, "\t");
+                console.log(JSONresult);
 
-            res.send(JSONresult);
-            res.end();
-        });
+                res.send(JSONresult);
+                res.end();
+            });
         }
 
         if (valueWater === "Ammonium") {
             con_Water.query(query2).then(results => {
                 let origin = req.headers.origin;
-            res.setHeader("Access-Control-Allow-Origin", origin);
+                res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
-            console.log(JSONresult);
+                let JSONresult = JSON.stringify(results, null, "\t");
+                console.log(JSONresult);
 
-            res.send(JSONresult);
-            res.end();
-        });
+                res.send(JSONresult);
+                res.end();
+            });
         }
 
         if (valueWater === "Potassium") {
             con_Water.query(query3).then(results => {
                 let origin = req.headers.origin;
-            res.setHeader("Access-Control-Allow-Origin", origin);
+                res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
-            console.log(JSONresult);
+                let JSONresult = JSON.stringify(results, null, "\t");
+                console.log(JSONresult);
 
-            res.send(JSONresult);
-            res.end();
-        });
+                res.send(JSONresult);
+                res.end();
+            });
         }
 
         if (valueWater === "Chloride") {
             con_Water.query(query4).then(results => {
                 let origin = req.headers.origin;
-            res.setHeader("Access-Control-Allow-Origin", origin);
+                res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
-            console.log(JSONresult);
+                let JSONresult = JSON.stringify(results, null, "\t");
+                console.log(JSONresult);
 
-            res.send(JSONresult);
-            res.end();
-        });
+                res.send(JSONresult);
+                res.end();
+            });
         }
 
         if (valueWater === "Colorimeter") {
             con_Water.query(query5).then(results => {
                 let origin = req.headers.origin;
-            res.setHeader("Access-Control-Allow-Origin", origin);
+                res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
-            console.log(JSONresult);
+                let JSONresult = JSON.stringify(results, null, "\t");
+                console.log(JSONresult);
 
-            res.send(JSONresult);
-            res.end();
-        });
+                res.send(JSONresult);
+                res.end();
+            });
         }
 
         if (valueWater === "Turbidity") {
             con_Water.query(query6).then(results => {
                 let origin = req.headers.origin;
-            res.setHeader("Access-Control-Allow-Origin", origin);
+                res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
-            console.log(JSONresult);
+                let JSONresult = JSON.stringify(results, null, "\t");
+                console.log(JSONresult);
 
-            res.send(JSONresult);
-            res.end();
-        });
+                res.send(JSONresult);
+                res.end();
+            });
         }
 
         if (valueWater === "pH") {
             con_Water.query(query7).then(results => {
                 let origin = req.headers.origin;
-            res.setHeader("Access-Control-Allow-Origin", origin);
+                res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
-            console.log(JSONresult);
+                let JSONresult = JSON.stringify(results, null, "\t");
+                console.log(JSONresult);
 
-            res.send(JSONresult);
-            res.end();
-        });
+                res.send(JSONresult);
+                res.end();
+            });
         }
 
         if (valueWater === "Temperature") {
             con_Water.query(query8).then(results => {
                 let origin = req.headers.origin;
-            res.setHeader("Access-Control-Allow-Origin", origin);
+                res.setHeader("Access-Control-Allow-Origin", origin);
 
-            let JSONresult = JSON.stringify(results, null, "\t");
-            console.log(JSONresult);
+                let JSONresult = JSON.stringify(results, null, "\t");
+                console.log(JSONresult);
 
-            res.send(JSONresult);
-            res.end();
-        });
+                res.send(JSONresult);
+                res.end();
+            });
         }
     });
 
     // =====================================
     // Others  =============================
     // =====================================
-    app.get('/scanner',function (req,res) {
+    app.get('/scanner', function (req, res) {
         res.render('scanner.ejs')
     });
 
@@ -1820,96 +1819,97 @@ module.exports = function (app, passport) {
         });
     });
 
-};
 
 // Customized Functions Below
-function isLoggedIn(req, res, next) {
+    function isLoggedIn(req, res, next) {
 
-    // if user is authenticated in the session, carry on
-    if (req.isAuthenticated())
-        return next();
+        // if user is authenticated in the session, carry on
+        if (req.isAuthenticated())
+            return next();
 
-    // if they aren't redirect them to the home page
-    res.redirect('/');
-}
+        // if they aren't redirect them to the home page
+        res.redirect('/');
+    }
 
-function dateNtime() {
-    today = new Date();
-    date2 = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-    time2 = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-    dateTime = date2 + ' ' + time2;
-}
+    function dateNtime() {
+        today = new Date();
+        date2 = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+        time2 = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        dateTime = date2 + ' ' + time2;
+    }
 
-function tokenExpTime() {
-    today = new Date();
-    date3 = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + (today.getDate()+1);
-    time3 = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-    tokenExpire = date3 + ' ' + time3;
-}
+    function tokenExpTime() {
+        today = new Date();
+        date3 = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + (today.getDate() + 1);
+        time3 = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        tokenExpire = date3 + ' ' + time3;
+    }
 
-function del_recov(StatusUpd, ErrMsg, targetURL, req, res) {
+    function del_recov(StatusUpd, ErrMsg, targetURL, req, res) {
 
-    transactionID = req.query.transactionIDStr.split(",");
-    console.log(transactionID);
-    let statementGeneral = "UPDATE Request_Form SET Status = '" + StatusUpd + "'";
-    // let statementDetailedS = "UPDATE Detailed_Scouting SET Status = '" + StatusUpd + "'";
-    // let statementDetailedT = "UPDATE Detailed_Trap SET Status = '" + StatusUpd + "'";
+        transactionID = req.query.transactionIDStr.split(",");
+        console.log(transactionID);
+        let statementGeneral = "UPDATE Request_Form SET Status = '" + StatusUpd + "'";
+        // let statementDetailedS = "UPDATE Detailed_Scouting SET Status = '" + StatusUpd + "'";
+        // let statementDetailedT = "UPDATE Detailed_Trap SET Status = '" + StatusUpd + "'";
 
-    for (let i = 0; i < transactionID.length; i++) {
-        if (i === 0) {
-            statementGeneral += " WHERE RID = '" + transactionID[i] + "'";
-            // statementDetailedS += " WHERE transactionID = '" + transactionID[i] + "'";
-            // statementDetailedT += " WHERE transactionID = '" + transactionID[i] + "'";
+        for (let i = 0; i < transactionID.length; i++) {
+            if (i === 0) {
+                statementGeneral += " WHERE RID = '" + transactionID[i] + "'";
+                // statementDetailedS += " WHERE transactionID = '" + transactionID[i] + "'";
+                // statementDetailedT += " WHERE transactionID = '" + transactionID[i] + "'";
 
-            if (i === transactionID.length - 1) {
-                statementGeneral += ";";
-                // statementDetailedS += ";";
-                // statementDetailedT += ";";
-                myStat = statementGeneral;
-                updateDBNres(myStat, "", ErrMsg, targetURL, res);
-            }
-        } else {
-            statementGeneral += " OR RID = '" + transactionID[i] + "'";
-            // statementDetailedS += " OR transactionID = '" + transactionID[i] + "'";
-            // statementDetailedT += " OR transactionID = '" + transactionID[i] + "'";
+                if (i === transactionID.length - 1) {
+                    statementGeneral += ";";
+                    // statementDetailedS += ";";
+                    // statementDetailedT += ";";
+                    myStat = statementGeneral;
+                    updateDBNres(myStat, "", ErrMsg, targetURL, res);
+                }
+            } else {
+                statementGeneral += " OR RID = '" + transactionID[i] + "'";
+                // statementDetailedS += " OR transactionID = '" + transactionID[i] + "'";
+                // statementDetailedT += " OR transactionID = '" + transactionID[i] + "'";
 
-            if (i === transactionID.length - 1) {
-                statementGeneral += ";";
-                // statementDetailedS += ";";
-                // statementDetailedT += ";";
-                myStat = statementGeneral;
-                updateDBNres(myStat, "", ErrMsg, targetURL, res);
+                if (i === transactionID.length - 1) {
+                    statementGeneral += ";";
+                    // statementDetailedS += ";";
+                    // statementDetailedT += ";";
+                    myStat = statementGeneral;
+                    updateDBNres(myStat, "", ErrMsg, targetURL, res);
+                }
             }
         }
     }
-}
 
-function updateDBNres(SQLstatement, Value, ErrMsg, targetURL, res) {
-    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-    //console.log("Query Statement: " + SQLstatement);
+    function updateDBNres(SQLstatement, Value, ErrMsg, targetURL, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+        //console.log("Query Statement: " + SQLstatement);
 
-    con_CS.query(SQLstatement, Value, function (err, rows) {
-        if (err) {
-            console.log(err);
-            res.json({"error": true, "message": ErrMsg});
-        } else { res.json({"error": false, "message": targetURL});}
-    })
-}
+        con_CS.query(SQLstatement, Value, function (err, rows) {
+            if (err) {
+                console.log(err);
+                res.json({"error": true, "message": ErrMsg});
+            } else {
+                res.json({"error": false, "message": targetURL});
+            }
+        })
+    }
 
-function updateDBNredir(SQLstatement, Value, ErrMsg, failURL, redirURL, res) {
-    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-    //console.log("Query Statement: " + SQLstatement);
+    function updateDBNredir(SQLstatement, Value, ErrMsg, failURL, redirURL, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+        //console.log("Query Statement: " + SQLstatement);
 
-    con_CS.query(SQLstatement, Value, function (err, rows) {
-        if (err) {
-            console.log(err);
-            res.render(failURL, {message: req.flash(ErrMsg)});
-        } else {
-            res.redirect(redirURL);
-            // render the page and pass in any flash data if it exists
-        }
-    })
-}
+        con_CS.query(SQLstatement, Value, function (err, rows) {
+            if (err) {
+                console.log(err);
+                res.render(failURL, {message: req.flash(ErrMsg)});
+            } else {
+                res.redirect(redirURL);
+                // render the page and pass in any flash data if it exists
+            }
+        })
+    }
 
 function QueryStat(myObj, scoutingStat, res) {
     // console.log(myObj);
@@ -1925,35 +1925,35 @@ function QueryStat(myObj, scoutingStat, res) {
             //     myObj[i].table = parseInt(myObj[i].table.substring(0, 1));
             // }
 
-            let aw;
-            if (j === 0) {
-                aw = " WHERE ";
-                j = 1;
+                let aw;
+                if (j === 0) {
+                    aw = " WHERE ";
+                    j = 1;
+                } else {
+                    aw = " AND ";
+                }
+
+                // if (myObj[i].table === 1) {
+                //     scoutingStat = editStat(scoutingStat, aw, myObj[i].dbCol, myObj[i].op, myObj[i].fieldVal);
+                //     console.log(scoutingStat);
+                //     // trapStat = editStat(trapStat, aw, myObj[i].dbCol, myObj[i].op, myObj[i].fieldVal);
+                // } else if (myObj[i].table === 2) {
+                //     scoutingStat = editStat(scoutingStat, aw, myObj[i].dbCol, myObj[i].op, myObj[i].fieldVal);
+                // }
+
+                scoutingStat = editStat(scoutingStat, aw, myObj[i].dbCol, myObj[i].op, myObj[i].fieldVal);
+
+                if (i === myObj.length - 1) {
+                    let sqlStatement = scoutingStat + "; ";
+                    dataList(sqlStatement, res);
+                }
             } else {
-                aw = " AND ";
-            }
-
-            // if (myObj[i].table === 1) {
-            //     scoutingStat = editStat(scoutingStat, aw, myObj[i].dbCol, myObj[i].op, myObj[i].fieldVal);
-            //     console.log(scoutingStat);
-            //     // trapStat = editStat(trapStat, aw, myObj[i].dbCol, myObj[i].op, myObj[i].fieldVal);
-            // } else if (myObj[i].table === 2) {
-            //     scoutingStat = editStat(scoutingStat, aw, myObj[i].dbCol, myObj[i].op, myObj[i].fieldVal);
-            // }
-
-            scoutingStat = editStat(scoutingStat, aw, myObj[i].dbCol, myObj[i].op, myObj[i].fieldVal);
-
-            if (i === myObj.length - 1) {
-                let sqlStatement = scoutingStat + "; ";
-                dataList(sqlStatement, res);
-            }
-        } else {
-            if (i === myObj.length - 1) {
-                let sqlStatement = scoutingStat + "; ";
-                dataList(sqlStatement, res);
+                if (i === myObj.length - 1) {
+                    let sqlStatement = scoutingStat + "; ";
+                    dataList(sqlStatement, res);
+                }
             }
         }
-    }
 
         function editStat(stat, aw, dbCol, op, fieldVal) {
             stat += aw + dbCol + op + fieldVal + "'";
@@ -1961,12 +1961,12 @@ function QueryStat(myObj, scoutingStat, res) {
         }
     }
 
-function dataList(sqlStatement, res) {
-    res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-    // console.log(sqlStatement);
-    con_CS.query(sqlStatement, function (err, results, fields) {
+    function dataList(sqlStatement, res) {
+        res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+        // console.log(sqlStatement);
+        con_CS.query(sqlStatement, function (err, results, fields) {
 
-        errStatus = [{errMsg: ""}];
+            errStatus = [{errMsg: ""}];
 
             if (err) {
                 console.log(err);
@@ -2140,13 +2140,13 @@ function dataList(sqlStatement, res) {
             res.status(500);
         }
 
-        res.send();
-    });
-}
+            res.send();
+        });
+    }
 
-function isValid(size) {
-    return maxFileSize === 0 || size < maxFileSize;
-}
+    function isValid(size) {
+        return maxFileSize === 0 || size < maxFileSize;
+    }
 
     function moveFile(destinationDir, sourceFile, destinationFile, success, failure) {
         console.log(destinationDir);
@@ -2248,6 +2248,7 @@ function moveUploadedFile(file, uuid, success, failure) {
 
         return (zeros + index).slice(-digits);
     }
+}
 
 function sendToken(username, subject, text, url, res) {
     async.waterfall([
