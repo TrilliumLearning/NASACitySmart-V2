@@ -868,6 +868,13 @@ module.exports = function (app, passport) {
                 });
             }
         });
+        fs.rename("./a/" + approvepictureStr[i] + "" , "./b/" + approvepictureStr[i] + "", function (err) {
+            if (err) {
+                console.log(err);
+            } else {
+                console.log("success");
+            }
+        });
     });
 
     // =====================================
@@ -905,9 +912,10 @@ module.exports = function (app, passport) {
         // };
         // name += ", Layer_Uploader, Layer_Uploader_name";
         // value += ", '" + newImage.Layer_Uploader + "','" +newImage.Layer_Uploader_name + "'";
+        "UPDATE UserLogin SET password = '" + newPass.Newpassword + "' WHERE username = '" + req.body.username + "'";
 
 
-        let statement1 = "INSERT INTO CitySmart.New_Users (" + name + ") VALUES (" + value + ");";
+        let statement1 = "UPDATE CitySmart.UserProfile SET '" + name + " = (" + value + ");"
         console.log(statement1);
 
         con_CS.query(statement1, function (err, result) {
@@ -1116,6 +1124,13 @@ module.exports = function (app, passport) {
                 res.json(results[i]);
             });
         }
+        fs.rename("./b/" + approvepictureStr[i] + "" , "./a/" + approvepictureStr[i] + "", function (err) {
+            if (err) {
+                console.log(err);
+            } else {
+                console.log("success");
+            }
+        });
 
     });
 
