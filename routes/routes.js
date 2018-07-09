@@ -893,33 +893,30 @@ module.exports = function (app, passport) {
         // console.log (result);
         res.setHeader("Access-Control-Allow-Origin", "*");
 
-        let name = "";
-        let valueSubmit = "";
-
-        for (let i = 0; i < result.length; i++) {
-            if (i === result.length - 1) {
-                name += result[i][0];
-                valueSubmit += '"' + result[i][1] + '"';
+        var update1 = "UPDATE CitySmart.UserProfile SET " ;
+        var update3 = " WHERE username = '" + req.user.username + "'";
+        let update2 = "";
+        for (let i = 0; i < result.length-3; i++) {
+            if (i === result.length - 4) {
+                update2 += result[i][0] + " = '" + result[i][1]+ "'";
             } else {
-                name += result[i][0] + ", ";
-                valueSubmit += '"' + result[i][1] + '"' + ", ";
+                update2 += result[i][0] + " = '" + result[i][1] + "', " ;
             }
         }
-        let value = JSON.parse("[" + valueSubmit + "]");
-        console.log(value);
-        // "UPDATE UserLogin SET password = '" + newPass.Newpassword + "' WHERE username = '" + req.body.username + "'";
-
-
-        let statement1 = "UPDATE CitySmart.UserProfile SET username = ?, firstName = ?, lastName = ?, Address_Line1 = ?, Address_Line2 = ?, State_Province_Region = ?, Country = ?, PostalCode_ZIP = ?, Phone_Number = ?,  WHERE username = '" + req.user.username + "'";
+        console.log(update2);
+        let statement1 = update1+update2+update3;
         console.log(statement1);
-
-        con_CS.query(statement1, [value], function (err, result) {
+        con_CS.query(statement1, function (err, result) {
             if (err) {
                 throw err;
             } else {
                 res.json("Connected!")
             }
         });
+        // console.log(valueSubmit);
+
+        // let statement1 = "UPDATE CitySmart.UserProfile SET username = ?, firstName = ?, lastName = ?, Address_Line1 = ?, Address_Line2 = ?, State_Province_Region = ?, Country = ?, PostalCode_ZIP = ?, Phone_Number = ? WHERE username = '" + req.user.username + "'";
+
 
     });
 
