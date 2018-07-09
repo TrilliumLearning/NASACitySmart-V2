@@ -225,7 +225,7 @@
                                     <option value="other">Other(Please specify)</option>
                                 </select>
                                 <div id="other1" style="display:none;">
-                                    <input type="text" name="FirstOther">
+                                    <input type="text" name="FirstOther" id ="inputone">
                                 </div>
                             </div>
                         </div>
@@ -240,7 +240,7 @@
                                     <option value="other" id="secondOther">Other(Please specify)</option>
                                 </select>
                                 <div id="other2" style="display:none;">
-                                    <input type="text" name="SecondOther">
+                                    <input type="text" name="SecondOther" id="inputtwo">
                                 </div>
                             </div>
                         </div>
@@ -308,7 +308,7 @@
         <div class="row">
             <button id="cancel" onclick="userHome();">Cancel</button>
             <button id="approve" type="submit" form="layer" data-toggle="tooltip"  title="Only for Admin" onclick="submitForm()">Approve</button>
-            <button id="clear" type="reset" onclick="window.location.reload()" value="  Clear  ">Clear</button>
+            <button id="clear" type="reset" onclick="clearForm()" value="  Clear  ">Clear</button>
         </div>
     </div>
 </div>
@@ -323,16 +323,24 @@
         document.getElementById('date').value = getvalue[0];
         document.getElementById('User ID').value = getvalue[1];
         document.getElementById('RID').value = getvalue[2];
-        document.getElementById('main').value = getvalue[7];
-        //sub has problem
-        // document.getElementById('sub').value = getvalue[9];
-        // document.getElementById('sub').innerHTML = getvalue[9];
         document.getElementById('LayerNameInput').value = getvalue[11];
         document.getElementById('LayerCityInput').value = getvalue[5];
         document.getElementById('LayerStateInput').value = getvalue[6];
         document.getElementById('LayerCountryInput').value = getvalue[4];
         document.getElementById('LayerFormat').value = getvalue[12];
         document.getElementById('message').value = getvalue[10];
+
+        if(getvalue[7] === "other" || getvalue[9] === "other"){
+            document.getElementById('main').value = getvalue[7];
+            document.getElementById("other1").style.display = "block";
+            document.getElementById("inputone").value = getvalue[8];
+            document.getElementById('sub').value = getvalue[9];
+            document.getElementById("other2").style.display = "block";
+            document.getElementById("inputtwo").value = getvalue[10];
+        }else{
+            document.getElementById('main').value = getvalue[7];
+            document.getElementById('sub').options[0].innerHTML = getvalue[9];
+        }
 
         $(function () {
             if (UserRole === "Admin") {
@@ -504,12 +512,18 @@
         }
     }
 
-    // function clearForm(){
-    //     if (confirm("Are you sure to clear this page? All the data will be cleared accordingly!") === true) {
-    //         document.getElementById("layer").reset();
-    //         document.getElementById("basic").reset();
-    //     }
-    // }
+    function clearForm(){
+        if (confirm("Are you sure to clear this page? All the data will be cleared accordingly!") === true) {
+            document.getElementById("main").value = 'Category';
+            document.getElementById("sub").value = 'Category';
+            document.getElementById('LayerNameInput').value = '';
+            document.getElementById('LayerCityInput').value = '';
+            document.getElementById('LayerStateInput').value = '';
+            document.getElementById('LayerCountryInput').value = '';
+            document.getElementById('LayerFormat').value = '';
+            document.getElementById('message').value = '';
+        }
+    }
 
     // Wait for the DOM to be ready
     // $('#layer').validate({

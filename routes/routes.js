@@ -1079,6 +1079,7 @@ module.exports = function (app, passport) {
         let result = Object.keys(req.body).map(function (key) {
             return [String(key), req.body[key]];
         });
+        console.log(result);
         res.setHeader("Access-Control-Allow-Origin", "*");
 
         let name = "";
@@ -1102,10 +1103,10 @@ module.exports = function (app, passport) {
         valueSubmit += ", '" + newImage.Layer_Uploader + "','" + newImage.Layer_Uploader_name + "'";
         let filepathname = "http://localhost:63342/NASACitySmart-V2/a/" + responseDataUuid;
         var valuearray = valueSubmit.split(",");
-        console.log(valuearray[3]);
         let statement2 = 'UPDATE CitySmart.Request_Form SET Date = ' + valuearray[0] + ', RID = ' + valuearray[1] + ', UID = ' + valuearray[2] + ', FirstLayer = ' + valuearray[3] + ', FirstOther = ' + valuearray[4] + ', SecondLayer = ' + valuearray[5] + ', SecondOther = ' + valuearray[6] + ', LayerName = ' + valuearray[7] + ', CityName = ' +valuearray[8] + ', StateName = ' + valuearray[9] +  ', CountryName = ' +valuearray[10] + ', Layer_Description = ' + valuearray[11] + ', LayerFormat = ' + valuearray[12] +  ' WHERE RID =' + valuearray[1] + ';' ;
-        if(valuearray[3] === '"other"'){
-            console.log("work?");
+        var array = valuearray[3].replace(/"/g,'');
+        // console.log(array);
+        if(array === " other"){
             let statement = "INSERT INTO CitySmart.LayerMenu VALUES (" + valuearray[7] + "," + valuearray[0] + "," + valuearray[4] + "," + valuearray[6] + "," + valuearray[7] + "," + valuearray[10] + "," + valuearray[8] + "," + valuearray[9] + ", 'Active');";
             con_CS.query(statement2 + statement, function (err, result) {
                 if (err) {
@@ -1115,7 +1116,6 @@ module.exports = function (app, passport) {
                 }
             });
         }else{
-            console.log("now?");
             let statement = "INSERT INTO CitySmart.LayerMenu VALUES (" + valuearray[7] + "," + valuearray[0] + "," + valuearray[3] + "," + valuearray[5] + "," + valuearray[7] + "," + valuearray[10] + "," + valuearray[8] + "," + valuearray[9] + ", 'Active');";
             con_CS.query(statement2 + statement, function (err, result) {
                 if (err) {
