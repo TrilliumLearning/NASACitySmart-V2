@@ -157,7 +157,7 @@
         .selectpicker {
             height: 60px;
         }
-        #continent, #country {
+        #City, #country{
             height: 60px;
         }
         .other {
@@ -267,23 +267,12 @@
                 </div>
                 <!--<p id="LayerName1" style="color: palevioletred; margin-left:270px;">Please Enter the Layer Name, the Layer Name must be at least 6 characters</p>-->
                 <div class="form-group">
-                    <label class="col-md-4 control-label">Layer Continent</label>
-                    <div class="col-md-8 inputGroupContainer">
-                        <div class="input-group">
-                            <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-globe"></i></span>
-                            <!--<input id="LayerContinentInput" name="ContinentName" placeholder="Layer Continent" class="form-control" required value="" type="text"></div>-->
-                            <select name="ContinentName" class="form-control selectpicker" id="continent" >
-                                <option selected>SELECT CONTINENT</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group">
                     <label class="col-md-4 control-label">Layer Country</label>
                     <div class="col-md-8 inputGroupContainer">
                         <div class="input-group">
                             <span class="input-group-addon"><i class="glyphicon glyphicon-globe"></i></span>
                             <select name="CountryName" class="crs-country form-control" data-region-id="two" data-default-option="SELECT COUNTRY" id="country">
+                                <option>United States</option>
                             </select>
                         </div>
                     </div>
@@ -296,6 +285,16 @@
                             <!--<select name="StateName" id="two" class="crs-region form-control" data-default-option="SELECT STATE" data-blank-option="NO STATE SELECTED">-->
                             <!--<option>Please select a state</option>-->
                             <input name="StateName" value="" placeholder="Please enter full state name" class="form-control" required  type="text">
+                        </div>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label class="col-md-4 control-label">Layer City</label>
+                    <div class="col-md-8 inputGroupContainer">
+                        <div class="input-group">
+                            <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-globe"></i></span>
+                            <!--<input id="LayerCityInput" name="CityName" placeholder="Layer City" class="form-control" required value="" type="text"></div>-->
+                            <input name="CityName" id="City" value="" placeholder="Please enter full City name" class="form-control" required  type="text">
                         </div>
                     </div>
                 </div>
@@ -439,7 +438,7 @@
             LayerName: "required",
             StateName:"required",
             CountryName:"required",
-            ContinentName:"required",
+            CityName:"required",
             FirstLayer:"required",
             Layer_Description: "required",
             LayerFormat:"required"
@@ -450,7 +449,7 @@
             LayerName: "Please enter the layer name.",
             StateName:"Please enter the layer state.",
             CountryName:"Please enter the layer country.",
-            ContinentName:"Please enter the layer continent.",
+            CityName:"Please enter the layer City.",
             FirstLayer: "Please select the main category.",
             Layer_Description: "Please write a description of the layer.",
             LayerFormat:"Please choose your layer format."
@@ -513,15 +512,14 @@
     }
 
     $(function() {
-        new dgContinentsCountries({
-            continentVal: document.getElementById("continent").val,
+        new dgCitysCountries({
+            CityVal: document.getElementById("City").val,
             countryVal: document.getElementById("country").val,
-            continent: document.getElementById("continent"),
+            City: document.getElementById("City"),
             country: document.getElementById("country"),
             change: true
         });
     });
-
 
 </script>
 </body>

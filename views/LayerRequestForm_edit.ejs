@@ -163,7 +163,7 @@
         .selectpicker {
             height: 60px;
         }
-        #continent, #country {
+        #City, #country {
             height: 60px;
         }
         .other {
@@ -311,18 +311,6 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-4 control-label">Layer Continent</label>
-                        <div class="col-md-8 inputGroupContainer">
-                            <div class="input-group">
-                                <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-globe"></i></span>
-                                <!--<input id="LayerContinentInput" name="ContinentName" placeholder="Layer Continent" class="form-control" required value="" type="text"></div>-->
-                                <select  id="continent" class="form-control selectpicker" name="ContinentName">
-                                    <option value="select">SELECT CONTINENT</option>
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="form-group">
                         <label class="col-md-4 control-label">Layer Country</label>
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group">
@@ -339,6 +327,23 @@
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="glyphicon glyphicon-globe"></i></span>
                                 <input name="StateName" value="" placeholder="State Name" class="form-control" required  type="text" id="LayerStateInput">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label class="col-md-4 control-label">Layer City</label>
+                        <div class="col-md-8 inputGroupContainer">
+                            <!--<div class="input-group">-->
+                                <!--<span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-globe"></i></span>-->
+                                <!--&lt;!&ndash;<input id="LayerCityInput" name="CityName" placeholder="Layer City" class="form-control" required value="" type="text"></div>&ndash;&gt;-->
+                                <!--<select  id="City" class="form-control selectpicker" name="CityName">-->
+                                    <!--<option value="select">SELECT CONTINENT</option>-->
+                                <!--</select>-->
+                            <!--</div>-->
+                            <div class="input-group">
+                                <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-globe"></i></span>
+                                <!--<input id="LayerCityInput" name="CityName" placeholder="Layer City" class="form-control" required value="" type="text"></div>-->
+                                <input name="CityName" id="City" value="" placeholder="Please enter full City name" class="form-control selectpicker" type="text">
                             </div>
                         </div>
                     </div>
@@ -408,7 +413,7 @@
         document.getElementById('LayerStateInput').value = getvalue[6];
         document.getElementById('LayerFormat').value = getvalue[13];
         document.getElementById('message').value = getvalue[12];
-        document.getElementById('continent').options[0].innerHTML = getvalue[4];
+        document.getElementById('City').innerHTML = getvalue[4];
         document.getElementById('country').options[0].innerHTML = getvalue[5];
         document.getElementById('DisplayName').value = getvalue[11];
         document.getElementById('comment').value = getvalue[16];
@@ -452,7 +457,7 @@
             }
         })
 
-        $("#continent").change(function () {
+        $("#City").change(function () {
             var val = $(this).val();
             if (val == "select") {
                 $("#country").html("<option value='select'>SELECT SUBCATEGORY</option>");
@@ -601,7 +606,7 @@
            $('input,select,textarea').not('[readonly],[disabled],:button').val('');
            $("#main").value = "Category";
             $("#sub").html("<option>SELECT SUBCATEGORY</option>");
-            $("#continent").html("<option>SELECT CONTINENT</option>");
+            $("#City").html("<option>SELECT CONTINENT</option>");
             $("#country").html("<option>SELECT COUNTRY</option>");
         }
     }
@@ -616,11 +621,10 @@
             Layer_Name: "required",
             StateName:"required",
             CountryName:"required",
-            ContinentName:"required",
+            CityName:"required",
             FirstLayer:"required",
             SecondLayer:"required",
             Layer_Description: "required",
-            CityName: "required",
             LayerFormat:"required"
 
         },
@@ -629,7 +633,7 @@
             Layer_Name: "Please enter the layer name.",
             StateName:"Please enter the layer state.",
             CountryName:"Please enter the layer country.",
-            ContinentName:"Please enter the layer continent.",
+            CityName:"Please enter the layer City.",
             FirstLayer: "Please select the main category.",
             SecondLayer:"Please select the subcategory.",
             Layer_Description: "Please write the description of the layer.",
@@ -698,11 +702,11 @@
         })
     }
 
-    $("#continent").click(function () {
-        new dgContinentsCountries({
-            continentVal: document.getElementById("continent").val,
+    $("#City").click(function () {
+        new dgCitysCountries({
+            CityVal: document.getElementById("City").val,
             countryVal: document.getElementById("country").val,
-            continent: document.getElementById("continent"),
+            City: document.getElementById("City"),
             country: document.getElementById("country"),
             change: true
         });

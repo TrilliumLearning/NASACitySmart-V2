@@ -166,6 +166,26 @@ module.exports = function (app, passport) {
 
     });
 
+
+    app.get('/placemark', function(req, res) {
+        console.log("Hello traveler");
+        res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+        var select = "SELECT * FROM CitySmart2.LayerMenu WHERE LayerType = 'Placemark'";
+        con_CS.query( select, function (err, result) {
+            if (err) throw err;
+            else {
+                console.log(result);
+                res.json({"err": false, "data": result});
+            }
+        });
+    });
+
+
+
+
+    // app.listen(3005, function(){ console.log('Example app listening on port 3005!')});
+
+
     app.post('/email', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
         let statement = "SELECT * FROM UserLogin WHERE username = '" + req.body.username + "';";
@@ -1422,7 +1442,7 @@ module.exports = function (app, passport) {
     app.get('/secondLayer', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         var firstlayerValue = req.query.FirstLayer;
-        con_CS.query("SELECT SecondLayer,FirstLayer FROM LayerMenu WHERE Status ='Approved' and FirstLayer =? GROUP BY SecondLayer ", firstlayerValue ,function (err, result) {
+        con_CS.query("SELECT SecondLayer,FirstLayer FROM LayerMenu WHERE Status ='Approved' and FirstLayer =? GROUP BY SecondLayer", firstlayerValue ,function (err, result) {
             // let JSONresult = JSON.stringify(result, null, "\t");
             if (err) { throw err } else {
                 console.log(result);
@@ -1434,7 +1454,7 @@ module.exports = function (app, passport) {
     app.get('/thirdLayer', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
         var secondLayerValue = req.query.SecondLayer;
-        con_CS.query("SELECT SecondLayer,ThirdLayer,CityName,StateName,CountryName, GROUP_CONCAT(LayerName) as LayerName FROM LayerMenu WHERE Status ='Approved' and SecondLayer =? GROUP BY ThirdLayer,CityName,StateName,CountryName,SecondLayer", secondLayerValue ,function (err, result) {
+        con_CS.query("SELECT LayerType,SecondLayer,ThirdLayer,CityName,StateName,CountryName, GROUP_CONCAT(LayerName) as LayerName FROM LayerMenu WHERE Status ='Approved' and SecondLayer =? GROUP BY ThirdLayer,CityName,StateName,CountryName,SecondLayer,LayerType", secondLayerValue ,function (err, result) {
             // let JSONresult = JSON.stringify(result, null, "\t");
             //All layer?
             //WHERE cityname = ''?

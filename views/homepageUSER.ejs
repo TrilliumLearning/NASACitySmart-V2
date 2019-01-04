@@ -18,6 +18,36 @@
     <script data-main="../scripts/MainMenu" src="../src/require-2.3.5.min.js"></script>
 
     <style>
+        .popup-group {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 120%;
+            background-color: rgba(290, 220, 220, 0.51);
+            display: none
+
+        }
+        .popupBoxWrapper{
+            width: 510px; margin: 50px auto; text-align: left; max-height:800px; overflow-y: auto;
+        }
+        .popupBoxContent{
+            background-color: #FFF; padding: 25px; width:100%;
+
+        }
+        .popup-Header {
+            padding: 10px 16px;
+            background-color: #84c77d;
+            color: white;
+        }
+        .close {
+            color: red;
+            float: right;
+            font-size: 38px;
+            font-weight: bold;
+        }
+        .popup-Body {padding: 2px 16px;}
+
         body{
             padding-bottom: 80px;
             word-wrap:break-word;
@@ -227,41 +257,40 @@
 </head>
 
 <body>
-<div class="container">
-
-    <div class="navul" style="height:80px;background:#000000;">
-        <a class="navul" style="background:#000000;" href="http://aworldbridge.com">
-            <img class="banner" src="/images/NewWBBanner.jpg" style="width: 500px;height:76px;"/>
-        </a>
-        <a href="/userHome" id= "Request" style="width:110px;">
-            <button class="navbutton1" style="width: 140px"> User Home </button>
-        </a>
-        <a href="/newRequest" id= "Request" style="width:110px;">
-            <button class="navbutton1" style="width: 140px"> New Request </button>
-        </a>
-        <a href="/recovery" id ="Restore" style="width:50px;">
-            <button class="navbutton1"> Restore </button>
-        </a>
-        <a href="/dataHistory" style="width:110px;">
-            <button class="navbutton1" style="width: 160px"> Approved Requests </button>
-        </a>
-        <div class="dropdown" style="height: 80px; width: 200px; float: right; margin: 0;">
-            <button onclick="dropDown()" class="dropbutton" id="Username">
-                <%= firstName%>
-                <span class="caret"></span>
-            </button>
-            <div id="userMenuAdmin" class="dropdown-content">
-                <a href="/userProfile"> User Profile </a>
-                <a href="/userManagement"> User Management </a>
-                <a href="/signout"> Sign Out </a>
-            </div>
-            <div id="userMenuRegular" class="dropdown-content">
-                <a href="/userProfile"> User Profile </a>
-                <a href="/signout"> Sign Out </a>
-            </div>
+<div class="navul" style="height:80px;background:#000000;">
+    <a class="navul" style="background:#000000;" href="http://aworldbridge.com">
+        <img class="banner" src="/images/NewWBBanner.jpg" style="width: 500px;height:76px;"/>
+    </a>
+    <a href="/userHome" id= "Request" style="width:110px;">
+        <button class="navbutton1" style="width: 140px"> User Home </button>
+    </a>
+    <a href="/newRequest" id= "Request" style="width:110px;">
+        <button class="navbutton1" style="width: 140px"> New Request </button>
+    </a>
+    <a href="/recovery" id ="Restore" style="width:50px;">
+        <button class="navbutton1"> Restore </button>
+    </a>
+    <a href="/dataHistory" style="width:110px;">
+        <button class="navbutton1" style="width: 160px"> Approved Requests </button>
+    </a>
+    <div class="dropdown" style="height: 80px; width: 200px; float: right; margin: 0;">
+        <button onclick="dropDown()" class="dropbutton" id="Username">
+            <%= firstName%>
+            <span class="caret"></span>
+        </button>
+        <div id="userMenuAdmin" class="dropdown-content">
+            <a href="/userProfile"> User Profile </a>
+            <a href="/userManagement"> User Management </a>
+            <a href="/signout"> Sign Out </a>
+        </div>
+        <div id="userMenuRegular" class="dropdown-content">
+            <a href="/userProfile"> User Profile </a>
+            <a href="/signout"> Sign Out </a>
         </div>
     </div>
+</div>
 
+<div class="container">
     <div>
         <!-- Menu -->
         <ul class="nav navbar-nav">
@@ -534,6 +563,27 @@
                 Your browser does not support HTML5 Canvas.
             </canvas>
 
+        </div>
+    </div>
+</div>
+<div class="col-sm-9" id="globe">
+    <canvas id="canvasOne" width="1000" height="1000" style="width: 100%; height: auto;">
+        Your browser does not support HTML5 Canvas.
+    </canvas>
+    <div class="popup-group" id="popupBox">
+        <div class="popupBoxWrapper">
+            <div class="popupBoxContent">
+                <!-- Popup Box Header-->
+                <div class="popup-Header">
+                    <span class="close" id="closeIt">&times;</span>
+                </div>
+                <!-- Popup Box Body-->
+                <div class="popup-Body" id="popupBody">
+                </div>
+                <!--Popup Box Footer-->
+                <div class="popup-Footer">
+                </div>
+            </div>
         </div>
     </div>
 </div>

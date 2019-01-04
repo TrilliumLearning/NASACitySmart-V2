@@ -136,6 +136,36 @@
 
         .alert alert-danger {
         }
+        .popup-group {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 120%;
+            background-color: rgba(290, 220, 220, 0.51);
+            display: none
+
+        }
+        .popupBoxWrapper{
+            width: 510px; margin: 50px auto; text-align: left; max-height:800px; overflow-y: auto;
+        }
+        .popupBoxContent{
+            background-color: #FFF; padding: 25px; width:100%;
+
+        }
+        .popup-Header {
+            padding: 10px 16px;
+            background-color: #84c77d;
+            color: white;
+        }
+        .close {
+            color: red;
+            float: right;
+            font-size: 38px;
+            font-weight: bold;
+        }
+        .popup-Body {padding: 2px 16px;}
+
 
     </style>
 
@@ -434,6 +464,27 @@
                 Your browser does not support HTML5 Canvas.
             </canvas>
 
+        </div>
+    </div>
+</div>
+<div class="col-sm-9" id="globe">
+    <canvas id="canvasOne" width="1000" height="1000" style="width: 100%; height: auto;">
+        Your browser does not support HTML5 Canvas.
+    </canvas>
+    <div class="popup-group" id="popupBox">
+        <div class="popupBoxWrapper">
+            <div class="popupBoxContent">
+                <!-- Popup Box Header-->
+                <div class="popup-Header">
+                    <span class="close" id="closeIt">&times;</span>
+                </div>
+                <!-- Popup Box Body-->
+                <div class="popup-Body" id="popupBody">
+                </div>
+                <!--Popup Box Footer-->
+                <div class="popup-Footer">
+                </div>
+            </div>
         </div>
     </div>
 </div>
