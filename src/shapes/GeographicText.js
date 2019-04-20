@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -103,18 +104,18 @@ define([
             dc.surfacePointForMode(this.position.latitude, this.position.longitude, this.position.altitude,
                 this.altitudeMode, GeographicText.placePoint);
 
-            if (!dc.navigatorState.frustumInModelCoordinates.containsPoint(GeographicText.placePoint)) {
+            if (!dc.frustumInModelCoordinates.containsPoint(GeographicText.placePoint)) {
                 return false;
             }
 
-            this.eyeDistance = this.alwaysOnTop ? 0 : dc.navigatorState.eyePoint.distanceTo(GeographicText.placePoint);
+            this.eyeDistance = this.alwaysOnTop ? 0 : dc.eyePoint.distanceTo(GeographicText.placePoint);
 
             // Compute the text's screen point in the OpenGL coordinate system of the WorldWindow by projecting its model
             // coordinate point onto the viewport. Apply a depth offset in order to cause the text to appear above nearby
             // terrain. When text is displayed near the terrain portions of its geometry are often behind the terrain,
             // yet as a screen element the text is expected to be visible. We adjust its depth values rather than moving
             // the text itself to avoid obscuring its actual position.
-            if (!dc.navigatorState.projectWithDepth(GeographicText.placePoint, this.depthOffset, this.screenPoint)) {
+            if (!dc.projectWithDepth(GeographicText.placePoint, this.depthOffset, this.screenPoint)) {
                 return false;
             }
 

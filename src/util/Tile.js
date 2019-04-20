@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -12,6 +13,11 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ * 
+ * NOTICE: This file was modified from the original NASAWorldWind/WebWorldWind distribution.
+ * NOTICE: This file contains changes made by Kyle Kauffman (Github: @kyonifer)
+ * NOTICE: This file contains changes made by Bruce Schubert (bruce@emxsys.com)
+ * 
  */
 /**
  * @exports Tile
@@ -115,7 +121,7 @@ define([
              * @type {String}
              * @readonly
              */
-            this.tileKey = level.levelNumber.toString() + "." + row.toString() + "." + column.toString();
+            this.tileKey = Tile.computeTileKey(level.levelNumber, row, column);
 
             /**
              * The Cartesian bounding box of this tile.
@@ -136,6 +142,15 @@ define([
              * @default 1
              */
             this.opacity = 1;
+            
+            /**
+             * Set minCellSize to a value greater than zero to limit the tile subdivision to a particular
+             * pixel size (typically measured in meters per pixel).
+             * @type Number
+             * @default 0.1
+             * @see mustSubdivide
+             */
+            this.minCellSize = 0.1;
 
             // Internal use only. Intentionally not documented.
             this.samplePoints = null;
@@ -322,10 +337,10 @@ define([
             // window-size dependent and results in selecting an excessive number of tiles when the window is large.
 
             var cellSize = dc.globe.equatorialRadius * this.texelSize,
-                distance = this.distanceTo(dc.navigatorState.eyePoint),
-                pixelSize = dc.navigatorState.pixelSizeAtDistance(distance);
+                distance = this.distanceTo(dc.eyePoint),
+                pixelSize = dc.pixelSizeAtDistance(distance);
 
-            return cellSize > Math.max(detailFactor * pixelSize, 0.5);
+          return cellSize > Math.max(detailFactor * pixelSize, this.minCellSize);
         };
 
         /**
@@ -372,9 +387,10 @@ define([
             var globe = dc.globe,
                 verticalExaggeration = dc.verticalExaggeration,
                 extremes = globe.minAndMaxElevationsForSector(this.sector),
-                minHeight = extremes ? (extremes[0] * verticalExaggeration) : 0,
-                maxHeight = extremes ? (extremes[1] * verticalExaggeration) : 0;
-            if (minHeight == maxHeight) {
+                minHeight = extremes[0] * verticalExaggeration,
+                maxHeight = extremes[1] * verticalExaggeration;
+
+            if (minHeight === maxHeight) {
                 minHeight = maxHeight + 10; // TODO: Determine if this is necessary.
             }
 
@@ -400,6 +416,18 @@ define([
 
             globe.computePointFromPosition(this.sector.centroidLatitude(), this.sector.centroidLongitude(), 0,
                 this.referencePoint);
+        };
+
+        /**
+         * Computes a key that uniquely identifies a tile within its level set.
+         *
+         * @param {Number} levelNumber The tile's level number in a tile pyramid.
+         * @param {Number} row The tile's row in the specified level in a tile pyramid.
+         * @param {Number} column The tile's column in the specified level in a tile pyramid.
+         * @returns {String} A string key uniquely identifying a tile with the specified level, row, and column.
+         */
+        Tile.computeTileKey = function (levelNumber, row, column) {
+            return levelNumber + "." + row + "." + column;
         };
 
         /**

@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -148,7 +149,7 @@ define([
 
             if (canvasWidth > 650) { // large canvas, align the text with bottom center
                 x = (canvasWidth / 2) - 50;
-                y = 5;
+                y = 11;
                 yUnitsScreen = WorldWind.OFFSET_PIXELS;
                 yUnitsText = 0;
             } else if (canvasWidth > 400) { // medium canvas, align the text in the top left
@@ -194,7 +195,7 @@ define([
             }
 
             // TODO can we control crosshair visibility by adding targetVisibility to ScreenImage?
-            if (this.eventType == "touch") {
+            if (this.eventType === "touch") {
                 this.crosshairImage.render(dc);
             }
 
@@ -203,15 +204,15 @@ define([
 
         // Intentionally not documented.
         CoordinatesDisplayLayer.prototype.handleUIEvent = function (event) {
-            if (event.type.indexOf("pointer") != -1) {
+            if (event.type.indexOf("pointer") !== -1) {
                 this.eventType = event.pointerType; // possible values are "mouse", "pen" and "touch"
-            } else if (event.type.indexOf("mouse") != -1) {
+            } else if (event.type.indexOf("mouse") !== -1) {
                 this.eventType = "mouse";
-            } else if (event.type.indexOf("touch") != -1) {
+            } else if (event.type.indexOf("touch") !== -1) {
                 this.eventType = "touch";
             }
 
-            if (event.type.indexOf("leave") != -1) {
+            if (event.type.indexOf("leave") !== -1) {
                 this.clientX = null; // clear the event coordinates when a pointer leaves the canvas
                 this.clientY = null;
             } else {
@@ -224,20 +225,20 @@ define([
 
         // Intentionally not documented.
         CoordinatesDisplayLayer.prototype.handleRedraw = function (stage) {
-            if (stage != WorldWind.BEFORE_REDRAW) {
+            if (stage !== WorldWind.BEFORE_REDRAW) {
                 return; // ignore after redraw events
             }
 
             var pickPoint,
                 terrainObject;
 
-            if ((this.eventType == "mouse" || this.eventType == "pen") && this.clientX && this.clientY) {
+            if ((this.eventType === "mouse" || this.eventType === "pen") && this.clientX && this.clientY) {
                 pickPoint = this.wwd.canvasCoordinates(this.clientX, this.clientY);
                 if (pickPoint[0] >= 0 && pickPoint[0] < this.wwd.canvas.width &&
                     pickPoint[1] >= 0 && pickPoint[1] < this.wwd.canvas.height) {
                     terrainObject = this.wwd.pickTerrain(pickPoint).terrainObject();
                 }
-            } else if (this.eventType == "touch") {
+            } else if (this.eventType === "touch") {
                 pickPoint = new Vec2(this.wwd.canvas.width / 2, this.wwd.canvas.height / 2);
                 terrainObject = this.wwd.pickTerrain(pickPoint).terrainObject();
             }

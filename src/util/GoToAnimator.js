@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -126,7 +127,7 @@ define([
             // Determine an approximate viewport size in radians in order to determine whether we actually change
             // the range as we pan to the new location. We don't want to change the range if the distance between
             // the start and target positions is small relative to the current viewport.
-            var viewportSize = this.wwd.worldWindowController.currentState().pixelSizeAtDistance(this.startPosition.altitude)
+            var viewportSize = this.wwd.pixelSizeAtDistance(this.startPosition.altitude)
                 * this.wwd.canvas.clientWidth / this.wwd.globe.equatorialRadius;
 
             if (panDistance <= 2 * viewportSize) {

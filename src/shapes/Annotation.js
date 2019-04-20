@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -12,6 +13,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ *  
+ * NOTICE: This file was modified from the original NASAWorldWind/WebWorldWind distribution.
+ * NOTICE: This file contains changes made by Bruce Schubert (bruce@emxsys.com)
  */
 define([
         '../shapes/AnnotationAttributes',
@@ -164,7 +168,7 @@ define([
 
                 if (dc.pickPoint) {
                     if (this.labelBounds.containsPoint(
-                            dc.navigatorState.convertPointToViewport(dc.pickPoint, Annotation.scratchPoint))) {
+                            dc.convertPointToViewport(dc.pickPoint, Annotation.scratchPoint))) {
                         po.labelPicked = true;
                     }
                 }
@@ -264,37 +268,28 @@ define([
             var w, h, s, iLeft, iRight, iTop, iBottom,
                 offset, leaderGapHeight;
 
-            // Wraps the text based and the width and height that were set for the
-            // annotation
-            this.label = dc.textRenderer.wrap(
-                this.label,
-                this.attributes.width, this.attributes.height,
-                this.attributes.textAttributes.font);
+            // Conditionally wraps the text to the width defined in the attributes.
+            // Also conditionally truncates the wrapped text to the height, if defined. 
+            if (this.attributes.width > 0) {
+                this.label = dc.textRenderer.wrap(
+                    this.label,
+                    this.attributes.width, this.attributes.height);
+            }
 
             // Compute the annotation's model point.
             dc.surfacePointForMode(this.position.latitude, this.position.longitude, this.position.altitude,
                 this.altitudeMode, this.placePoint);
 
-            this.eyeDistance = dc.navigatorState.eyePoint.distanceTo(this.placePoint);
+            this.eyeDistance = dc.eyePoint.distanceTo(this.placePoint);
 
             // Compute the annotation's screen point in the OpenGL coordinate system of the WorldWindow
             // by projecting its model coordinate point onto the viewport. Apply a depth offset in order
             // to cause the annotation to appear above nearby terrain.
-            if (!dc.navigatorState.projectWithDepth(this.placePoint, this.depthOffset, Annotation.screenPoint)) {
+            if (!dc.projectWithDepth(this.placePoint, this.depthOffset, Annotation.screenPoint)) {
                 return null;
             }
 
-            var labelFont = this.attributes.textAttributes.font;
-            var labelKey = this.label + labelFont.toString();
-
-            this.labelTexture = dc.gpuResourceCache.resourceForKey(labelKey);
-
-            if (!this.labelTexture) {
-                dc.textRenderer.enableOutline = false; // Temporary, while TextRenderer is refactored
-                this.labelTexture = dc.textRenderer.renderText(this.label);
-                dc.textRenderer.enableOutline = true; // Temporary, while TextRenderer is refactored
-                dc.gpuResourceCache.putResource(labelKey, this.labelTexture, this.labelTexture.size);
-            }
+            this.labelTexture = dc.createTextTexture(this.label, this.attributes.textAttributes);
 
             w = this.labelTexture.imageWidth;
             h = this.labelTexture.imageHeight;
@@ -333,7 +328,7 @@ define([
                 leaderOffsetY = 0;
             }
 
-            if (this.attributes.stateKey != this.lastStateKey) {
+            if (this.attributes.stateKey !== this.lastStateKey) {
                 this.calloutPoints = this.createCallout(
                     width, height,
                     leaderOffsetX, leaderOffsetY,
@@ -462,11 +457,11 @@ define([
                 this.pickColor = dc.uniquePickColor();
             }
 
-            program.loadOpacity(gl, this.attributes.opacity);
+            program.loadOpacity(gl, dc.pickingMode ? 1 : this.attributes.opacity * this.layer.opacity);
 
             // Attributes have changed. We need to track this because the callout vbo data may
             // have changed if scaled or text wrapping changes callout dimensions
-            var calloutAttributesChanged = (this.attributes.stateKey != this.lastStateKey);
+            var calloutAttributesChanged = (this.attributes.stateKey !== this.lastStateKey);
 
             // Create new cache key if callout drawing points have changed
             if (!this.calloutCacheKey || calloutAttributesChanged) {
@@ -523,7 +518,7 @@ define([
             Annotation.matrix.multiplyByTextureTransform(this.labelTexture);
             program.loadTextureMatrix(gl, Annotation.matrix);
 
-            program.loadColor(gl, dc.pickingMode ? this.pickColor : this.attributes.textAttributes.color);
+            program.loadColor(gl, dc.pickingMode ? this.pickColor : Color.WHITE);
             textureBound = this.labelTexture.bind(dc);
             program.loadTextureEnabled(gl, textureBound);
 

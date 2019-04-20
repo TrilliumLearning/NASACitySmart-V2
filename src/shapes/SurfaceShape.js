@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -21,6 +22,7 @@ define([
         '../geom/Angle',
         '../error/ArgumentError',
         '../geom/BoundingBox',
+        '../util/Color',
         '../geom/Location',
         '../util/Logger',
         '../cache/MemoryCache',
@@ -31,12 +33,13 @@ define([
         '../geom/Sector',
         '../shapes/ShapeAttributes',
         '../error/UnsupportedOperationError',
-        '../util/WWMath'
+        '../geom/Vec3'
     ],
     function (AbstractError,
               Angle,
               ArgumentError,
               BoundingBox,
+              Color,
               Location,
               Logger,
               MemoryCache,
@@ -47,7 +50,7 @@ define([
               Sector,
               ShapeAttributes,
               UnsupportedOperationError,
-              WWMath) {
+              Vec3) {
         "use strict";
 
         /**
@@ -79,7 +82,7 @@ define([
             this._pathType = WorldWind.GREAT_CIRCLE;
             this._maximumNumEdgeIntervals = SurfaceShape.DEFAULT_NUM_EDGE_INTERVALS;
             this._polarThrottle = SurfaceShape.DEFAULT_POLAR_THROTTLE;
-            this._sector = null;
+            this._boundingSector = null;
 
             /**
              * Indicates the object to return as the owner of this shape when picked.
@@ -93,7 +96,7 @@ define([
              * @type {Sector[]}
              * @protected
              */
-            this._sectors = [];
+            this._boundingSectors = [];
 
             /*
              * The raw collection of locations defining this shape and are explicitly specified by the client of this class.
@@ -381,9 +384,9 @@ define([
              * @memberof SurfaceShape.prototype
              * @type {Sector}
              */
-            sector: {
+            boundingSector: {
                 get: function () {
-                    return this._sector;
+                    return this._boundingSector;
                 }
             }
         });
@@ -417,10 +420,10 @@ define([
                 " ne " + shape.maximumNumEdgeIntervals +
                 " po " + shape.polarThrottle +
                 " se " + "[" +
-                shape.sector.minLatitude + "," +
-                shape.sector.maxLatitude + "," +
-                shape.sector.minLongitude + "," +
-                shape.sector.maxLongitude +
+                shape.boundingSector.minLatitude + "," +
+                shape.boundingSector.maxLatitude + "," +
+                shape.boundingSector.minLongitude + "," +
+                shape.boundingSector.maxLongitude +
                 "]";
         };
 
@@ -454,7 +457,7 @@ define([
                 if (dc.pickingMode) {
                     return this.currentData.extent.intersectsFrustum(dc.pickFrustum);
                 } else {
-                    return this.currentData.extent.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates);
+                    return this.currentData.extent.intersectsFrustum(dc.frustumInModelCoordinates);
                 }
             } else {
                 return true;
@@ -712,13 +715,13 @@ define([
          */
         SurfaceShape.prototype.computeSectors = function (dc) {
             // Return a previously computed value if it already exists.
-            if (this._sectors && this._sectors.length > 0) {
-                return this._sectors;
+            if (this._boundingSectors && this._boundingSectors.length > 0) {
+                return this._boundingSectors;
             }
 
             this.prepareBoundaries(dc);
 
-            return this._sectors;
+            return this._boundingSectors;
         };
 
         /**
@@ -730,7 +733,7 @@ define([
          */
         SurfaceShape.prototype.computeExtent = function (dc) {
 
-            if (!this._sectors || this._sectors.length === 0) {
+            if (!this._boundingSectors || this._boundingSectors.length === 0) {
                 return null;
             }
 
@@ -746,8 +749,8 @@ define([
             var boxPoints;
             // This surface shape does not cross the international dateline, and therefore has a single bounding sector.
             // Return the box which contains that sector.
-            if (this._sectors.length === 1) {
-                boxPoints = this._sectors[0].computeBoundingPoints(dc.globe, dc.verticalExaggeration);
+            if (this._boundingSectors.length === 1) {
+                boxPoints = this._boundingSectors[0].computeBoundingPoints(dc.globe, dc.verticalExaggeration);
                 this.currentData.extent.setToVec3Points(boxPoints);
             }
             // This surface crosses the international dateline, and its bounding sectors are split along the dateline.
@@ -755,8 +758,8 @@ define([
             else {
                 var boxCorners = [];
 
-                for (var i = 0; i < this._sectors.length; i++) {
-                    boxPoints = this._sectors[i].computeBoundingPoints(dc.globe, dc.verticalExaggeration);
+                for (var i = 0; i < this._boundingSectors.length; i++) {
+                    boxPoints = this._boundingSectors[i].computeBoundingPoints(dc.globe, dc.verticalExaggeration);
                     var box = new BoundingBox();
                     box.setToVec3Points(boxPoints);
                     var corners = box.getCorners();
@@ -770,6 +773,134 @@ define([
             return this.currentData.extent;
 
         };
+
+        /**
+         * Computes a new set of locations translated from a specified location to a new location for a shape.
+         *
+         * @param {Globe} globe The globe on which to compute a new set of locations.
+         * @param {Location} oldLocation The original reference location.
+         * @param {Location} newLocation The new reference location.
+         * @param {Location[]} locations The locations to translate.
+         *
+         * @return {Location[]} The translated locations.
+         */
+        SurfaceShape.prototype.computeShiftedLocations = function(globe, oldLocation, newLocation, locations) {
+            var newLocations = [];
+            var result = new Vec3(0, 0, 0);
+            var newPos = new WorldWind.Position(0, 0, 0);
+
+            var oldPoint = globe.computePointFromLocation(oldLocation.latitude, oldLocation.longitude,
+                new Vec3(0, 0, 0));
+            var newPoint = globe.computePointFromLocation(newLocation.latitude, newLocation.longitude,
+                new Vec3(0, 0, 0));
+
+            if(globe.is2D()){
+                var delta = newPoint.subtract(oldPoint);
+
+                for (var i = 0, len = locations.length; i < len; i++) {
+                    globe.computePointFromLocation(locations[i].latitude, locations[i].longitude, result);
+                    result.add(delta);
+                    globe.computePositionFromPoint(result[0], result[1], result[2], newPos);
+                    newLocations.push(new Location(newPos.latitude, newPos.longitude));
+                }
+            } else {
+                // Euler method
+
+                // var xVecOld = new Vec3(0, oldPoint[1], oldPoint[2]);
+                // var yVecOld =  new Vec3(oldPoint[0], 0, oldPoint[2]);
+                // var zVecOld =  new Vec3(oldPoint[0], oldPoint[1], 0);
+                // var xVecNew = new Vec3(0, newPoint[1], newPoint[2]);
+                // var yVecNew =  new Vec3(newPoint[0], 0, newPoint[2]);
+                // var zVecNew =  new Vec3(newPoint[0], newPoint[1], 0);
+                //
+                //
+                // var alpha = Math.acos(xVecOld.dot(xVecNew) / (xVecOld.magnitude() * xVecNew.magnitude()));
+                // var beta = Math.acos(yVecOld.dot(yVecNew) / (yVecOld.magnitude() * yVecNew.magnitude()));
+                // var gama = Math.acos(zVecOld.dot(zVecNew) / (zVecOld.magnitude() * zVecNew.magnitude()));
+                //
+                // var alpha = Math.atan2()
+                //
+                // var crossX = xVecOld.cross(xVecNew);
+                // var crossY = yVecOld.cross(yVecNew);
+                // var crossZ = zVecOld.cross(zVecNew);
+                //
+                // if(new Vec3(1, 0, 0).dot(crossX) < 0){
+                //      alpha = -alpha;
+                // }
+                //
+                // if(new Vec3(0, 1, 0).dot(crossY) < 0){
+                //     beta = -beta;
+                // }
+                //
+                // if(new Vec3(0, 0, 1).dot(crossZ) < 0){
+                //     gama = -gama;
+                // }
+                //
+                // for (var i = 0, len = locations.length; i < len; i++) {
+                //     globe.computePointFromLocation(locations[i].latitude, locations[i].longitude, result);
+                //     var newX = result[0] * Math.cos(beta) * Math.cos(gama) +
+                //                result[1] * (Math.cos(beta) * (-Math.sin(gama))) +
+                //                result[2] * Math.sin(beta);
+                //
+                //     var newY = result[0] * ((-Math.sin(alpha)) * (-Math.sin(beta)) * (Math.cos(gama)) + Math.cos(alpha) * Math.sin(gama)) +
+                //                result[1] * ( (-Math.sin(alpha)) * (-Math.sin(beta)) * (-Math.sin(gama)) + Math.cos(alpha) * Math.cos(gama) ) +
+                //                result[2] * Math.sin(alpha) * Math.cos(beta);
+                //
+                //     var newZ = result[0] * (Math.cos(alpha) * (-Math.sin(beta)) * Math.cos(gama) + Math.sin(alpha) * Math.sin(gama)) +
+                //                result[1] * (Math.cos(alpha) * (-Math.sin(beta)) * (-Math.sin(gama)) + Math.sin(alpha) * Math.cos(gama)) +
+                //                result[2] * Math.cos(alpha) * Math.cos(beta);
+                //
+                //     globe.computePositionFromPoint(newX, newY, newZ, newPos);
+                //     newLocations.push(new Location(newPos.latitude, newPos.longitude));
+                // }
+
+                var delta_lat = newLocation.latitude - oldLocation.latitude;
+                var delta_long = newLocation.longitude - oldLocation.longitude;
+                var max = -90;
+                var min = 90;
+
+                for (var i = 0, len = locations.length; i < len; i++) {
+                    var new_lat = locations[i].latitude + delta_lat;
+                    var new_long = locations[i].longitude + delta_long;
+
+
+                    if (new_lat > 90) {
+                        new_lat = 180 - new_lat;
+                        new_long += 180;
+                    } else if (new_lat < -90) {
+                        new_lat = -180 - new_lat;
+                        new_long += 180;
+                    }
+
+                    if (new_long < -180) {
+                        new_long += 360;
+                    } else if (new_long > 180) {
+                        new_long -= 360;
+                    }
+
+
+                    if (new_lat > max) {
+                        max = new_lat;
+                    }
+
+                    if (new_lat < min) {
+                        min = new_lat;
+                    }
+
+                    newLocations.push(new Location(new_lat, new_long));
+                }
+
+                if (max > 90) {
+                    var delta = max - 90;
+                    for (var i = 0, len = newLocations.length; i < len; i++) {
+                        newLocations[i].latitude -= delta;
+                    }
+                }
+            }
+
+            return newLocations;
+        };
+
 
         // Internal use only. Intentionally not documented.
         SurfaceShape.prototype.prepareSectors = function () {
@@ -826,20 +957,20 @@ define([
             }
             var minLatitude = Math.min(eastSector.minLatitude, westSector.minLatitude);
             var maxLatitude = Math.max(eastSector.maxLatitude, eastSector.maxLatitude);
-            this._sector = new Sector(minLatitude, maxLatitude, -180, 180);
-            this._sectors = [eastSector, westSector];
+            this._boundingSector = new Sector(minLatitude, maxLatitude, -180, 180);
+            this._boundingSectors = [eastSector, westSector];
         };
 
         // Internal use only. Intentionally not documented.
         SurfaceShape.prototype.sectorsNotOverAntiMeridian = function () {
-            this._sector = new Sector(90, -90, 180, -180);
+            this._boundingSector = new Sector(90, -90, 180, -180);
             for (var i = 0, len = this.contours.length; i < len; i++) {
                 var sectors = this.contours[i].sectors;
                 for (var j = 0, lenS = sectors.length; j < lenS; j++) {
-                    this._sector.union(sectors[j]);
+                    this._boundingSector.union(sectors[j]);
                 }
             }
-            this._sectors = [this._sector];
+            this._boundingSectors = [this._boundingSector];
         };
 
         // Internal use only. Intentionally not documented.
@@ -947,43 +1078,47 @@ define([
          */
         SurfaceShape.prototype.renderToTexture = function (dc, ctx2D, xScale, yScale, dx, dy) {
             var attributes = (this._highlighted ? (this._highlightAttributes || this._attributes) : this._attributes);
+            if (!attributes) {
+                return;
+            }
+
             var drawInterior = (!this._isInteriorInhibited && attributes.drawInterior);
             var drawOutline = (attributes.drawOutline && attributes.outlineWidth > 0);
-
             if (!drawInterior && !drawOutline) {
                 return;
             }
 
-            if (dc.pickingMode && !this.pickColor) {
-                this.pickColor = dc.uniquePickColor();
-            }
-
             if (dc.pickingMode) {
-                var pickColor = this.pickColor.toHexString();
+                if (!this.pickColor) {
+                    this.pickColor = dc.uniquePickColor();
+                }
+                ctx2D.fillStyle = this.pickColor.toCssColorString();
+                ctx2D.strokeStyle = ctx2D.fillStyle;
+                ctx2D.lineWidth = attributes.outlineWidth;
+            } else {
+                var ic = attributes.interiorColor,
+                    oc = attributes.outlineColor;
+                ctx2D.fillStyle = new Color(ic.red, ic.green, ic.blue, ic.alpha * this.layer.opacity).toCssColorString();
+                ctx2D.strokeStyle = new Color(oc.red, oc.green, oc.blue, oc.alpha * this.layer.opacity).toCssColorString();
+                ctx2D.lineWidth = attributes.outlineWidth;
             }
 
             if (this.crossesAntiMeridian || this.containsPole) {
                 if (drawInterior) {
                     this.draw(this._interiorGeometry, ctx2D, xScale, yScale, dx, dy);
-                    ctx2D.fillStyle = dc.pickingMode ? pickColor : attributes.interiorColor.toRGBAString();
                     ctx2D.fill();
                 }
                 if (drawOutline) {
                     this.draw(this._outlineGeometry, ctx2D, xScale, yScale, dx, dy);
-                    ctx2D.lineWidth = attributes.outlineWidth;
-                    ctx2D.strokeStyle = dc.pickingMode ? pickColor : attributes.outlineColor.toRGBAString();
                     ctx2D.stroke();
                 }
             }
             else {
                 this.draw(this._interiorGeometry, ctx2D, xScale, yScale, dx, dy);
                 if (drawInterior) {
-                    ctx2D.fillStyle = dc.pickingMode ? pickColor : attributes.interiorColor.toRGBAString();
                     ctx2D.fill();
                 }
                 if (drawOutline) {
-                    ctx2D.lineWidth = attributes.outlineWidth;
-                    ctx2D.strokeStyle = dc.pickingMode ? pickColor : attributes.outlineColor.toRGBAString();
                     ctx2D.stroke();
                 }
             }

@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -313,7 +314,7 @@ define([
         // Private. Intentionally not documented.
         Path.prototype.makeTessellatedPositions = function (dc) {
             var tessellatedPositions = [],
-                navState = dc.navigatorState,
+                eyePoint = dc.eyePoint,
                 showVerticals = this.mustDrawVerticals(dc),
                 ptA = new Vec3(0, 0, 0),
                 ptB = new Vec3(0, 0, 0),
@@ -333,8 +334,8 @@ define([
             for (var i = 1, len = this._positions.length; i < len; i++) {
                 posB = this._positions[i];
                 dc.surfacePointForMode(posB.latitude, posB.longitude, posB.altitude, this._altitudeMode, ptB);
-                eyeDistance = navState.eyePoint.distanceTo(ptA);
-                pixelSize = navState.pixelSizeAtDistance(eyeDistance);
+                eyeDistance = eyePoint.distanceTo(ptA);
+                pixelSize = dc.pixelSizeAtDistance(eyeDistance);
                 if (ptA.distanceTo(ptB) < pixelSize * 8 && this.altitudeMode !== WorldWind.ABSOLUTE) {
                     tessellatedPositions.push(posB); // distance is short so no need for sub-segments
                 } else {
@@ -356,8 +357,7 @@ define([
 
         // Private. Intentionally not documented.
         Path.prototype.makeSegment = function (dc, posA, posB, ptA, ptB, tessellatedPositions) {
-            var navState = dc.navigatorState,
-                eyePoint = navState.eyePoint,
+            var eyePoint = dc.eyePoint,
                 pos = new Location(0, 0),
                 height = 0,
                 arcLength, segmentAzimuth, segmentDistance, s, p, distance;
@@ -403,7 +403,7 @@ define([
             this.scratchPoint.copy(ptA);
             for (s = 0, p = 0; s < 1;) {
                 if (this._followTerrain) {
-                    p += this._terrainConformance * navState.pixelSizeAtDistance(this.scratchPoint.distanceTo(eyePoint));
+                    p += this._terrainConformance * dc.pixelSizeAtDistance(this.scratchPoint.distanceTo(eyePoint));
                 } else {
                     p += arcLength / this._numSubSegments;
                 }
@@ -441,7 +441,7 @@ define([
         Path.prototype.computeRenderedPath = function (dc, tessellatedPositions) {
             var capturePoles = this.mustDrawInterior(dc) || this.mustDrawVerticals(dc),
                 eyeDistSquared = Number.MAX_VALUE,
-                eyePoint = dc.navigatorState.eyePoint,
+                eyePoint = dc.eyePoint,
                 numPoints = (capturePoles ? 2 : 1) * tessellatedPositions.length,
                 tessellatedPoints = new Float32Array(numPoints * 3),
                 stride = capturePoles ? 6 : 3,
@@ -512,7 +512,7 @@ define([
                 program = dc.currentProgram,
                 currentData = this.currentData,
                 numPoints = currentData.tessellatedPoints.length / 3,
-                vboId, opacity, color, pickColor, stride, nPts;
+                vboId, color, pickColor, stride, nPts;
 
             this.applyMvpMatrix(dc);
 
@@ -546,13 +546,10 @@ define([
 
             if (this.mustDrawInterior(dc)) {
                 color = this.activeAttributes.interiorColor;
-                opacity = color.alpha * dc.currentLayer.opacity;
                 // Disable writing the shape's fragments to the depth buffer when the interior is semi-transparent.
-                if (opacity < 1 && !dc.pickingMode) {
-                    gl.depthMask(false);
-                }
+                gl.depthMask(color.alpha * this.layer.opacity >= 1 || dc.pickingMode);
                 program.loadColor(gl, dc.pickingMode ? pickColor : color);
-                program.loadOpacity(gl, dc.pickingMode ? (opacity > 0 ? 1 : 0) : opacity);
+                program.loadOpacity(gl, dc.pickingMode ? 1 : this.layer.opacity);
 
                 gl.vertexAttribPointer(program.vertexPointLocation, 3, gl.FLOAT, false, 0, 0);
                 gl.drawArrays(gl.TRIANGLE_STRIP, 0, numPoints);
@@ -566,13 +563,10 @@ define([
                 }
 
                 color = this.activeAttributes.outlineColor;
-                opacity = color.alpha * dc.currentLayer.opacity;
                 // Disable writing the shape's fragments to the depth buffer when the interior is semi-transparent.
-                if (opacity < 1 && !dc.pickingMode) {
-                    gl.depthMask(false);
-                }
+                gl.depthMask(color.alpha * this.layer.opacity >= 1 || dc.pickingMode);
                 program.loadColor(gl, dc.pickingMode ? pickColor : color);
-                program.loadOpacity(gl, dc.pickingMode ? 1 : opacity);
+                program.loadOpacity(gl, dc.pickingMode ? 1 : this.layer.opacity);
 
                 gl.lineWidth(this.activeAttributes.outlineWidth);
 
@@ -615,7 +609,7 @@ define([
             currentData.fillVbo = false;
 
             if (dc.pickingMode) {
-                var po = new PickedObject(pickColor, this.pickDelegate ? this.pickDelegate : this, null, dc.currentLayer,
+                var po = new PickedObject(pickColor, this.pickDelegate ? this.pickDelegate : this, null, this.layer,
                     false);
                 dc.resolvePick(po);
             }

@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -334,7 +335,7 @@ define([
                 if (dc.pickingMode) {
                     return this.currentData.extent.intersectsFrustum(dc.pickFrustum);
                 } else {
-                    return this.currentData.extent.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates);
+                    return this.currentData.extent.intersectsFrustum(dc.frustumInModelCoordinates);
                 }
             } else {
                 return true;
@@ -415,7 +416,7 @@ define([
          * @protected
          */
         AbstractShape.prototype.applyMvpMatrix = function (dc) {
-            this.scratchMatrix.copy(dc.navigatorState.modelviewProjection);
+            this.scratchMatrix.copy(dc.modelviewProjection);
             this.scratchMatrix.multiplyMatrix(this.currentData.transformationMatrix);
             dc.currentProgram.loadModelviewProjection(dc.currentGlContext, this.scratchMatrix);
         };
@@ -428,9 +429,9 @@ define([
          */
         AbstractShape.prototype.applyMvpMatrixForOutline = function (dc) {
             // Causes the outline to stand out from the interior.
-            this.scratchMatrix.copy(dc.navigatorState.projection);
+            this.scratchMatrix.copy(dc.projection);
             this.scratchMatrix.offsetProjectionDepth(-0.001);
-            this.scratchMatrix.multiplyMatrix(dc.navigatorState.modelview);
+            this.scratchMatrix.multiplyMatrix(dc.modelview);
             this.scratchMatrix.multiplyMatrix(this.currentData.transformationMatrix);
             dc.currentProgram.loadModelviewProjection(dc.currentGlContext, this.scratchMatrix);
         };

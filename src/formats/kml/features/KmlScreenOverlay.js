@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -17,17 +18,15 @@ define([
     './../KmlElements',
     './KmlFeature',
     './KmlOverlay',
-    '../util/NodeTransformers',
+    '../util/KmlNodeTransformers',
     '../../../util/Offset',
-    '../../../shapes/ScreenImage',
-    '../../../util/WWUtil'
+    '../../../shapes/ScreenImage'
 ], function (KmlElements,
              KmlFeature,
              KmlOverlay,
              NodeTransformers,
              Offset,
-             ScreenImage,
-             WWUtil) {
+             ScreenImage) {
     "use strict";
 
     /**
@@ -44,8 +43,6 @@ define([
      */
     var KmlScreenOverlay = function (options) {
         KmlOverlay.call(this, options);
-
-        console.log("Create Screen Overlay", this);
     };
 
     KmlScreenOverlay.prototype = Object.create(KmlOverlay.prototype);
@@ -301,7 +298,7 @@ define([
                         this.kmlScreenXYyunits,
                         this.kmlScreenXYy
                     ),
-                    this.kmlIcon.kmlHref
+                    this.kmlIcon.kmlHref(kmlOptions.fileCache)
                 );
                 this._renderable.imageOffset = new Offset(
                     this.kmlOverlayXYxunits,

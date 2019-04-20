@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -19,7 +20,7 @@
 define([
         '../../error/ArgumentError',
         '../../geom/Sector',
-        '../../ogc/wmts/OwsDescription',
+        '../../ogc/ows/OwsDescription',
         '../../util/Logger'
     ],
     function (ArgumentError,
@@ -299,7 +300,7 @@ define([
         WmtsLayerCapabilities.assembleMetadata = function (element) { // TODO
             var result = {};
 
-            var link = element.getAttribute("xlink:href");
+            var link = "https://cors.aworldbridgelabs.com:9084/" + element.getAttribute("xlink:href");
             if (link) {
                 result.url = link;
             }
@@ -352,7 +353,7 @@ define([
             result.format = element.getAttribute("format");
             result.minScaleDenominator = element.getAttribute("minScaleDenominator");
             result.maxScaleDenominator = element.getAttribute("maxScaleDenominator");
-            result.href = element.getAttribute("xlink:href");
+            result.href = "https://cors.aworldbridgelabs.com:9084/" + element.getAttribute("xlink:href");
             result.width = element.getAttribute("width");
             result.height = element.getAttribute("height");
 

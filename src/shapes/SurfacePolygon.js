@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -114,6 +115,34 @@ define([
 
         // Internal. Polygon doesn't generate its own boundaries. See SurfaceShape.prototype.computeBoundaries.
         SurfacePolygon.prototype.computeBoundaries = function(dc) {
+        };
+
+        // Internal use only. Intentionally not documented.
+        SurfacePolygon.prototype.getReferencePosition = function () {
+            // Assign the first position as the reference position.
+            if (this.boundaries.length > 0 && this.boundaries[0].length > 2) {
+                return this.boundaries[0][0];
+            } else if (this.boundaries.length > 2) {
+                return this.boundaries[0];
+            } else {
+                return null;
+            }
+        };
+
+        // Internal use only. Intentionally not documented.
+        SurfacePolygon.prototype.moveTo = function (globe, position) {
+            if (this.boundaries.length > 0 && this.boundaries[0].length > 2) {
+                var boundaries = [];
+                for (var i = 0, len = this._boundaries.length; i < len; i++) {
+                    var locations = this.computeShiftedLocations(globe, this.getReferencePosition(), position,
+                        this._boundaries[i]);
+                    boundaries.push(locations);
+                }
+                this.boundaries = boundaries;
+            } else if (this.boundaries.length > 2) {
+                this.boundaries = this.computeShiftedLocations(globe, this.getReferencePosition(), position,
+                    this._boundaries);
+            }
         };
 
         return SurfacePolygon;

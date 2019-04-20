@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -12,6 +13,9 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
+ * 
+ * NOTICE: This file was modified from the original NASAWorldWind/WebWorldWind distribution.
+ * NOTICE: This file contains changes made by Bruce Schubert <bruce@emxsys.com>.
  */
 /**
  * @exports AtmosphereLayer
@@ -128,15 +132,15 @@ define([
             }
 
             vboId = dc.gpuResourceCache.resourceForKey(skyData.verticesVboCacheKey);
-            
+
             if (!vboId) {
                 skyPoints = this.assembleVertexPoints(dc, this._skyHeight, this._skyWidth, program.getAltitude());
-                
+
                 vboId = gl.createBuffer();
                 gl.bindBuffer(gl.ARRAY_BUFFER, vboId);
                 gl.bufferData(gl.ARRAY_BUFFER, skyPoints, gl.STATIC_DRAW);
                 gl.vertexAttribPointer(0, 3, gl.FLOAT, false, 0, 0);
-                
+
                 dc.gpuResourceCache.putResource(skyData.verticesVboCacheKey, vboId,
                     skyPoints.length * 4);
                 dc.frameStatistics.incrementVboLoadCount(1);
@@ -159,14 +163,14 @@ define([
             }
 
             vboId = dc.gpuResourceCache.resourceForKey(skyData.indicesVboCacheKey);
-            
+
             if (!vboId) {
                 skyIndices = this.assembleTriStripIndices(this._skyWidth, this._skyHeight);
-                
+
                 vboId = gl.createBuffer();
                 gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, vboId);
                 gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, skyIndices, gl.STATIC_DRAW);
-                
+
                 dc.frameStatistics.incrementVboLoadCount(1);
                 dc.gpuResourceCache.putResource(skyData.indicesVboCacheKey, vboId, skyIndices.length * 2);
             }
@@ -183,11 +187,11 @@ define([
 
             program.loadGlobeRadius(gl, dc.globe.equatorialRadius);
 
-            program.loadEyePoint(gl, dc.navigatorState.eyePoint);
+            program.loadEyePoint(gl, dc.eyePoint);
 
             program.loadVertexOrigin(gl, Vec3.ZERO);
 
-            program.loadModelviewProjection(gl, dc.navigatorState.modelviewProjection);
+            program.loadModelviewProjection(gl, dc.modelviewProjection);
 
             program.loadLightDirection(gl, this._activeLightDirection);
 
@@ -215,21 +219,23 @@ define([
 
             program.loadGlobeRadius(gl, dc.globe.equatorialRadius);
 
-            program.loadEyePoint(gl, dc.navigatorState.eyePoint);
+            program.loadEyePoint(gl, dc.eyePoint);
 
             program.loadLightDirection(gl, this._activeLightDirection);
 
+            program.loadOpacity(gl, this.opacity);
+            
             program.setScale(gl);
 
             // Use this layer's night image when the layer has time value defined
             if (this.nightImageSource && (this.time !== null)) {
-                
+
                 this._activeTexture = dc.gpuResourceCache.resourceForKey(this.nightImageSource);
-                
+
                 if (!this._activeTexture) {
                     this._activeTexture = dc.gpuResourceCache.retrieveTexture(gl, this.nightImageSource);
                 }
-                
+
                 textureBound = this._activeTexture && this._activeTexture.bind(dc);
             }
 
@@ -237,7 +243,7 @@ define([
 
             for (var idx = 0, len = terrain.surfaceGeometry.length; idx < len; idx++) {
                 var currentTile = terrain.surfaceGeometry[idx];
-                
+
                 // Use the vertex origin for the terrain tile.
                 var terrainOrigin = currentTile.referencePoint;
                 program.loadVertexOrigin(gl, terrainOrigin);
@@ -309,7 +315,7 @@ define([
             }
 
             this._numIndices = result.length;
-            
+
             return new Uint16Array(result);
         };
 
@@ -320,7 +326,7 @@ define([
                 dc.globe.computePointFromLocation(sunLocation.latitude, sunLocation.longitude,
                     this._activeLightDirection);
             } else {
-                this._activeLightDirection.copy(dc.navigatorState.eyePoint);
+                this._activeLightDirection.copy(dc.eyePoint);
             }
             this._activeLightDirection.normalize();
         };

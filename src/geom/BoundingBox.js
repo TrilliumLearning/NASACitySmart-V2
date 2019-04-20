@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -318,6 +319,16 @@ define([
                 this.adjustExtremes(this.r, rExtremes, this.s, sExtremes, this.t, tExtremes, this.tmp1);
             }
 
+            // If the sector encompasses more than one hemisphere, the 3x3 grid does not capture enough detail to bound
+            // the sector. The antipodal points along the parallel through the sector's centroid represent its extremes
+            // in longitude. Incorporate those antipodal points into the extremes along each axis.
+            if (sector.deltaLongitude() > 180) {
+                globe.computePointFromPosition(sector.centroidLatitude(), sector.centroidLongitude() + 90, maxElevation, this.tmp1);
+                globe.computePointFromPosition(sector.centroidLatitude(), sector.centroidLongitude() - 90, maxElevation, this.tmp2);
+                this.adjustExtremes(this.r, rExtremes, this.s, sExtremes, this.t, tExtremes, this.tmp1);
+                this.adjustExtremes(this.r, rExtremes, this.s, sExtremes, this.t, tExtremes, this.tmp2);
+            }
+
             // Sort the axes from most prominent to least prominent. The frustum intersection methods in WWBoundingBox assume
             // that the axes are defined in this way.
             if (rExtremes[1] - rExtremes[0] < sExtremes[1] - sExtremes[0]) {
@@ -550,7 +561,7 @@ define([
             try {
                 // Setup to transform unit cube coordinates to this bounding box's local coordinates, as viewed by the
                 // current navigator state.
-                matrix.copy(dc.navigatorState.modelviewProjection);
+                matrix.copy(dc.modelviewProjection);
                 matrix.multiply(
                     this.r[0], this.s[0], this.t[0], this.center[0],
                     this.r[1], this.s[1], this.t[1], this.center[1],

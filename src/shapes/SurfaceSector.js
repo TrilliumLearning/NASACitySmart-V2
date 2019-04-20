@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -110,6 +111,31 @@ define([
             this._boundaries[1] = new Location(sector.maxLatitude, sector.minLongitude);
             this._boundaries[2] = new Location(sector.maxLatitude, sector.maxLongitude);
             this._boundaries[3] = new Location(sector.minLatitude, sector.maxLongitude);
+        };
+
+        // Internal use only. Intentionally not documented.
+        SurfaceSector.prototype.getReferencePosition = function () {
+            return new Location(this.sector.centroidLatitude(), this.sector.centroidLongitude());
+        };
+
+        // Internal use only. Intentionally not documented.
+        SurfaceSector.prototype.moveTo = function (globe, position) {
+            var sector = this._sector;
+
+            var locations = new Array(3);
+
+            locations[0] = new Location(sector.minLatitude, sector.minLongitude);
+            locations[1] = new Location(sector.maxLatitude, sector.minLongitude);
+            locations[2] = new Location(sector.maxLatitude, sector.maxLongitude);
+
+            locations = this.computeShiftedLocations(globe, this.getReferencePosition(), position, locations);
+
+            this.sector = new WorldWind.Sector(
+                locations[0].latitude,
+                locations[1].latitude,
+                locations[1].longitude,
+                locations[2].longitude
+            );
         };
 
         return SurfaceSector;

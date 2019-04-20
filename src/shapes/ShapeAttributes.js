@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -41,8 +42,8 @@ define([
             this._drawInterior = attributes ? attributes._drawInterior : true;
             this._drawOutline = attributes ? attributes._drawOutline : true;
             this._enableLighting = attributes ? attributes._enableLighting : false;
-            this._interiorColor = attributes ? attributes._interiorColor : Color.WHITE;
-            this._outlineColor = attributes ? attributes._outlineColor : Color.RED;
+            this._interiorColor = attributes ? attributes._interiorColor.clone() : Color.WHITE.clone();
+            this._outlineColor = attributes ? attributes._outlineColor.clone() : Color.RED.clone();
             this._outlineWidth = attributes ? attributes._outlineWidth : 1.0;
             this._outlineStippleFactor = attributes ? attributes._outlineStippleFactor : 0;
             this._outlineStipplePattern = attributes ? attributes._outlineStipplePattern : 0xF0F0;

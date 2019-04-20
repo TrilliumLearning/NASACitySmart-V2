@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -72,7 +73,7 @@ define([
 
                 Logger.log(Logger.LEVEL_WARNING, "WARNING: You are using a limited use, non-production Bing Maps key.\n" +
                 "If you are developing an app or a web page this violates the Bing Terms of Use.\n" +
-                "Please visit https://www.microsoft.com/maps/choose-your-bing-maps-API.aspx to obtain your own key for your application.\n" +
+                "Please visit https://www.microsoft.com/en-us/maps/create-a-bing-maps-key to obtain your own key for your application.\n" +
                 "Specify that key to WorldWind by setting the WorldWind.BingMapsKey property to your key " +
                 "prior to creating any Bing Maps layers.\n");
             }

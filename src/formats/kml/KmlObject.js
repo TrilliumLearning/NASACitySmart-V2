@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -18,7 +19,7 @@
  */
 define([
     '../../error/ArgumentError',
-    './util/Attribute',
+    './util/KmlAttribute',
     './KmlElements',
     './util/KmlElementsFactoryCached',
     '../../util/Logger',
@@ -60,6 +61,7 @@ define([
         this._cache = {};
         
         this._controls = options.controls || [];
+        // It should be possible to keep the context here?
         this._factory = new KmlElementsFactoryCached({controls: this._controls});
         
         this.hook(this._controls, options);

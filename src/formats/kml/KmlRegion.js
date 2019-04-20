@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -21,7 +22,7 @@ define([
     './KmlLod',
     './KmlObject',
     './styles/KmlStyle',
-    './util/NodeTransformers',
+    './util/KmlNodeTransformers',
     '../../geom/Sector'
 ], function (BoundingBox,
              Color,
@@ -61,7 +62,10 @@ define([
          */
         kmlLatLonAltBox: {
             get: function () {
-                return this._factory.specific(this, {name: KmlLatLonAltBox.prototype.getTagNames(), transformer: NodeTransformers.kmlObject});
+                return this._factory.specific(this, {
+                    name: KmlLatLonAltBox.prototype.getTagNames(),
+                    transformer: NodeTransformers.kmlObject
+                });
             }
         },
 
@@ -76,22 +80,25 @@ define([
          */
         kmlLod: {
             get: function () {
-                return this._factory.specific(this, {name: KmlLod.prototype.getTagNames(), transformer: NodeTransformers.kmlObject});
+                return this._factory.specific(this, {
+                    name: KmlLod.prototype.getTagNames(),
+                    transformer: NodeTransformers.kmlObject
+                });
             }
         }
     });
 
-	/**
-	 * It tests whether the region intersects the visible area.
+    /**
+     * It tests whether the region intersects the visible area.
      * @param dc {DrawContext} Frustum to test for intersection.
      */
-    KmlRegion.prototype.intersectsVisible = function(dc) {
+    KmlRegion.prototype.intersectsVisible = function (dc) {
         var box = this.kmlLatLonAltBox;
 
         var boundingBoxForRegion = new BoundingBox();
         boundingBoxForRegion.setToSector(new Sector(box.kmlSouth, box.kmlNorth, box.kmlWest, box.kmlEast), dc.globe, box.kmlMinAltitude, box.kmlMaxAltitude);
 
-        return boundingBoxForRegion.intersectsFrustum(dc.navigatorState.frustumInModelCoordinates)&&
+        return boundingBoxForRegion.intersectsFrustum(dc.frustumInModelCoordinates) &&
             (!box.kmlMinAltitude || dc.eyePosition.altitude > box.kmlMinAltitude) &&
             (!box.kmlMaxAltitude || dc.eyePosition.altitude < box.kmlMaxAltitude);
     };

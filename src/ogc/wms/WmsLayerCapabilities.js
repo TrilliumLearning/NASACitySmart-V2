@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -749,7 +750,7 @@ define([
                     result.title = childElement.textContent;
 
                 } else if (childElement.localName === "OnlineResource") {
-                    result.url = childElement.getAttribute("xlink:href");
+                    result.url = "https://cors.aworldbridgelabs.com:9084/" + childElement.getAttribute("xlink:href");
 
                 } else if (childElement.localName === "LogoUrul") {
                     result.logoUrl = WmsLayerCapabilities.assembleLogoUrl(childElement);
@@ -769,7 +770,7 @@ define([
                 var childElement = children[c];
 
                 if (childElement.localName === "OnlineResource") {
-                    result.url = childElement.getAttribute("xlink:href");
+                    result.url = "https://cors.aworldbridgelabs.com:9084/" + childElement.getAttribute("xlink:href");
                 }
             }
 
@@ -798,7 +799,7 @@ define([
                     result.format = childElement.textContent;
 
                 } else if (childElement.localName === "OnlineResource") {
-                    result.url = childElement.getAttribute("xlink:href");
+                    result.url = "https://cors.aworldbridgelabs.com:9084/" + childElement.getAttribute("xlink:href");
                 }
             }
 
@@ -819,7 +820,7 @@ define([
                     result.format = childElement.textContent;
 
                 } else if (childElement.localName === "OnlineResource") {
-                    result.url = childElement.getAttribute("xlink:href");
+                    result.url = "https://cors.aworldbridgelabs.com:9084/" + childElement.getAttribute("xlink:href");
                 }
             }
 
@@ -840,7 +841,7 @@ define([
                     result.format = childElement.textContent;
 
                 } else if (childElement.localName === "OnlineResource") {
-                    result.url = childElement.getAttribute("xlink:href");
+                    result.url = "https://cors.aworldbridgelabs.com:9084/" + childElement.getAttribute("xlink:href");
                 }
             }
 
@@ -858,7 +859,7 @@ define([
                     result.format = childElement.textContent;
 
                 } else if (childElement.localName === "OnlineResource") {
-                    result.url = childElement.getAttribute("xlink:href");
+                    result.url = "https://cors.aworldbridgelabs.com:9084/" + childElement.getAttribute("xlink:href");
                 }
             }
 

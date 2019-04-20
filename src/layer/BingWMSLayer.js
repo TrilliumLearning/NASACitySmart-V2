@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -13,6 +14,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
+import {WWConf} from "../WWConf";
+
 /**
  * @exports BingWMSLayer
  */
@@ -36,8 +40,8 @@ define([
             this.displayName = "Bing WMS";
             this.pickEnabled = false;
             this.maxActiveAltitude = 10e3;
-
-            this.urlBuilder = new WmsUrlBuilder("https://worldwind27.arc.nasa.gov/wms/virtualearth", "ve", "", "1.3.0");
+            // this.urlBuilder = new WmsUrlBuilder(WWConf.Virtual_Earth, "ve", "", "1.3.0");
+            // this.urlBuilder = new WmsUrlBuilder("https://worldwind27.arc.nasa.gov/wms/virtualearth", "ve", "", "1.3.0");
         };
 
         BingWMSLayer.prototype = Object.create(TiledImageLayer.prototype);

@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -43,7 +44,7 @@ define([
          */
         var PlacemarkAttributes = function (attributes) {
             // These are all documented with their property accessors below.
-            this._imageColor = attributes ? attributes._imageColor : new Color(1, 1, 1, 1);
+            this._imageColor = attributes ? attributes._imageColor.clone() : Color.WHITE.clone();
             this._imageOffset = attributes ? attributes._imageOffset
                 : new Offset(WorldWind.OFFSET_FRACTION, 0.5, WorldWind.OFFSET_FRACTION, 0.5);
             this._imageScale = attributes ? attributes._imageScale : 1;

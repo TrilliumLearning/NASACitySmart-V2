@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -132,8 +133,8 @@ define([
 
         WmtsLayerTile.prototype.mustSubdivide = function (dc, detailFactor) {
             var cellSize = dc.globe.equatorialRadius * this.texelSize,
-                distance = this.distanceTo(dc.navigatorState.eyePoint),
-                pixelSize = dc.navigatorState.pixelSizeAtDistance(distance);
+                distance = this.distanceTo(dc.eyePoint),
+                pixelSize = dc.pixelSizeAtDistance(distance);
 
             return cellSize > Math.max(detailFactor * pixelSize, 0.5);
         };
@@ -167,10 +168,10 @@ define([
             var globe = dc.globe,
                 verticalExaggeration = dc.verticalExaggeration,
                 extremes = globe.minAndMaxElevationsForSector(this.sector),
-                minHeight = extremes ? (extremes[0] * verticalExaggeration) : 0,
-                maxHeight = extremes ? (extremes[1] * verticalExaggeration) : 0;
+                minHeight = extremes[0] * verticalExaggeration,
+                maxHeight = extremes[1] * verticalExaggeration;
 
-            if (minHeight == maxHeight) {
+            if (minHeight === maxHeight) {
                 minHeight = maxHeight + 10; // TODO: Determine if this is necessary.
             }
 

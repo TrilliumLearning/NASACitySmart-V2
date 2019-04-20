@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -40,6 +41,9 @@ define([
 
             // Documented in defineProperties below.
             this._extraSamples = null;
+
+            // Documented in defineProperties below.
+            this._imageDescription = null;
 
             // Documented in defineProperties below.
             this._imageLength = null;
@@ -123,6 +127,9 @@ define([
             this._noData = null;
 
             // Documented in defineProperties below.
+            this._metaData = null;
+
+            // Documented in defineProperties below.
             this._bbox = null;
 
             // Documented in defineProperties below.
@@ -154,6 +161,9 @@ define([
 
             // Documented in defineProperties below.
             this._projectedCSType = null;
+
+            // Documented in defineProperties below.
+            this._projLinearUnits = null;
         };
 
         Object.defineProperties(GeoTiffMetadata.prototype, {
@@ -216,6 +226,21 @@ define([
 
                 set: function(value){
                     this._extraSamples = value;
+                }
+            },
+
+            /**
+             * Contains the image description.
+             * @memberof GeoTiffMetadata.prototype
+             * @type {String}
+             */
+            imageDescription: {
+                get: function () {
+                    return this._imageDescription;
+                },
+
+                set: function(value){
+                    this._imageDescription = value;
                 }
             },
 
@@ -592,6 +617,21 @@ define([
             },
 
             /**
+             * Contains the METADATA value.
+             * @memberof GeoTiffMetadata.prototype
+             * @type {String}
+             */
+            metaData: {
+                get: function () {
+                    return this._metaData;
+                },
+
+                set: function(value){
+                    this._metaData = value;
+                }
+            },
+
+            /**
              * Contains the extent of the geotiff.
              * @memberof GeoTiffMetadata.prototype
              * @type {Sector}
@@ -756,6 +796,21 @@ define([
 
                 set: function(value){
                     this._projectedCSType = value;
+                }
+            },
+
+            /**
+             * Contains the linear units of the geotiff.
+             * @memberof GeoTiffMetadata.prototype
+             * @type {Number}
+             */
+            projLinearUnits: {
+                get: function () {
+                    return this._projLinearUnits;
+                },
+
+                set: function(value){
+                    this._projLinearUnits = value;
                 }
             },
 

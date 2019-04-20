@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -210,6 +211,16 @@ define([
                 this._boundaries[i] = Location.greatCircleLocation(this.center, azimuth * Angle.RADIANS_TO_DEGREES,
                     distance / globeRadius, new Location(0, 0));
             }
+        };
+
+        // Internal use only. Intentionally not documented.
+        SurfaceEllipse.prototype.getReferencePosition = function () {
+            return this.center;
+        };
+
+        // Internal use only. Intentionally not documented.
+        SurfaceEllipse.prototype.moveTo = function (globe, position) {
+            this.center = position;
         };
 
         /**

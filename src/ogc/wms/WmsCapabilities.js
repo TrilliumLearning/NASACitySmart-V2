@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -136,7 +137,7 @@ define([
                 } else if (child.localName === "KeywordList") {
                     service.keywordList = this.assembleKeywordList(child);
                 } else if (child.localName === "OnlineResource") {
-                    service.url = child.getAttribute("xlink:href");
+                    service.url = "https://cors.aworldbridgelabs.com:9084/" + child.getAttribute("xlink:href");
                 } else if (child.localName === "Fees") {
                     service.fees = child.textContent;
                 } else if (child.localName === "AccessConstraints") {
@@ -303,7 +304,7 @@ define([
                                     for (var c4 = 0; c4 < children4.length; c4++) {
                                         var child4 = children4[c4];
                                         if (child4.localName === "OnlineResource") {
-                                            request.getUrl = child4.getAttribute("xlink:href");
+                                            request.getUrl = "https://cors.aworldbridgelabs.com:9084/" + child4.getAttribute("xlink:href");
                                         }
                                     }
                                 }

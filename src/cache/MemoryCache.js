@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -83,7 +84,7 @@ define([
              * @memberof MemoryCache.prototype
              */
             capacity: {
-                get: function() {
+                get: function () {
                     return this._capacity;
                 },
                 set: function (value) {
@@ -192,7 +193,8 @@ define([
                 key: key,
                 entry: entry,
                 size: size,
-                lastUsed: Date.now()
+                lastUsed: Date.now(),
+                agingFactor: 1  // 1x = normal aging
             };
 
             this.entries[key] = cacheEntry;
@@ -229,6 +231,27 @@ define([
             var cacheEntry = this.entries[key];
             if (cacheEntry) {
                 this.removeCacheEntry(cacheEntry);
+            }
+        };
+
+        /**
+         * Sets an entry's aging factor (multiplier) used to sort the entries for eviction.
+         * A value of one is normal aging; a value of two invokes 2x aging, causing
+         * the entry to become twice as old as a normal sibling with the same
+         * 'last used' timestamp. Setting a value of zero would be a "fountain
+         * of youth" for an entry as it wouldn't age and thus would sort to the
+         * bottom of the eviction queue.
+         * @param {String} key The key of the entry to modify. If null or undefined, the cache entry is not modified.
+         * @param {Number} agingFactor A multiplier applied to the age of the entry when sorting candidates for eviction.
+         *
+         */
+        MemoryCache.prototype.setEntryAgingFactor = function (key, agingFactor) {
+            if (!key)
+                return;
+
+            var cacheEntry = this.entries[key];
+            if (cacheEntry) {
+                cacheEntry.agingFactor = agingFactor;
             }
         };
 
@@ -299,21 +322,21 @@ define([
 
         // Private. Clears this cache to that necessary to contain a specified amount of free space.
         MemoryCache.prototype.makeSpace = function (spaceRequired) {
-            var sortedEntries = [];
+            var sortedEntries = [],
+                now = Date.now();
 
             // Sort the entries from least recently used to most recently used, then remove the least recently used entries
             // until the cache capacity reaches the low water and the cache has enough free capacity for the required
             // space.
-
-            var sizeAtStart = this.usedCapacity;
             for (var key in this.entries) {
                 if (this.entries.hasOwnProperty(key)) {
                     sortedEntries.push(this.entries[key]);
                 }
             }
-
             sortedEntries.sort(function (a, b) {
-                return a.lastUsed - b.lastUsed;
+                var aAge = (now - a.lastUsed) * a.agingFactor,
+                    bAge = (now - b.lastUsed) * b.agingFactor;
+                return bAge - aAge;
             });
 
             for (var i = 0, len = sortedEntries.length; i < len; i++) {

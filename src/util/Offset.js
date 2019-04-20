@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -91,17 +92,17 @@ define(['../geom/Vec2'
         Offset.prototype.offsetForSize = function (width, height) {
             var x, y;
 
-            if (this.xUnits == WorldWind.OFFSET_FRACTION) {
+            if (this.xUnits === WorldWind.OFFSET_FRACTION) {
                 x = width * this.x;
-            } else if (this.xUnits == WorldWind.OFFSET_INSET_PIXELS) {
+            } else if (this.xUnits === WorldWind.OFFSET_INSET_PIXELS) {
                 x = width - this.x;
             } else { // default to OFFSET_PIXELS
                 x = this.x;
             }
 
-            if (this.yUnits == WorldWind.OFFSET_FRACTION) {
+            if (this.yUnits === WorldWind.OFFSET_FRACTION) {
                 y = height * this.y;
-            } else if (this.yUnits == WorldWind.OFFSET_INSET_PIXELS) {
+            } else if (this.yUnits === WorldWind.OFFSET_INSET_PIXELS) {
                 y = height - this.y;
             } else { // default to OFFSET_PIXELS
                 y = this.y;

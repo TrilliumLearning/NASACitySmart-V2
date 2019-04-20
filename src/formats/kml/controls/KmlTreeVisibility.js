@@ -1,7 +1,8 @@
 /*
- * Copyright 2015-2017 WorldWind Contributors
+ * Copyright 2003-2006, 2009, 2017, United States Government, as represented by the Administrator of the
+ * National Aeronautics and Space Administration. All rights reserved.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
+ * The NASAWorldWind/WebWorldWind platform is licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
@@ -54,9 +55,10 @@ define([
     // For internal use only.
     KmlTreeVisibility.prototype.createControls = function (node) {
         var name = node.kmlName || node.id || WWUtil.guid();
-        var enabled = node.enabled || node.kmlVisibility === true;
+        var enabled = node.enabled && node.kmlVisibility === true;
 
         var controlsForSingleElement = document.createElement("div");
+
         var toggleVisibility = document.createElement("input");
         toggleVisibility.setAttribute("type", "checkbox");
         if (enabled) {
@@ -66,9 +68,15 @@ define([
 
         controlsForSingleElement.appendChild(toggleVisibility);
 
-        var lookAtName = document.createElement("span");
+        var lookAtName;
+        if (node.kmlAbstractView) {
+            lookAtName = document.createElement("a");
+        } else {
+            lookAtName = document.createElement("span");
+        }
         lookAtName.appendChild(document.createTextNode(name));
         lookAtName.addEventListener("click", lookAt, true);
+
         controlsForSingleElement.appendChild(lookAtName);
 
         document.getElementById(this._visualElementId).appendChild(controlsForSingleElement);
