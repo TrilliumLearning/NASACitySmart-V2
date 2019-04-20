@@ -15,21 +15,22 @@
  * limitations under the License.
  */
 
-import {WWConf} from "../WWConf";
-
 /**
  * @exports BMNGLayer
  */
 define([
-        '../geom/Location',
-        '../geom/Sector',
-        '../layer/TiledImageLayer',
-        '../util/WmsUrlBuilder'
+    '../WWConf',
+    '../geom/Location',
+    '../geom/Sector',
+    '../layer/TiledImageLayer',
+    '../util/WmsUrlBuilder'
     ],
-    function (Location,
-              Sector,
-              TiledImageLayer,
-              WmsUrlBuilder) {
+    function (
+        WWConf,
+        Location,
+        Sector,
+        TiledImageLayer,
+        WmsUrlBuilder) {
         "use strict";
 
         /**

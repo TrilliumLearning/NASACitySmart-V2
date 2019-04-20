@@ -14,21 +14,23 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import {WWConf} from "../WWConf";
 
 /**
  * @exports UsgsNedHiElevationCoverage
  */
 define([
+        '../WWConf',
         '../geom/Location',
         '../geom/Sector',
         '../globe/TiledElevationCoverage',
         '../util/WmsUrlBuilder'
     ],
-    function (Location,
-              Sector,
-              TiledElevationCoverage,
-              WmsUrlBuilder) {
+    function (
+        WWConf,
+        Location,
+        Sector,
+        TiledElevationCoverage,
+        WmsUrlBuilder) {
         "use strict";
 
         /**

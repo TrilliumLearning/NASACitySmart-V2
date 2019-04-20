@@ -18,18 +18,20 @@
 /**
  * @exports AsterV2ElevationCoverage
  */
+
 define([
+        '../WWConf',
         '../geom/Location',
         '../geom/Sector',
         '../globe/TiledElevationCoverage',
-        '../util/WmsUrlBuilder',
-        '../WWConf'
+        '../util/WmsUrlBuilder'
     ],
-    function (Location,
-              Sector,
-              TiledElevationCoverage,
-              WmsUrlBuilder,
-              WWConf) {
+    function (
+        WWConf,
+        Location,
+        Sector,
+        TiledElevationCoverage,
+        WmsUrlBuilder) {
         "use strict";
 
         /**
@@ -39,8 +41,8 @@ define([
          * @augments TiledElevationCoverage
          * @classdesc Provides elevations for Earth. Elevations are drawn from the NASA WorldWind elevation service.
          */
-        // let worldwindConf = new WWConf();
-            console.log(WWConf);
+
+        console.log(WWConf);
         let AsterV2ElevationCoverage = function () {
             TiledElevationCoverage.call(this, {
                 coverageSector: new Sector(-83.0001, 83.0001, -180, 180),

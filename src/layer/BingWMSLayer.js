@@ -15,21 +15,22 @@
  * limitations under the License.
  */
 
-import {WWConf} from "../WWConf";
-
 /**
  * @exports BingWMSLayer
  */
 define([
+        '../WWConf',
         '../geom/Location',
         '../geom/Sector',
         '../layer/TiledImageLayer',
         '../util/WmsUrlBuilder'
     ],
-    function (Location,
-              Sector,
-              TiledImageLayer,
-              WmsUrlBuilder) {
+    function (
+        WWConf,
+        Location,
+        Sector,
+        TiledImageLayer,
+        WmsUrlBuilder) {
         "use strict";
 
         // Intentionally not documented. For diagnostic use only.
@@ -40,7 +41,7 @@ define([
             this.displayName = "Bing WMS";
             this.pickEnabled = false;
             this.maxActiveAltitude = 10e3;
-            // this.urlBuilder = new WmsUrlBuilder(WWConf.Virtual_Earth, "ve", "", "1.3.0");
+            this.urlBuilder = new WmsUrlBuilder(WWConf.Virtual_Earth, "ve", "", "1.3.0");
             // this.urlBuilder = new WmsUrlBuilder("https://worldwind27.arc.nasa.gov/wms/virtualearth", "ve", "", "1.3.0");
         };
 
