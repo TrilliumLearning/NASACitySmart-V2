@@ -4,25 +4,21 @@
 <head>
     <title>CitySmart - WMS Layer Customized Request</title>
     <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1">
-
-    <!--<link rel="stylesheet" href="../css/style_final.css" type="text/css">
-    <link rel="stylesheet" href="../css/multi-select.css" media="screen" type="text/css">-->
     <link rel="stylesheet" href="//netdna.bootstrapcdn.com/font-awesome/4.0.3/css/font-awesome.min.css">
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css">
-    <link rel="stylesheet" href="../Backup2/src/jquery-validation-1.17.0/demo/css/screen.css">
+    <link rel="stylesheet" href="../3rdPartyLibs/jquery-validation-1.17.0/demo/css/screen.css">
     <link href="//netdna.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css">
     <link href="//cdnjs.cloudflare.com/ajax/libs/file-uploader/5.16.2/fine-uploader-gallery.css" rel="stylesheet">
-    <script src="../Backup2/src/jquery-3.3.1.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/file-uploader/5.16.2/all.fine-uploader/all.fine-uploader.min.js"></script>
-    <!--<script type = "text/javascript" src="LayerNameSearch.js"></script>-->
-    <script src="../Backup2/src/jquery.multi-select.js"></script>
-    <script src="../Backup2/src/country/dist/country.js"></script>
-    <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js"></script>
     <link rel="stylesheet" href="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/css/ol.css">    <!--<script src="../src/jquery.form.min.js"></script>-->
-    <!-- Change the "src" attribute according to your installation path -->
-    <!--<script src="https://cdn.jsdelivr.net/jquery.validation/1.15.1/jquery.validate.min.js"></script>-->
-    <!--<script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.17.0/dist/jquery.validate.min.js"></script>-->
-    <script src="../Backup2/src/jquery-validation-1.17.0/dist/jquery.validate.js"></script>
+    <script src="../3rdPartyLibs/jquery-3.3.1.min.js"></script>
+    <script src="../3rdPartyLibs/jquery.multi-select.js"></script>
+    <script src="https://cdn.rawgit.com/openlayers/openlayers.github.io/master/en/v5.3.0/build/ol.js"></script>
+    <script src="../3rdPartyLibs/jquery.form.min.js"></script>
+    <script src="../3rdPartyLibs/jquery-validation-1.17.0/dist/jquery.validate.js"></script>
+    <script src="../scripts/LayerNameSearch.js"></script>
+    <script src="../3rdPartyLibs/fine-uploader/fine-uploader.min.js"></script>
+    <!--    <script src="//cdnjs.cloudflare.com/ajax/libs/file-uploader/5.16.2/all.fine-uploader/all.fine-uploader.min.js"></script>-->
+    <!--    <script src="../src/country/dist/country.js"></script>-->
 
     <script type="text/template" id="qq-template">
         <div class="qq-uploader-selector qq-uploader qq-gallery" qq-drop-area-text="Drop files here">
@@ -101,7 +97,6 @@
         </div>
     </script>
 
-
     <style>
         body      { padding-bottom:80px; word-wrap:break-word; }
         /*#hide { display: none; }*/
@@ -112,7 +107,12 @@
             position:relative;
             width:100%;
         }
+        .column {
+            float:right;
+            position:relative;
+            width:10%;
 
+        }
         #clear{
             background-color: white;
             width: 105px;
@@ -208,19 +208,21 @@
     </style>
 
 </head>
-<div class="navul" style="height: 150px;
-    background: #000000;">
-    <a class="navul" href="//aworldbridge.com" style="background: #000000;
-    width: 500px;
-    height: 60px;">
-        <img class="banner" src="../images/NewWBBanner.jpg" style="width: 950px;
-    height: 150px;
-    margin: auto; display: block;" />
-    </a>
-</div>
-<body onload="init()">
 
-<div class="container" style="width: 850px;">
+<body onload="init()">
+    <div class="navul" style="height: 150px;
+        background: #000000;">
+        <a class="navul" href="//aworldbridge.com" style="background: #000000;
+        width: 500px;
+        height: 60px;">
+            <img class="banner" src="../images/NewWBBanner.jpg" style="width: 950px;
+        height: 150px;
+        margin: auto; display: block;" />
+        </a>
+    </div>
+
+
+    <div class="container" style="width: 850px;">
     <h1 class="text-center page-header"><strong>Layer Request Form</strong></h1>
     <h3 class="text-center" style="margin:30px;">Layer Information</h3>
         <div class="generalForm">
@@ -284,7 +286,7 @@
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group">
                                 <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-list"></i></span>
-                                <select id="sub" class="selectpicker form-control" name="SecondLayer">
+                                <select id="sub" class="selectpicker form-control" name="SecondLayer" value="">
                                     <option value="Category">SELECT SUBCATEGORY</option>
                                     <option value="other" id="secondOther">Other(Please specify)</option>
                                 </select>
@@ -316,7 +318,7 @@
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="glyphicon glyphicon-globe"></i></span>
-                                <select name="ContinentName" class="crs-country form-control" data-region-id="two" data-default-option="SELECT CONTINENT" id="continent" onchange="ChangeContinentList(this.value)">
+                                <select name="ContinentName" class="crs-country form-control" data-region-id="two" data-default-option="SELECT CONTINENT" id="continent" onchange="changeContinent(this.value)">
                                     <option selected="selected" value="AL" id="continent-option">SELECT A CONTINENT</option>
                                 </select>
                             </div>
@@ -338,7 +340,7 @@
                         <div class="col-md-8 inputGroupContainer">
                             <div class="input-group">
                                 <span class="input-group-addon"><i class="glyphicon glyphicon-globe"></i></span>
-                                <select name="ContinentName" class="crs-country form-control" data-region-id="two" data-default-option="SELECT CONTINENT" id="continent2" onchange="ChangeContinentList(this.value)">
+                                <select name="ContinentName" class="crs-country form-control" data-region-id="two" data-default-option="SELECT CONTINENT" id="continent2" onchange="changeContinent(this.value)">
                                     <option selected="selected" value="AL" id="continent-option">SELECT A CONTINENT</option>
                                 </select>
                             </div>
@@ -367,13 +369,6 @@
                     <div class="form-group">
                         <label class="col-md-4 control-label">Layer City</label>
                         <div class="col-md-8 inputGroupContainer">
-                            <!--<div class="input-group">-->
-                                <!--<span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-globe"></i></span>-->
-                                <!--&lt;!&ndash;<input id="LayerCityInput" name="CityName" placeholder="Layer City" class="form-control" required value="" type="text"></div>&ndash;&gt;-->
-                                <!--<select  id="City" class="form-control selectpicker" name="CityName">-->
-                                    <!--<option value="select">SELECT CONTINENT</option>-->
-                                <!--</select>-->
-                            <!--</div>-->
                             <div class="input-group">
                                 <span class="input-group-addon" style="max-width: 100%;"><i class="glyphicon glyphicon-globe"></i></span>
                                 <!--<input id="LayerCityInput" name="CityName" placeholder="Layer City" class="form-control" required value="" type="text"></div>-->
@@ -429,7 +424,7 @@
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="col-md-4 control-label">Layer Uploader <p>(You can only upload one file)</p> </label>
+                        <label class="col-md-4 control-label" id="msg">Layer Uploader <p>(You can only upload one file)</p> </label>
                         <div class="col-md-8 inputGroupContainer">
                             <div id="uploader"></div>
                         </div>
@@ -460,10 +455,9 @@
         <p class="text-center"><a id="cancel" onclick="userHome();">Cancel</a></p>
 </div>
 
-<script>
+    <script>
     let UserRole = "<%= user.userrole %>";
     let rowSelectedValue = JSON.parse(localStorage.getItem("rowSelectedValue"));
-    console.log(rowSelectedValue);
 
     $(document).ready(function() {
         document.getElementById('date').value = rowSelectedValue[0];
@@ -498,36 +492,34 @@
             $("#sub").html("<option>" + rowSelectedValue[10]+ "</option>")
         }
 
-        $(function () {
-            if (UserRole === "Admin") {
-                document.getElementById("comment").disabled = false;
-                document.getElementById("approve").disabled = false;
-                document.getElementById("reject").disabled = false;
-                document.getElementById('message').readOnly = true;
-                document.getElementById('LayerFormat').disabled = true;
-                document.getElementById('City').readOnly = true;
-                document.getElementById('LayerStateInput').readOnly = true;
-                document.getElementById('country').disabled = false;
-                document.getElementById('continent').disabled = false;
-                document.getElementById('country2').disabled = true;
-                document.getElementById('continent2').disabled = true;
-                document.getElementById('main').disabled = true;
-                document.getElementById('sub').disabled = false;
-                document.getElementById('main').disabled = false;
-                document.getElementsByClassName('qq-uploader-selector').disabled = true;
-                document.getElementById('upload-button').disabled = true;
-                // $('#upload-button').prop('disabled',true);
-                document.getElementById("submit").style.backgroundColor = "lightgray";
-                document.getElementById("adminonly").style.display = "block";
-                document.getElementById("comment").placeholder = "Please describe why you are rejecting the request.";
-            } else if (UserRole === "Regular") {
-                document.getElementById("comment").disabled = true;
-                document.getElementById("submit").disabled = false;
-                document.getElementById("adminonly").style.display = "none";
-                document.getElementById("approve").style.backgroundColor = "lightgray";
-                document.getElementById("reject").style.backgroundColor = "lightgray";
-            }
-        });
+        if (UserRole === "Admin") {
+            document.getElementById("comment").disabled = false;
+            document.getElementById("approve").disabled = false;
+            document.getElementById("reject").disabled = false;
+            document.getElementById('message').readOnly = true;
+            document.getElementById('LayerFormat').disabled = true;
+            document.getElementById('City').readOnly = true;
+            document.getElementById('LayerStateInput').readOnly = true;
+            document.getElementById('country').disabled = false;
+            document.getElementById('continent').disabled = false;
+            document.getElementById('country2').disabled = true;
+            document.getElementById('continent2').disabled = true;
+            document.getElementById('main').disabled = true;
+            document.getElementById('sub').disabled = false;
+            document.getElementById('main').disabled = false;
+            document.getElementsByClassName('qq-uploader-selector').disabled = true;
+            document.getElementById('upload-button').disabled = true;
+            // $('#upload-button').prop('disabled',true);
+            document.getElementById("submit").style.backgroundColor = "lightgray";
+            document.getElementById("adminonly").style.display = "block";
+            document.getElementById("comment").placeholder = "Please describe why you are rejecting the request.";
+        } else if (UserRole === "Regular") {
+            document.getElementById("comment").disabled = true;
+            document.getElementById("submit").disabled = false;
+            document.getElementById("adminonly").style.display = "none";
+            document.getElementById("approve").style.backgroundColor = "lightgray";
+            document.getElementById("reject").style.backgroundColor = "lightgray";
+        }
 
         $("#main").change(function () {
             let val = $(this).val();
@@ -544,6 +536,164 @@
                 $("#country").html("<option value='select'>SELECT SUBCATEGORY</option>");
             }
         })
+
+        //resubmit the photo
+        let photoDiv = $("#photo");
+        photoDiv.empty();
+
+        let editIDSr = "editIDSr=" + rowSelectedValue[2];
+        $.ajax({
+            url: 'edit',
+            type: 'GET',
+            dataType: 'json',
+            data: editIDSr,
+            success: function (results) {
+                if(results[0].Layer_Uploader_name !== "") {
+                    if (!results.error) {
+                        globalResults = results;
+                        let list = [];
+                        for (let i = 0; i < globalResults.length; i++) {
+                            let first = {
+                                id: i,
+                                size: 561276,
+                                thumbnailUrl: globalResults[i].Layer_Uploader,
+                                name: globalResults[i].Layer_Uploader_name
+                            };
+                            list.push(first);
+                        }
+                        uploader.addInitialFiles(list);
+                    } else {
+                        console.log("didn't work :(");
+                    }
+                }
+            }
+        });
+
+
+        let uploader = new qq.FineUploader({
+            element: document.getElementById("uploader"),
+            // debug: true,
+            request: {
+                endpoint: 'upload'
+            },
+            cors: {
+                //all requests are expected to be cross-domain requests
+                expected: true
+            },
+            deleteFile: {
+                enabled: true, // defaults to false
+                endpoint: 'deleteFiles'
+            },
+            callbacks: {
+                onComplete: function (id, name, responseJSON) {
+                    uploader.setUuid(id, responseJSON.newuuid);
+                }
+            },
+            validation:{
+                allowedExtensions: ['tif', 'shp','jp2','adf','j2k']
+            }
+        });
+
+        $("#testButton").click(function () {
+            let data = $("#layer").serialize();
+            console.log(data);
+            $.ajax({
+                url: 'testB',
+                method: "post",
+                data: data,
+                dataType: 'json',
+                success: function (d) {
+                    console.log(data);
+                }
+            });
+        })
+
+        // Wait for the DOM to be ready
+        $('#layer').validate({
+            // Specify validation rules
+            rules: {
+                // The key name on the left side is the name attribute
+                // of an input field. Validation rules are defined
+                // on the right side
+                Layer_Name: "required",
+                StateName:"required",
+                CountryName:"required",
+                CityName:"required",
+                FirstLayer:"required",
+                SecondLayer:"required",
+                Layer_Description: "required",
+                LayerFormat:"required"
+
+            },
+            // Specify validation error messages
+            messages: {
+                Layer_Name: "Please enter the layer name.",
+                StateName:"Please enter the layer state.",
+                CountryName:"Please enter the layer country.",
+                CityName:"Please enter the layer City.",
+                FirstLayer: "Please select the main category.",
+                SecondLayer:"Please select the subcategory.",
+                Layer_Description: "Please write the description of the layer.",
+                LayerFormat:"Please choose your layer format."
+            },
+
+            // Make sure the form is submitted to the destination defined
+            // in the "action" attribute of the form when valid
+            submitHandler: function (form) {
+                submitForm();
+            }
+        });
+
+        $("#City").click(function () {
+            new dgCitysCountries({
+                CityVal: document.getElementById("City").val,
+                countryVal: document.getElementById("country").val,
+                City: document.getElementById("City"),
+                country: document.getElementById("country"),
+                change: true
+            });
+        });
+
+        $("#reject").click(function () {
+            let tID = "reject=" + document.getElementById('RID').value;
+            let Comment = "comment=" + document.getElementById('comment').value;
+            let rejectPicPath = "picturePath="+ rowSelectedValue[15];
+            $.ajax({
+                url: 'reject',
+                type: "GET",
+                dataType: 'json',
+                data: tID + "&" + Comment + "&" +rejectPicPath,
+                success: function (result) {
+
+                    alert(result.message);
+                    window.location.replace('/userHome')
+                }
+            });
+            // if (confirm("Are you sure to reject the data?") === true) {
+            //     let tID = "reject=" + document.getElementById('RID').value;
+            //     let Comment = "comment=" + document.getElementById('comment').value;
+            //     let rejectPicPath = "picturePath="+ rowSelectedValue[15];
+            //     $.ajax({
+            //         url: 'reject',
+            //         type: "GET",
+            //         dataType: 'json',
+            //         data: tID + "&" + Comment + "&" +rejectPicPath,
+            //         success: function (result) {
+            //             console.log(result.message);
+            //             console.log(result.error);
+            //
+            //             if(result.error === true){
+            //                 alert(result.message)
+            //             }else{
+            //                 alert(result.message);
+            //             }
+            //             window.location.replace('/userHome')
+            //         }
+            //     });
+            // }else {
+            //     return false;
+            // }
+        });
     });
 
     function Check(that) {
@@ -555,27 +705,29 @@
             document.getElementById("other2").style.display = "none";
         }
     }
-    $(document).ready(function() {
-        let continentList = document.getElementById("continent")
-        $.ajax({
-            url: "layerRequestContinent",
-            dataType: 'json',
-            success: function (results) {
-                console.log(results);
-                var option;
-                for (let i = 0; i < results.length; i++) {
-                    option = new Option(results[i].Contitent_name, results[i].Continent);
-                    continentList.add(option);
-                    // console.log(option);
-                }
-            }
-        });
-    });
 
-    function ChangeContinentList (continentValue){
-        console.log(continentValue);
-        var country = "country="+continentValue;
+    // $(document).ready(function() {
+    //     let continentList = document.getElementById("continent")
+    //     $.ajax({
+    //         url: "layerRequestContinent",
+    //         dataType: 'json',
+    //         success: function (results) {
+    //             console.log(results);
+    //             let option;
+    //             for (let i = 0; i < results.length; i++) {
+    //                 option = new Option(results[i].Contitent_name, results[i].Continent);
+    //                 continentList.add(option);
+    //                 // console.log(option);
+    //             }
+    //         }
+    //     });
+    // });
+
+    function changeContinent (continentValue){
+
+        let country = "country="+continentValue;
         let countryList = document.getElementById("country")
+
         while (countryList.options.length) {
             countryList.remove(0);
         }
@@ -583,95 +735,25 @@
         if(continentValue !== 'SAS'){
             countryList.disabled = false;
         }
+
         if(continentValue === "AL"){
             countryList.disabled = true;
             $("#country").html("<option>SELECT A COUNTRY</option>")
         }
-        console.log(country);
+
         $.ajax({
             url: "layerRequestCountry",
             method: 'GET',
             dataType: 'json',
             data: country,
             success: function (results) {
-                console.log(results)
-                for(var j = 0; j < results.length; j++){
-                    var option = new Option(results[j].Country_name, results[j].Country_name);
-                    countryList.add(option);
+                for(let j = 0; j < results.length; j++){
+                    countryList.add(new Option(results[j].Country_name, results[j].Country_name));
                 }
             }
         });
     }
 
-    //resubmit the photo
-    let photoDiv = $("#photo");
-    photoDiv.empty();
-    let editIDSr = "editIDSr=" + rowSelectedValue[2];
-    $.ajax({
-        url: 'edit',
-        type: 'GET',
-        dataType: 'json',
-        data: editIDSr,
-        success: function (results) {
-            if(results[0].Layer_Uploader_name !== "") {
-                if (!results.error) {
-                    globalResults = results;
-                    let list = [];
-                    for (let i = 0; i < globalResults.length; i++) {
-                        let first = {
-                            id: i,
-                            size: 561276,
-                            thumbnailUrl: globalResults[i].Layer_Uploader,
-                            name: globalResults[i].Layer_Uploader_name
-                        };
-                        list.push(first);
-                    }
-                    uploader.addInitialFiles(list);
-                } else {
-                    console.log("didn't work :(");
-                }
-            }
-        }
-    });
-
-
-    let uploader = new qq.FineUploader({
-        element: document.getElementById("uploader"),
-        // debug: true,
-        request: {
-            endpoint: 'upload'
-        },
-        cors: {
-            //all requests are expected to be cross-domain requests
-            expected: true
-        },
-        deleteFile: {
-            enabled: true, // defaults to false
-            endpoint: 'deleteFiles'
-        },
-        callbacks: {
-            onComplete: function (id, name, responseJSON) {
-                uploader.setUuid(id, responseJSON.newuuid);
-            }
-        },
-        validation:{
-            allowedExtensions: ['tif', 'shp','jp2','adf','j2k']
-        }
-    });
-
-    $("#testButton").click(function () {
-        var data = $("#layer").serialize();
-        console.log(data);
-        $.ajax({
-            url: 'testB',
-            method: "post",
-            data: data,
-            dataType: 'json',
-            success: function (d) {
-                console.log(data);
-            }
-        });
-    })
 
     function submitForm() {
         if (UserRole === "Admin") {
@@ -757,145 +839,59 @@
         }
     }
 
-   // Wait for the DOM to be ready
-    $('#layer').validate({
-        // Specify validation rules
-        rules: {
-            // The key name on the left side is the name attribute
-            // of an input field. Validation rules are defined
-            // on the right side
-            Layer_Name: "required",
-            StateName:"required",
-            CountryName:"required",
-            CityName:"required",
-            FirstLayer:"required",
-            SecondLayer:"required",
-            Layer_Description: "required",
-            LayerFormat:"required"
+    // function SearchLayerName(value){
+    //     $.ajax({
+    //         url: "SearchLayerName",
+    //         dataType:"json",
+    //         success: function (results) {
+    //             for(let i = 0; i < results.length; i++) {
+    //                 if (value === results[i].LayerName) {
+    //                     document.getElementById("LayerName1").innerHTML = "The Layer Name has already been used";
+    //                     document.addEventListener("keyup", function (e) {
+    //                         if (event.keyCode === 8) {
+    //                             document.getElementById("LayerName1").innerHTML = "Please enter the layer name. NOTE: Do not include spaces.";
+    //                         }
+    //                     }, false);
+    //                     break;
+    //                 } else{
+    //                     document.getElementById("LayerName1").innerHTML = "This Layer Name is available";
+    //                 }
+    //             }
+    //             if(value.length === 0){
+    //                 document.getElementById("LayerName1").innerHTML = "Please enter the layer name. NOTE: Do not include spaces.";
+    //             }
+    //         }
+    //     })
+    //     //use if to check
+    //     //false replace the <p> to the Layer Name is duplicated
+    //     //ture --> nothing
+    // }
 
-        },
-        // Specify validation error messages
-        messages: {
-            Layer_Name: "Please enter the layer name.",
-            StateName:"Please enter the layer state.",
-            CountryName:"Please enter the layer country.",
-            CityName:"Please enter the layer City.",
-            FirstLayer: "Please select the main category.",
-            SecondLayer:"Please select the subcategory.",
-            Layer_Description: "Please write the description of the layer.",
-            LayerFormat:"Please choose your layer format."
-        },
+    // function SearchThirdLayer(thisvalue){
+    //     $.ajax({
+    //         url: "SearchThirdLayer",
+    //         dataType:"json",
+    //         success: function (results) {
+    //             for(let i = 0; i < results.length; i++) {
+    //                 if (thisvalue === results[i].ThirdLayer) {
+    //                     document.getElementById("LayerName2").innerHTML = "The ThirdLayer Name has already been used";
+    //                     document.addEventListener("keyup", function (e) {
+    //                         if (event.keyCode === 8) {
+    //                             document.getElementById("LayerName2").innerHTML = "Please enter the ThirdLayer name. NOTE: Do not include spaces.";
+    //                         }
+    //                     }, false);
+    //                     break;
+    //                 } else{
+    //                     document.getElementById("LayerName2").innerHTML = "This ThirdLayer Name is available";
+    //                 }
+    //             }
+    //             if(value.length === 0){
+    //                 document.getElementById("LayerName2").innerHTML = "Please enter the ThirdLayer name. NOTE: Do not include spaces.";
+    //             }
+    //         }
+    //     })
+    // }
 
-        // Make sure the form is submitted to the destination defined
-        // in the "action" attribute of the form when valid
-        submitHandler: function (form) {
-            submitForm();
-        }
-    });
-
-    function SearchLayerName(value){
-        $.ajax({
-            url: "SearchLayerName",
-            dataType:"json",
-            success: function (results) {
-                for(let i = 0; i < results.length; i++) {
-                    if (value === results[i].LayerName) {
-                        document.getElementById("LayerName1").innerHTML = "The Layer Name has already been used";
-                        document.addEventListener("keyup", function (e) {
-                            if (event.keyCode === 8) {
-                                document.getElementById("LayerName1").innerHTML = "Please enter the layer name. NOTE: Do not include spaces.";
-                            }
-                        }, false);
-                        break;
-                    } else{
-                        document.getElementById("LayerName1").innerHTML = "This Layer Name is available";
-                    }
-                }
-                if(value.length === 0){
-                    document.getElementById("LayerName1").innerHTML = "Please enter the layer name. NOTE: Do not include spaces.";
-                }
-            }
-        })
-        //use if to check
-        //false replace the <p> to the Layer Name is duplicated
-        //ture --> nothing
-    }
-
-    function SearchThirdLayer(thisvalue){
-        $.ajax({
-            url: "SearchThirdLayer",
-            dataType:"json",
-            success: function (results) {
-                for(let i = 0; i < results.length; i++) {
-                    if (thisvalue === results[i].ThirdLayer) {
-                        document.getElementById("LayerName2").innerHTML = "The ThirdLayer Name has already been used";
-                        document.addEventListener("keyup", function (e) {
-                            if (event.keyCode === 8) {
-                                document.getElementById("LayerName2").innerHTML = "Please enter the ThirdLayer name. NOTE: Do not include spaces.";
-                            }
-                        }, false);
-                        break;
-                    } else{
-                        document.getElementById("LayerName2").innerHTML = "This ThirdLayer Name is available";
-                    }
-                }
-                if(value.length === 0){
-                    document.getElementById("LayerName2").innerHTML = "Please enter the ThirdLayer name. NOTE: Do not include spaces.";
-                }
-            }
-        })
-    }
-
-    $("#City").click(function () {
-        new dgCitysCountries({
-            CityVal: document.getElementById("City").val,
-            countryVal: document.getElementById("country").val,
-            City: document.getElementById("City"),
-            country: document.getElementById("country"),
-            change: true
-        });
-    });
-
-    $("#reject").click(function () {
-        let tID = "reject=" + document.getElementById('RID').value;
-        let Comment = "comment=" + document.getElementById('comment').value;
-        let rejectPicPath = "picturePath="+ rowSelectedValue[15];
-        $.ajax({
-            url: 'reject',
-            type: "GET",
-            dataType: 'json',
-            data: tID + "&" + Comment + "&" +rejectPicPath,
-            success: function (result) {
-
-                alert(result.message);
-                window.location.replace('/userHome')
-            }
-        });
-        // if (confirm("Are you sure to reject the data?") === true) {
-        //     let tID = "reject=" + document.getElementById('RID').value;
-        //     let Comment = "comment=" + document.getElementById('comment').value;
-        //     let rejectPicPath = "picturePath="+ rowSelectedValue[15];
-        //     $.ajax({
-        //         url: 'reject',
-        //         type: "GET",
-        //         dataType: 'json',
-        //         data: tID + "&" + Comment + "&" +rejectPicPath,
-        //         success: function (result) {
-        //             console.log(result.message);
-        //             console.log(result.error);
-        //
-        //             if(result.error === true){
-        //                 alert(result.message)
-        //             }else{
-        //                 alert(result.message);
-        //             }
-        //             window.location.replace('/userHome')
-        //         }
-        //     });
-        // }else {
-        //     return false;
-        // }
-    });
 </script>
 </body>
 </html>

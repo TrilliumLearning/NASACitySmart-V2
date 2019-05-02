@@ -14,8 +14,9 @@
     <link href='//fonts.googleapis.com/css?family=Open+Sans' rel='stylesheet' type='text/css'>
     <link rel="stylesheet" href="../css/menu.css"/>
     <script src="//ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js" type="text/javascript"></script>
+    <script src="../scripts/AutoMenu.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.4/js/bootstrap.min.js"></script>
-    <script data-main="../scripts/MainMenu" src="../Backup2/src/requirejs-2.3.6.min.js"></script>
+    <script data-main="../scripts/Home" src="../3rdPartyLibs/requirejs-2.3.6.min.js"></script>
 
     <style>
         .popup-group {
@@ -589,14 +590,14 @@
 </div>
 </body>
 <script type='text/javascript'>
-    var username = "<%= user.username %>";
+    let username = "<%= user.username %>";
     console.log(username);
-    var scoutingRowSelected, DropMenu, transactionpicturename;
-    var UserRole = "<%= user.userrole %>";
+    let scoutingRowSelected, DropMenu, transactionpicturename;
+    let UserRole = "<%= user.userrole %>";
     console.log(UserRole);
-    var scoutingTransactionID = [];
-    var trapTransactionID = [];
-    var LayerNameStr = [];
+    let scoutingTransactionID = [];
+    let trapTransactionID = [];
+    let LayerNameStr = [];
 
 
     function dropDown() {
@@ -609,9 +610,9 @@
     }
     window.onclick = function(event) {
         if (!event.target.matches('.dropbutton')) {
-            var dropdowns = document.getElementsByClassName("dropdown-content");
-            for (var i = 0; i < dropdowns.length; i++) {
-                var openDropdown = dropdowns[i];
+            let dropdowns = document.getElementsByClassName("dropdown-content");
+            for (let i = 0; i < dropdowns.length; i++) {
+                let openDropdown = dropdowns[i];
                 if (openDropdown.classList.contains('show')) {
                     openDropdown.classList.remove('show');
                 }

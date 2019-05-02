@@ -3,7 +3,7 @@ function SearchLayerName(value){
         url: "/SearchLayerName",
         dataType:"json",
         success: function (results) {
-            for(var i = 0; i < results.length; i++) {
+            for(let i = 0; i < results.length; i++) {
                 if (value === results[i].LayerName) {
                     document.getElementById("LayerName1").innerHTML = "The Layer Name has already been used";
                     document.addEventListener("keyup", function (e) {
@@ -33,7 +33,7 @@ function SearchThirdLayer(thisvalue){
         url: "/SearchThirdLayer",
         dataType:"json",
         success: function (results) {
-            for(var i = 0; i < results.length; i++) {
+            for(let i = 0; i < results.length; i++) {
                 if (thisvalue === results[i].ThirdLayer) {
                     document.getElementById("LayerName2").innerHTML = "The ThirdLayer Name has already been used";
                     document.addEventListener("keyup", function (e) {
@@ -52,3 +52,5 @@ function SearchThirdLayer(thisvalue){
         }
     })
 }
+
+export {SearchLayerName, SearchThirdLayer}

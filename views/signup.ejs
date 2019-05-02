@@ -9,7 +9,7 @@
 	<!-- load fontawesome -->
 	<link rel="stylesheet" href="//cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 	<!--<link rel="stylesheet" href="//unpkg.com/flatpickr/dist/flatpickr.min.css">-->
-	<script src="../Backup2/src/jquery-3.3.1.min.js"></script>
+	<script src="../3rdPartyLibs/jquery-3.3.1.min.js"></script>
 	<script src="//cdn.jsdelivr.net/npm/flatpickr"></script>
 	<!--<script src="//unpkg.com/flatpickr"></script>-->
 	<style>.floatingBox {
@@ -149,10 +149,10 @@
                 })
             });
         });
-        var today = new Date();
-        var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-        var time2 = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
-        var dateTime = date + ' ' + time2;
+        let today = new Date();
+        let date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
+        let time2 = today.getHours() + ":" + today.getMinutes() + ":" + today.getSeconds();
+        let dateTime = date + ' ' + time2;
         document.getElementById("DATE").value = dateTime;
     });
 
@@ -161,7 +161,7 @@
 			url: "SearchUsername",
 			dataType: "json",
 			success: function (results) {
-				for (var i = 0; i < results.length; i++) {
+				for (let i = 0; i < results.length; i++) {
 					// let newRes = JSON.stringify(results);
 					console.log(value);
 					console.log(results[i].username);

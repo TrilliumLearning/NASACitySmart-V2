@@ -55,12 +55,12 @@ module.exports = function(passport) {
                     } else {
                         // if there is no user with that username
                         // create the user
-                        var newUserMysql = {
+                        let newUserMysql = {
                             username: username,
                             password: bcrypt.hashSync(password, null, null)  // use the generateHash function in our user model
                         };
 
-                        var insertQuery = "INSERT INTO Users ( username, password ) values (?,?)";
+                        let insertQuery = "INSERT INTO Users ( username, password ) values (?,?)";
 
                         con_CS.query(insertQuery,[newUserMysql.username, newUserMysql.password],function(err, rows) {
                             newUserMysql.id = rows.insertId;

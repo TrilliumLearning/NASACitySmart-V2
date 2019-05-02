@@ -91,10 +91,10 @@ module.exports = function (app, passport) {
 
     app.get('/position',function (req,res) {
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-        var layername = req.query.layername;
+        let layername = req.query.layername;
         // console.log("Layername Below: ");
         // console.log(layername);
-        var parsedLayers = layername.split(",");
+        let parsedLayers = layername.split(",");
         // console.log("Parsed Layers: ");
         // console.log(parsedLayers);
 
@@ -112,22 +112,36 @@ module.exports = function (app, passport) {
         // })
     });
 
-    app.get('/placemark', function(req, res) {
+    app.get('/csPK', function(req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-        var select = "SELECT * FROM CitySmart2.LayerMenu WHERE LayerType = 'Placemark'";
+        let select = "SELECT * FROM CitySmart2.LayerMenu WHERE LayerType = 'CS_PKLayer'";
         con_CS.query( select, function (err, result) {
-            if (err) throw err;
-            else {
-                // console.log(result);
-                res.json({"err": false, "data": result});
-            }
+            if (err) { throw err }
+            else { res.json({"err": false, "data": result})}
         });
     });
 
+    app.get('/autoMenu',function (req,res) {
+        // res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+        let queryState = "SELECT FirstLayer, SecondLayer, ThirdLayer, " +
+            "GROUP_CONCAT(LayerName) as LayerName, LayerType, CountryName, StateName, CityName " +
+            "FROM CitySmart2.LayerMenu WHERE Status = 'Approved' " +
+            "GROUP BY FirstLayer, SecondLayer, ThirdLayer, LayerType, CountryName, StateName, CityName";
+
+        con_CS.query(queryState, function (err, results) {
+            if (err) {
+                console.log(err);
+                res.json({"error": true, "message": "An unexpected error occurred !"});
+            } else {
+                res.json(results);
+                // console.log(results);
+            }
+        });
+    });
     app.get('/currentLayer',function (req,res) {
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
-        var thirdlayer = req.query.thirdlayer;
-        var queryState = 'SELECT FirstLayer, SecondLayer, ThirdLayer, Longitude, Latitude, Altitude FROM LayerMenu WHERE ThirdLayer = ?';
+        let thirdlayer = req.query.thirdlayer;
+        let queryState = 'SELECT FirstLayer, SecondLayer, ThirdLayer, Longitude, Latitude, Altitude FROM LayerMenu WHERE ThirdLayer = ?';
         con_CS.query(queryState, thirdlayer, function (err, results) {
             if (err) {
                 console.log(err);
@@ -151,7 +165,7 @@ module.exports = function (app, passport) {
 
     app.get('/secondLayer', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
-        var firstlayerValue = req.query.FirstLayer;
+        let firstlayerValue = req.query.FirstLayer;
         con_CS.query("SELECT SecondLayer,FirstLayer FROM LayerMenu WHERE Status ='Approved' and FirstLayer =? GROUP BY SecondLayer", firstlayerValue ,function (err, result) {
             // let JSONresult = JSON.stringify(result, null, "\t");
             if (err) { throw err } else {
@@ -163,7 +177,7 @@ module.exports = function (app, passport) {
 
     app.get('/thirdLayer', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
-        var secondLayerValue = req.query.SecondLayer;
+        let secondLayerValue = req.query.SecondLayer;
         con_CS.query("SELECT LayerType,SecondLayer,ThirdLayer,CityName,StateName,CountryName, GROUP_CONCAT(LayerName) as LayerName FROM LayerMenu WHERE Status ='Approved' and SecondLayer =? GROUP BY ThirdLayer,CityName,StateName,CountryName,SecondLayer,LayerType", secondLayerValue ,function (err, result) {
             // let JSONresult = JSON.stringify(result, null, "\t");
             //All layer?
@@ -173,6 +187,28 @@ module.exports = function (app, passport) {
             }
         });
     });
+
+
+    app.get('/mrdsData', function (req, res) {
+        // console.log( "A: " + new Date());
+
+        res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+
+        // let statement = "SELECT p_name, xlong, ylat, p_year_color, p_avgcap_color, t_ttlh_color FROM USWTDB INNER JOIN USWTDB_COLOR ON USWTDB.case_id = USWTDB_COLOR.case_id ORDER BY p_name;";
+        let statement = "SELECT * FROM mrds_sample;";
+
+        con_CS.query(statement, function (err, results, fields) {
+            if (err) {
+                console.log(err);
+                res.json({"error": true, "message": "An unexpected error occurred !"});
+            } else {
+                // console.log("success: " + new Date());
+                // console.log(results);
+                res.json({"error": false, "data": results});
+            }
+        });
+    });
+
 
     // app.get('/request',function (req,res) {
     //     res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
@@ -231,10 +267,10 @@ module.exports = function (app, passport) {
             } else if (results.length === 0) {
                 res.json({"error": true, "message": "Please verify your email address !"});
             } else {
-                var username = req.body.username;
-                var subject = "Password Reset";
-                var text = 'the reset of the password for your account.';
-                var url = "http://" + req.headers.host + "/reset/";
+                let username = req.body.username;
+                let subject = "Password Reset";
+                let text = 'the reset of the password for your account.';
+                let url = "http://" + req.headers.host + "/reset/";
                 sendToken(username, subject, text, url, res);
             }
         });
@@ -284,9 +320,9 @@ module.exports = function (app, passport) {
                                 console.log(err);
                                 res.json({"error": true, "message": "New Password Insert Fail!"});
                             } else {
-                                var username = req.body.username;
-                                var subject = "Your password has been changed";
-                                var text = 'Hello,\n\n' + 'This is a confirmation that the password for your account, ' + changeMail(username) + ' has just been changed.\n';
+                                let username = req.body.username;
+                                let subject = "Your password has been changed";
+                                let text = 'Hello,\n\n' + 'This is a confirmation that the password for your account, ' + changeMail(username) + ' has just been changed.\n';
                                 done(err, username, subject, text);
                             }
                         });
@@ -567,8 +603,8 @@ module.exports = function (app, passport) {
 
     app.get('/filterQuery', isLoggedIn, function (req, res) {
         // console.log(req.query);
-        var sqlStat = "SELECT UserProfile.firstName, UserProfile.lastName, Request_Form.* FROM Request_Form INNER JOIN UserProfile ON UserProfile.username = Request_Form.UID";
-        var myQueryObj = [ //change everything because we need to make sure it matches what we want to happen in client side
+        let sqlStat = "SELECT UserProfile.firstName, UserProfile.lastName, Request_Form.* FROM Request_Form INNER JOIN UserProfile ON UserProfile.username = Request_Form.UID";
+        let myQueryObj = [ //change everything because we need to make sure it matches what we want to happen in client side
             {
                 fieldVal: req.query.firstName,
                 dbCol: "firstName",
@@ -746,9 +782,9 @@ module.exports = function (app, passport) {
                 return [String(key), req.body[key]];
             });
 
-            var update1 = "UPDATE UserProfile SET ";
+            let update1 = "UPDATE UserProfile SET ";
             let update2 = "";
-            var update3 = " WHERE username = '" + req.user.username + "'";
+            let update3 = " WHERE username = '" + req.user.username + "'";
             for (let i = 1; i < result.length - 3; i++) {
                 if (i === result.length - 4) {
                     update2 += result[i][0] + " = '" + result[i][1] + "'";
@@ -775,10 +811,10 @@ module.exports = function (app, passport) {
                             } else if (result.length === 0) {
                                 res.json({"error": true, "message": "Please verify your email address !"});
                             } else {
-                                var username = newname;
-                                var subject = "Email verify";
-                                var text = 'to verify the new username(email).';
-                                var url = "http://" + req.headers.host + "/verifyemail/";
+                                let username = newname;
+                                let subject = "Email verify";
+                                let text = 'to verify the new username(email).';
+                                let url = "http://" + req.headers.host + "/verifyemail/";
                                 sendname(username, subject, text, url, res);
                             }
                         });
@@ -881,10 +917,10 @@ module.exports = function (app, passport) {
                 res.json({"error": true, "message": "An unexpected error occurred!"});
                 res.end();
             } else {
-                var username = req.body.username;
-                var subject = "Sign Up";
-                var text = 'to sign up an account with this email.';
-                var url = "http://" + req.headers.host + "/verify/";
+                let username = req.body.username;
+                let subject = "Sign Up";
+                let text = 'to sign up an account with this email.';
+                let url = "http://" + req.headers.host + "/verify/";
                 sendToken(username, subject, text, url, res);
             }
         });
@@ -904,7 +940,7 @@ module.exports = function (app, passport) {
         res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
         // connection.query('USE ' + configGlobal.Login_db); // Locate Login DB
 
-        var newUser = {
+        let newUser = {
             username: req.body.username,
             firstName: req.body.firstName,
             lastName: req.body.lastName,
@@ -951,8 +987,8 @@ module.exports = function (app, passport) {
                         console.log(err);
                         res.send("An unexpected error occurred !");
                     } else {
-                        var subject = "Account Activated";
-                        var text = 'Hello,\n\n' + 'This is a confirmation for your account, ' + changeMail(username) + ' has just been activated.\n';
+                        let subject = "Account Activated";
+                        let text = 'Hello,\n\n' + 'This is a confirmation for your account, ' + changeMail(username) + ' has just been activated.\n';
                         done(err, username, subject, text);
                     }
 
@@ -979,14 +1015,14 @@ module.exports = function (app, passport) {
             }, function(PendingUsername, done) {
                 myStat = "UPDATE UserLogin SET username = '"+ PendingUsername  + "', PendingUsername = '' WHERE PendingUsername = '"+ PendingUsername + "';";
                 // mylogin = "UPDATE UserLogin SET PendingUsername = '' WHERE PendingUsername = '" + PendingUsername + "';";
-                var myProfile = "UPDATE UserProfile SET username = '" + PendingUsername + "' WHERE username = '" + req.user.username + "';";
+                let myProfile = "UPDATE UserProfile SET username = '" + PendingUsername + "' WHERE username = '" + req.user.username + "';";
                 con_CS.query(myStat + myProfile, function(err, user) {
                     if (err) {
                         console.log(err);
                         res.send("An unexpected error occurred !");
                     } else {
-                        var subject = "Account Activated";
-                        var text = 'Hello,\n\n' + 'This is a confirmation for your account, ' + changeMail(PendingUsername) + ' has just been activated.\n';
+                        let subject = "Account Activated";
+                        let text = 'Hello,\n\n' + 'This is a confirmation for your account, ' + changeMail(PendingUsername) + ' has just been activated.\n';
                         done(err, PendingUsername, subject, text);
                     }
 
@@ -1074,7 +1110,7 @@ module.exports = function (app, passport) {
     });
 
     // // Retrieve user data from user management page
-    var edit_User, edit_firstName, edit_lastName, edit_userrole, edit_status, edit_city;
+    let edit_User, edit_firstName, edit_lastName, edit_userrole, edit_status, edit_city;
     app.get('/editUserQuery', isLoggedIn, function (req, res) {
 
          edit_User = req.query.Username;
@@ -1153,7 +1189,7 @@ module.exports = function (app, passport) {
                 return [String(key), req.body[key]];
             });
 
-            // var update3 = " WHERE username = '" + req.user.username + "'";
+            // let update3 = " WHERE username = '" + req.user.username + "'";
             let statement1 = "UPDATE UserLogin SET userrole = '" + result[3][1] + "',   status = '" + result[4][1] + "' WHERE username = '" + result[0][1]+ "';";
             let statement2 = "UPDATE UserProfile SET firstName = '" + result[1][1] + "', lastName = '" + result[2][1] + "' WHERE username = '" + result[0][1] + "';";
             con_CS.query(statement1 + statement2, function (err, result) {
@@ -1262,9 +1298,9 @@ module.exports = function (app, passport) {
         });
         res.setHeader("Access-Control-Allow-Origin", "*");
 
-        var update1 = "UPDATE UserProfile SET ";
+        let update1 = "UPDATE UserProfile SET ";
         let update2 = "";
-        var update3 = " WHERE username = '" + req.user.username + "'";
+        let update3 = " WHERE username = '" + req.user.username + "'";
         for (let i = 0; i < result.length - 3; i++) {
             if (i === result.length - 4) {
                 update2 += result[i][0] + " = '" + result[i][1] + "'";
@@ -1295,10 +1331,10 @@ module.exports = function (app, passport) {
             } else if (result.length === 0) {
                 res.json({"error": true, "message": "Please verify your email address !"});
             } else {
-                var username = newname;
-                var subject = "Email verify";
-                var text = 'to verify the new username(email).';
-                var url = "http://" + req.headers.host + "/verifyemail/";
+                let username = newname;
+                let subject = "Email verify";
+                let text = 'to verify the new username(email).';
+                let url = "http://" + req.headers.host + "/verifyemail/";
                 sendname(username, subject, text, url, res);
             }
         })
@@ -1350,16 +1386,16 @@ module.exports = function (app, passport) {
 
     //Request ID
     app.get('/newRequest', isLoggedIn, function (req, res) {
-        var d = new Date();
-        var utcDateTime = d.getUTCFullYear() + "-" + ('0' + (d.getUTCMonth() + 1)).slice(-2) + "-" + ('0' + d.getUTCDate()).slice(-2);
-        var queryRID = "SELECT COUNT(RID) AS number FROM Special_ID WHERE RID LIKE '" + utcDateTime + "%';";
+        let d = new Date();
+        let utcDateTime = d.getUTCFullYear() + "-" + ('0' + (d.getUTCMonth() + 1)).slice(-2) + "-" + ('0' + d.getUTCDate()).slice(-2);
+        let queryRID = "SELECT COUNT(RID) AS number FROM Special_ID WHERE RID LIKE '" + utcDateTime + "%';";
 
         con_CS.query(queryRID, function (err, results, fields) {
             RID = utcDateTime + "_" + ('000' + (results[0].number + 1)).slice(-4);
             if (err) {
                 console.log(err);
             } else {
-                var insertRID = "INSERT INTO Special_ID (RID, UID) VALUE (" + "'" + RID + "', '" + req.user + "');";
+                let insertRID = "INSERT INTO Special_ID (RID, UID) VALUE (" + "'" + RID + "', '" + req.user + "');";
 
                 con_CS.query(insertRID, function (err, results, fields) {
                     if (err) {
@@ -1485,10 +1521,10 @@ module.exports = function (app, passport) {
 
                 if (format === "Shapefile - ESRI(tm) Shapefiles (.shp)") {
                     console.log("name of file: " + approvepictureStr[0]);
-                    var type = "Content-type: application/zip";
-                    var datastore = "datastore" + fName;
+                    let type = "Content-type: application/zip";
+                    let datastore = "datastore" + fName;
 
-                    var uploadStat1 = "curl -u julia:123654 -v -XPUT -H '" + type + "' --data-binary @approvedfolder/" + approvepictureStr[0] + " " + geoServer + "rest/workspaces/Approved/datastores/" + datastore +"/file.shp";
+                    let uploadStat1 = "curl -u julia:123654 -v -XPUT -H '" + type + "' --data-binary @approvedfolder/" + approvepictureStr[0] + " " + geoServer2 + "rest/workspaces/Approved/datastores/" + datastore +"/file.shp";
 
                     child = exec(uploadStat1,
                         function (error, stdout, stderr) {
@@ -1498,8 +1534,8 @@ module.exports = function (app, passport) {
                             if (error !== null) {
                                 console.log('exec error: ' + error);
                             } else {
-                                var uploadStat2 = "curl -u julia:123654 -v -XGET " + geoServer + "rest/workspaces/Approved/datastores/" + datastore + "/featuretypes.json";
-                                var jsonF;
+                                let uploadStat2 = "curl -u julia:123654 -v -XGET " + geoServer + "rest/workspaces/Approved/datastores/" + datastore + "/featuretypes.json";
+                                let jsonF;
                                 child = exec(uploadStat2,
                                     function (error, stdout, stderr) {
                                         console.log(uploadStat2);
@@ -1514,18 +1550,148 @@ module.exports = function (app, passport) {
                                             layerName = "Approved:" + jsonF.featureTypes.featureType[0].name;
                                             console.log(layerName);
                                             geoName = layerName;
+                                            // let lname = jsonF.featureTypes.featureType[0].name;
 
-                                            let myStat2 = "UPDATE Request_Form SET LayerName = '" + geoName +"' WHERE RID = '" + approveIDStr + "'";
+                                            let myState2 = "UPDATE Request_Form SET LayerName = '" + geoName +"' WHERE RID = '" + approveIDStr + "';";
+                                            let myState3 = "UPDATE LayerMenu SET LayerName = '" + geoName +"' WHERE RID = '" + approveIDStr + "'";
 
-                                            con_CS.query(myStat2, function (err, results) {
-                                                if (err) throw err;
-                                            })
+                                            con_CS.query(myState2 + myState3, function (err, results) {
+                                                if (err) {
+                                                    throw err;
+                                                } else {
+                                                    //res.json(results);
+                                                    let uploadStat3 = "curl -u julia:123654 -v -H 'Accept: text/xml' -XGET -H 'Content-type: text/json' " + geoServer2 + "rest/workspaces/Approved/datastores/" + datastore + "/featuretypes/"+ geoName +".json";
+                                                    let jsonL;
+                                                    child = exec(uploadStat3,
+                                                        function (error, stdout, stderr) {
+                                                            console.log(uploadStat3);
+                                                            console.log('stdout: ' + stdout);
+                                                            console.log('stderr: ' + stderr);
+
+                                                            jsonL = JSON.parse(stdout);
+                                                            if (error !== null) {
+
+                                                                console.log('exec error: ' + error);
+                                                            } else {
+                                                                let minx, maxx, miny, maxy, avgx, avgy;
+                                                                minx = jsonL.featureType.nativeBoundingBox.minx;
+                                                                maxx = jsonL.featureType.nativeBoundingBox.maxx;
+                                                                miny = jsonL.featureType.nativeBoundingBox.miny;
+                                                                maxy = jsonL.featureType.nativeBoundingBox.maxy;
+                                                                avgx = (minx + maxx)/2;
+                                                                avgy = (miny + maxy)/2;
+                                                                console.log(minx);
+                                                                console.log(maxx);
+                                                                console.log(avgx);
+                                                                console.log(miny);
+                                                                console.log(maxy);
+                                                                console.log(avgy);
+
+                                                                let myState4 = "UPDATE LayerMenu SET Latitude = '" + avgy +"', Longitude = '" + avgx +"' WHERE RID = '" + approveIDStr + "'";
+
+                                                                con_CS.query(myState4, function (err, results) {
+                                                                    if (err) {
+                                                                        throw err;
+                                                                    } else {
+                                                                        //res.json(results);
+                                                                    }
+                                                                });
+                                                            }
+                                                        });
+                                                }
+                                            });
+
                                         }
                                     });
                             }
                         });
                 } else if (format === "GeoTIFF - Tagged Image File Format with Geographic information (.tif)") {
                     console.log("geotiff file works :D");
+                    console.log("name of file: " + approvepictureStr[0]);
+                    type = "Content-type: text/plain";
+                    let coveragestore = "coveragestore" + fName;
+
+                    let uploadStat4 = "curl -u julia:123654 -v -XPUT -H '" + type + "' -d 'file:data_dir/data/Approved/coveragestore/" + approvepictureStr[0] + "' " + geoServer + "rest/workspaces/Approved/coveragestores/" + coveragestore +"/external.geotiff";
+
+                    child = exec(uploadStat4,
+                        function (error, stdout, stderr) {
+                            console.log(uploadStat4);
+                            console.log('stdout: ' + stdout);
+                            console.log('stderr: ' + stderr);
+                            if (error !== null) {
+                                console.log('exec error: ' + error);
+                            } else {
+                                // let statement = "curl -u julia:123654 -v -XGET " + geoServer + "rest/workspaces/Approved/coveragestore/" + datastore + "/featuretypes.json";
+                                // let jsonF;
+                                // child = exec(statement,
+                                //     function (error, stdout, stderr) {
+                                //         console.log(statement);
+                                //         console.log('stdout: ' + stdout);
+                                //         console.log('stderr: ' + stderr);
+                                //
+                                //         jsonF = JSON.parse(stdout);
+                                //         if (error !== null) {
+                                //
+                                //             console.log('exec error: ' + error);
+                                //         } else {
+                                //             layerName = "Approved:" + jsonF.featureTypes.featureType[0].name;
+                                //             console.log(layerName);
+                                //             geoName = layerName;
+                                //             let lname = jsonF.featureTypes.featureType[0].name;
+                                //
+                                //             let statementNext = "UPDATE Request_Form SET LayerName = '" + geoName +"' WHERE RID = '" + approveIDStr + "';";
+                                //             let statementNext2 = "UPDATE LayerMenu SET LayerName = '" + geoName +"' WHERE RID = '" + approveIDStr + "'";
+                                //
+                                //             con_CS.query(statementNext + statementNext2, function (err, results) {
+                                //                 if (err) {
+                                //                     throw err;
+                                //                 } else {
+                                //                     //res.json(results);
+                                //                     let statement = "curl -u julia:123654 -v -H 'Accept: text/xml' -XGET -H 'Content-type: text/json' " + geoServer + "rest/workspaces/Approved/datastores/" + datastore + "/featuretypes/"+ lname +".json";
+                                //                     let jsonL;
+                                //                     child = exec(statement,
+                                //                         function (error, stdout, stderr) {
+                                //                             console.log(statement);
+                                //                             console.log('stdout: ' + stdout);
+                                //                             console.log('stderr: ' + stderr);
+                                //
+                                //                             jsonL = JSON.parse(stdout);
+                                //                             if (error !== null) {
+                                //
+                                //                                 console.log('exec error: ' + error);
+                                //                             } else {
+                                //                                 let minx, maxx, miny, maxy, avgx, avgy;
+                                //                                 minx = jsonL.featureType.nativeBoundingBox.minx;
+                                //                                 maxx = jsonL.featureType.nativeBoundingBox.maxx;
+                                //                                 miny = jsonL.featureType.nativeBoundingBox.miny;
+                                //                                 maxy = jsonL.featureType.nativeBoundingBox.maxy;
+                                //                                 avgx = (minx + maxx)/2;
+                                //                                 avgy = (miny + maxy)/2;
+                                //                                 console.log(minx);
+                                //                                 console.log(maxx);
+                                //                                 console.log(avgx);
+                                //                                 console.log(miny);
+                                //                                 console.log(maxy);
+                                //                                 console.log(avgy);
+                                //
+                                //                                 let statementNext3 = "UPDATE LayerMenu SET Latitude = '" + avgy +"', Longitude = '" + avgx +"' WHERE RID = '" + approveIDStr + "'";
+                                //
+                                //                                 con_CS.query(statementNext3, function (err, results) {
+                                //                                     if (err) {
+                                //                                         throw err;
+                                //                                     } else {
+                                //                                         //res.json(results);
+                                //                                     }
+                                //                                 });
+                                //                             }
+                                //                         });
+                                //                 }
+                                //             });
+                                //
+                                //         }
+                                //     });
+                            }
+                        });
                 }
 
                 res.json(results[i]);
@@ -1540,20 +1706,20 @@ module.exports = function (app, passport) {
 
         console.log(result);
 
-        var statement = "curl -u julia:123654 -v -XGET " + geoServer + "rest/workspaces/Approved/datastores/datastoresigh/featuretypes.json";
-        var jsonF;
+        let statement = "curl -u julia:123654 -v -XPUT -H 'Content-type: text/plain' -d 'file:data_dir/data/Approved/coveragestore/marbles.tif' " + geoServer + "rest/workspaces/Approved/coveragestore/newCov2/external.geotiff";
+        // let jsonF;
         child = exec(statement,
             function (error, stdout, stderr) {
                 console.log(statement);
                 console.log('stdout: ' + stdout);
                 console.log('stderr: ' + stderr);
 
-                jsonF = JSON.parse(stdout);
+                // jsonF = JSON.parse(stdout);
                 if (error !== null) {
 
                     console.log('exec error: ' + error);
                 } else {
-                    console.log(jsonF.featureTypes.featureType[0].name);
+                    // console.log(jsonF.featureTypes.featureType[0].name);
                 }
             });
 
@@ -1566,8 +1732,8 @@ module.exports = function (app, passport) {
 
         res.setHeader("Access-Control-Allow-Origin", "*");
 
-        var update1 = "UPDATE Request_Form SET " ;
-        var update3 = " WHERE RID = '" + result[1][1] + "';";
+        let update1 = "UPDATE Request_Form SET " ;
+        let update3 = " WHERE RID = '" + result[1][1] + "';";
         let update2 = "";
         let layerName;
         let datastore = "datastore" + result[7][1];
@@ -1703,9 +1869,9 @@ module.exports = function (app, passport) {
     });
 
     app.get('/editdata',function (req,res){
-        // var d = new Date();
-        // var utcDateTime = d.getUTCFullYear() + "-" + ('0' + (d.getUTCMonth() + 1)).slice(-2) + "-" + ('0' + d.getUTCDate()).slice(-2);
-        // var queryRID = "SELECT COUNT(RID) AS number FROM Special_ID WHERE RID LIKE '" + utcDateTime + "%';";
+        // let d = new Date();
+        // let utcDateTime = d.getUTCFullYear() + "-" + ('0' + (d.getUTCMonth() + 1)).slice(-2) + "-" + ('0' + d.getUTCDate()).slice(-2);
+        // let queryRID = "SELECT COUNT(RID) AS number FROM Special_ID WHERE RID LIKE '" + utcDateTime + "%';";
         res.render('LayerRequestForm_edit.ejs', {
             user: req.user
         });
@@ -1726,14 +1892,14 @@ module.exports = function (app, passport) {
     //Class for menu
     app.get('/ClassName', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
-        var recieveCitylist = req.query.citylevel;
+        let recieveCitylist = req.query.citylevel;
         con_CS.query("SELECT FirstLayer, SecondLayer, ThirdLayer FROM LayerMenu WHERE CityName = '" + recieveCitylist + "'", function (err, results) {
             res.json(results);
         });
     });
     app.get('/CountryClassName', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
-        var recieveCountrylist = req.query.countrylevel;
+        let recieveCountrylist = req.query.countrylevel;
         con_CS.query("SELECT FirstLayer, SecondLayer, ThirdLayer FROM LayerMenu WHERE CountryName = '" + recieveCountrylist + "'", function (err, results) {
             res.json(results);
         });
@@ -1741,7 +1907,7 @@ module.exports = function (app, passport) {
     //state level
     app.get('/StateList', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
-        var recieveCountrylist = req.query.countrylevel;
+        let recieveCountrylist = req.query.countrylevel;
         con_CS.query("SELECT StateName FROM LayerMenu  WHERE CountryName = '" + recieveCountrylist + "' GROUP BY StateName", function (err, results, fields) {
             res.json(results);
         });
@@ -1749,7 +1915,7 @@ module.exports = function (app, passport) {
     //city level
     app.get('/CityList', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
-        var recieveCitylist = req.query.statelevel;
+        let recieveCitylist = req.query.statelevel;
         con_CS.query("SELECT CityName FROM LayerMenu  WHERE StateName = '" + recieveCitylist + "' GROUP BY CityName", function (err, results, fields) {
             res.json(results);
         });
@@ -1766,7 +1932,7 @@ module.exports = function (app, passport) {
     app.get('/layerRequestCountry',function(req,res){
         res.setHeader("Access-Control-Allow-Origin", "*");
         console.log(req.query);
-        var recieveCountryData = req.query.country;
+        let recieveCountryData = req.query.country;
         console.log(recieveCountryData);
         con_CS.query("SELECT Country_name FROM Country WHERE Continent = ?", recieveCountryData, function (err, results) {
             console.log(results);
@@ -1787,17 +1953,6 @@ module.exports = function (app, passport) {
             res.json(results);
         })
     });
-
-//check if the layer name is available
-    app.get('/SearchLayerName', function (req, res) {
-        res.setHeader("Access-Control-Allow-Origin", "*");
-        con_CS.query("SELECT ThirdLayer FROM LayerMenu", function (err, results) {
-            if (err) throw err;
-            res.json(results);
-
-        });
-    });
-
 
     app.get('/EditData', function (req, res) {
         res.setHeader("Access-Control-Allow-Origin", "*");
@@ -1839,6 +1994,25 @@ module.exports = function (app, passport) {
 
     });
 
+    app.get('/usgswtPK', function (req, res) {
+        // console.log("A: " + new Date());
+
+        res.setHeader("Access-Control-Allow-Origin", "*"); // Allow cross domain header
+
+        // var statement = "SELECT p_name, xlong, ylat, p_year_color, p_avgcap_color, t_ttlh_color FROM USWTDB INNER JOIN USWTDB_COLOR ON USWTDB.case_id = USWTDB_COLOR.case_id ORDER BY p_name;";
+        let statement = "SELECT USWTDB_Sample.case_id, t_state, p_name, xlong, ylat, p_year, p_tnum, p_cap, p_avgcap, t_ttlh, p_year_color, p_avgcap_color, t_ttlh_color FROM USWTDB_Sample INNER JOIN USWTDB_COLOR_Sample ON USWTDB_Sample.case_id = USWTDB_COLOR_Sample.case_id ORDER BY p_name;";
+
+        con_CS.query(statement, function (err, results, fields) {
+            if (err) {
+                console.log(err);
+                res.json({"error": true, "message": "An unexpected error occurred !"});
+            } else {
+                // console.log("success: " + new Date());
+                // console.log(results);
+                res.json({"error": false, "data": results});
+            }
+        });
+    });
 
     // =====================================
     // Others  =============================
@@ -2282,7 +2456,7 @@ function QueryStat(myObj, sqlStat, res) {
             },
             function(token, done, err) {
                 // Message object
-                var message = {
+                let message = {
                     from: 'FTAA <aaaa.zhao@g.northernacademy.org>', // sender info
                     to: username, // Comma separated list of recipients
                     subject: subject, // Subject of the message
@@ -2335,7 +2509,7 @@ function QueryStat(myObj, sqlStat, res) {
             },
             function(token, done, err) {
                 // Message object
-                var message = {
+                let message = {
                     from: 'FTAA <aaaa.zhao@g.northernacademy.org>', // sender info
                     to: username, // Comma separated list of recipients
                     subject: subject, // Subject of the message
@@ -2363,7 +2537,7 @@ function QueryStat(myObj, sqlStat, res) {
     }
 
     function successMail(username, subject, text, res) {
-        var message = {
+        let message = {
             from: 'FTAA <aaaa.zhao@g.northernacademy.org>',
             to: username,
             subject: subject,

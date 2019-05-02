@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <!--<link rel="stylesheet" href="//unpkg.com/flatpickr/dist/flatpickr.min.css">-->
     <link rel="stylesheet" href="../css/Title.css" type="text/css">
-    <script src="../Backup2/src/jquery-3.3.1.min.js"></script>
+    <script src="../3rdPartyLibs/jquery-3.3.1.min.js"></script>
     <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
     <script src="//cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -341,12 +341,12 @@
 
     <script type="text/javascript">
 
-        var rowSelected, thArray, DropMenu, queryString1, queryString2;
-        var table = $('#dataDisplay').DataTable({ "lengthMenu": [[5, 10, 25, -1], [5, 10, 25, "All"]]});
-        var querystr = "";
-        var userrole = "";
-        var UserRole = "<%= user.userrole %>";
-        var rowUserName = [];
+        let rowSelected, thArray, DropMenu, queryString1, queryString2;
+        let table = $('#dataDisplay').DataTable({ "lengthMenu": [[5, 10, 25, -1], [5, 10, 25, "All"]]});
+        let querystr = "";
+        let userrole = "";
+        let UserRole = "<%= user.userrole %>";
+        let rowUserName = [];
 
         $(document).ready(function() {
             $(function () {
@@ -370,7 +370,7 @@
                     thArray.push($(this).text())
                 })
 
-                for (var i = 0; i < rowSelected.length; i ++) {
+                for (let i = 0; i < rowSelected.length; i ++) {
 //                    console.log("rowSelected[" + i + "][2]: " + rowSelected[i][2]);
                     rowUserName.push(rowSelected[i][0]);
                 }
@@ -383,8 +383,8 @@
                 } else if (rowSelected.length === 0) {
                     confirm("No rows have been selected---- please choose ONE.")
                 } else {
-                    var tstring = "";
-                    for (var i = 0; i < thArray.length; i++) {
+                    let tstring = "";
+                    for (let i = 0; i < thArray.length; i++) {
                         if (i === 0) {
                             tstring += thArray[i] + "=" + rowSelected[0][i];
                         } else {
@@ -392,7 +392,7 @@
                         }
                     }
 
-                    var getvalue = table.rows('.selected').data();
+                    let getvalue = table.rows('.selected').data();
                     localStorage.setItem("getvalue", JSON.stringify(getvalue[0]));
                     window.location.replace('/editUser');
 //                    console.log("tstring for loop: " + tstring);
@@ -412,7 +412,7 @@
             $("#suspendUserButton").on("click", function () {
                 if (confirm("Are you sure you would like to suspend the user(s)?")) {
 
-                    var usernameStr = "usernameStr=" + rowUserName.toString();
+                    let usernameStr = "usernameStr=" + rowUserName.toString();
                    console.log("usernameStr: " + usernameStr);
 
                     $.ajax({
@@ -453,9 +453,9 @@
         }
         window.onclick = function(event) {
             if (!event.target.matches('.dropbutton')) {
-                var dropdowns = document.getElementsByClassName("dropdown-content");
-                for (var i = 0; i < dropdowns.length; i++) {
-                    var openDropdown = dropdowns[i];
+                let dropdowns = document.getElementsByClassName("dropdown-content");
+                for (let i = 0; i < dropdowns.length; i++) {
+                    let openDropdown = dropdowns[i];
                     if (openDropdown.classList.contains('show')) {
                         openDropdown.classList.remove('show');
                     }
@@ -464,15 +464,15 @@
         }
 
         function query() {
-            var dateCreatedFrom = document.getElementsByClassName("datePicker")[0].value;
-            var dateCreatedTo = document.getElementsByClassName("datePicker")[1].value;
-            var dateModifiedFrom = document.getElementsByClassName("datePicker")[2].value;
-            var dateModifiedTo = document.getElementsByClassName("datePicker")[3].value;
-            var firstName = document.getElementById("firstName").value;
-            var lastName = document.getElementById("lastName").value;
-            var Phone_Number = document.getElementById("Phone_Number").value;
-            var status = document.getElementById("status").value;
-            var userrole = document.getElementById("userrole").value;
+            let dateCreatedFrom = document.getElementsByClassName("datePicker")[0].value;
+            let dateCreatedTo = document.getElementsByClassName("datePicker")[1].value;
+            let dateModifiedFrom = document.getElementsByClassName("datePicker")[2].value;
+            let dateModifiedTo = document.getElementsByClassName("datePicker")[3].value;
+            let firstName = document.getElementById("firstName").value;
+            let lastName = document.getElementById("lastName").value;
+            let Phone_Number = document.getElementById("Phone_Number").value;
+            let status = document.getElementById("status").value;
+            let userrole = document.getElementById("userrole").value;
             /*if ($("input[name='userrole']").is(":checked")) {
                 userrole = $("input[name='userrole']:checked").val();
             } else {
@@ -494,7 +494,7 @@
             }
         }
 
-        var queryAndDisplay = function (querystr) {
+        let queryAndDisplay = function (querystr) {
             // alert(querystr);
 //            console.log("querystr: " + querystr);
 
@@ -506,7 +506,7 @@
                 data: querystr,
                 success: function (resp) {
                     console.log(resp)
-                    for (var i = 0; i < resp.length; i++) {
+                    for (let i = 0; i < resp.length; i++) {
                         table.row.add( [
                             resp[i].username,
                             resp[i].firstName,
@@ -530,8 +530,8 @@
 
         // Format the phone number as the user types it
         document.getElementById('Phone_Number').addEventListener('keyup',function(evt){
-            var phoneNumber = document.getElementById('Phone_Number');
-            var charCode = (evt.which) ? evt.which : evt.keyCode;
+            let phoneNumber = document.getElementById('Phone_Number');
+            let charCode = (evt.which) ? evt.which : evt.keyCode;
             phoneNumber.value = phoneFormat(phoneNumber.value);
         });
 
@@ -540,7 +540,7 @@
 
         // A function to determine if the pressed key is an integer
         function numberPressed(evt){
-            var charCode = (evt.which) ? evt.which : evt.keyCode;
+            let charCode = (evt.which) ? evt.which : evt.keyCode;
             if(charCode > 31 && (charCode < 48 || charCode > 57) && (charCode < 36 || charCode > 40)){
                 return false;
             }
@@ -556,7 +556,7 @@
             input = input.substring(0,10);
 
             // Based upon the length of the string, we add formatting as necessary
-            var size = input.length;
+            let size = input.length;
             if(size == 0){
                 input = input;
             }else if(size < 4){

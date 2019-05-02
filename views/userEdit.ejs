@@ -15,13 +15,13 @@
 
 
     <!--<link rel="stylesheet" href="//unpkg.com/flatpickr/dist/flatpickr.min.css">-->
-    <script src="../Backup2/src/jquery-3.3.1.min.js"></script>
+    <script src="../3rdPartyLibs/jquery-3.3.1.min.js"></script>
     <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
     <script src="//cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
     <!--<script src="//unpkg.com/flatpickr"></script>-->
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/flatpickr"></script>
-    <script src="../Backup2/src/jquery.multi-select.js"></script>
+    <script src="../3rdPartyLibs/jquery.multi-select.js"></script>
 
     <style>
         table, th{
@@ -144,10 +144,10 @@
     </div>
 </div>
 <script>
-     var LoginUser = "<%= user.username %>";
+     let LoginUser = "<%= user.username %>";
 
 
-     var getvalue = JSON.parse(localStorage.getItem("getvalue"));
+     let getvalue = JSON.parse(localStorage.getItem("getvalue"));
     document.getElementById('username').value = getvalue[0];
     document.getElementById('firstName').value = getvalue[1];
     document.getElementById('lastName').value = getvalue[2];
@@ -164,10 +164,10 @@
     }
 
 
-    var password = $("#password");
-    var initial = password.is(":checked");
-    var change = $("#password_change")[initial ? "removeClass" : "addClass"]("gray");
-    var changeInputs = change.find("input").attr("disabled", !initial);
+    let password = $("#password");
+    let initial = password.is(":checked");
+    let change = $("#password_change")[initial ? "removeClass" : "addClass"]("gray");
+    let changeInputs = change.find("input").attr("disabled", !initial);
 
 
     password.click(function(){
@@ -178,8 +178,8 @@
 
 
      function myFunction(){
-        var checkbox = document.getElementById("password");
-        var text = document.getElementById("pswchange");
+        let checkbox = document.getElementById("password");
+        let text = document.getElementById("pswchange");
 
 
          if (checkbox.checked === true){
@@ -202,8 +202,8 @@
     function checkForm() {
         let xyj = document.getElementById("updateForm");
         let oldP = document.getElementById("currentPassword").value;
-        var newP = document.getElementById("newPassword").value;
-        var confirmP = document.getElementById("confirmPassword").value;
+        let newP = document.getElementById("newPassword").value;
+        let confirmP = document.getElementById("confirmPassword").value;
         let userEditData = "username=" + getvalue[0] + "&pass=" + document.getElementById("currentPassword").value;
          if (LoginUser !== getvalue[0]) {
              if (confirmP !== "" && newP !== "") {
@@ -248,7 +248,7 @@
     }
 
     function submitForm () {
-            var data = $("#editForm").serialize() + "&" + $("#pswchange").serialize();
+            let data = $("#editForm").serialize() + "&" + $("#pswchange").serialize();
 
             $.ajax({
                 url  : '/edituserform',

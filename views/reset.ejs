@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <!--<link rel="stylesheet" href="//unpkg.com/flatpickr/dist/flatpickr.min.css">-->
     <link rel="stylesheet" href="../css/Title.css" type="text/css">
-    <script src="../Backup2/src/jquery-3.3.1.min.js"></script>
+    <script src="../3rdPartyLibs/jquery-3.3.1.min.js"></script>
     <!--<script src="//unpkg.com/flatpickr"></script>-->
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -73,8 +73,8 @@
 <script>
 
     function checkForm() {
-        var newP=document.getElementById("NewPassword").value;
-        var confirmP =document.getElementById("Confirmpassword").value;
+        let newP=document.getElementById("NewPassword").value;
+        let confirmP =document.getElementById("Confirmpassword").value;
 
         if (newP === confirmP) {
             return true;

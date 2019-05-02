@@ -10,7 +10,7 @@
     <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/buttons/1.4.2/css/buttons.dataTables.min.css">
     <link rel="stylesheet" href="//cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <!--<link rel="stylesheet" href="//unpkg.com/flatpickr/dist/flatpickr.min.css">-->
-    <script src="../Backup2/src/jquery-3.3.1.min.js"></script>
+    <script src="../3rdPartyLibs/jquery-3.3.1.min.js"></script>
     <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
     <script src="//cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -235,18 +235,18 @@
 </div>
 
 <script type='text/javascript'>
-    var dtstring = "";
-    var rowSelected = [];
-    var table = $("#dataDisplay").DataTable();
-    var trapTable = $("#trapDisplay").DataTable();
-    var UserRole = "<%= user.userrole %>";
-    var DropMenu;
-    var d;
-    var transactionID = [];
-    var picturename = []
-    var priorStatus = []
-    var layerName = [];
-    var username = "<%= user.username %>";
+    let dtstring = "";
+    let rowSelected = [];
+    let table = $("#dataDisplay").DataTable();
+    let trapTable = $("#trapDisplay").DataTable();
+    let UserRole = "<%= user.userrole %>";
+    let DropMenu;
+    let d;
+    let transactionID = [];
+    let picturename = []
+    let priorStatus = []
+    let layerName = [];
+    let username = "<%= user.username %>";
 
 
     $(document).ready(function(){
@@ -298,7 +298,7 @@
                 $(this).removeClass('selected');//unselect it
 
                 d = table.row(this).data();
-                var index = transactionID.indexOf(d[0]); //delete the last transactionID in the array when deselected
+                let index = transactionID.indexOf(d[0]); //delete the last transactionID in the array when deselected
                 console.log(index)
                 transactionID.splice(index, 1);
                 priorStatus.splice(index,1)
@@ -323,17 +323,17 @@
                 console.log(transactionID);
                 console.log(priorStatus)
                 console.log(picturename)
-                // var pictureStr = "pictureStr=" + picturename.toString();
+                // let pictureStr = "pictureStr=" + picturename.toString();
                 // console.log(pictureStr);
 
-                var thArray = [];
+                let thArray = [];
 
                 $('#dataDisplay > thead > tr > th').each(function () {
                     thArray.push($(this).text())
                 })
                 // console.log(thArray);
 
-                for (var i = 0; i < thArray.length; i++) {
+                for (let i = 0; i < thArray.length; i++) {
                     rowSelected[i] = {};
                     rowSelected[i].Name = thArray[i];
                     rowSelected[i].Value = d[i];
@@ -343,7 +343,7 @@
             // if ($(this).hasClass('selected')) { //if the row is selected already
             //     $(this).removeClass('selected');//unselect it
             //     d = table.row(this).data();
-            //     var index = transactionID.indexOf(d[0]); //delete the transactionID in the array
+            //     let index = transactionID.indexOf(d[0]); //delete the transactionID in the array
             //     transactionID.splice(index, 1);
             // } else {
             //     $(this).addClass('selected');
@@ -358,14 +358,14 @@
             //     transactionID.push(d[1]);
             //     picturename.push(d[11]);
             //
-            //     var thArray = [];
+            //     let thArray = [];
             //
             //     $('#dataDisplay > thead > tr > th').each(function () {
             //         thArray.push($(this).text())
             //     })
             //     console.log(thArray);
             //
-            //     for (var i = 0; i < thArray.length; i++) {
+            //     for (let i = 0; i < thArray.length; i++) {
             //         rowSelected[i] = {};
             //         rowSelected[i].Name = thArray[i];
             //         rowSelected[i].Value = d[i];
@@ -384,10 +384,10 @@
                 console.log(priorStatus)
 
 
-                var transactionIDStr = "transactionIDStr=";
-                var transactionPrStatusStr = "transactionStatusStr="
-                var layerNameStr = "layerName="
-                for (var i = 0; i < transactionID.length; i++) {
+                let transactionIDStr = "transactionIDStr=";
+                let transactionPrStatusStr = "transactionStatusStr="
+                let layerNameStr = "layerName="
+                for (let i = 0; i < transactionID.length; i++) {
                     //update the status to pending
                     //move file from trash folder to upload files.
                     transactionIDStr += transactionID[i] + ",";
@@ -402,7 +402,7 @@
                     }
                 }
                 function update() {
-                    var pictureStr = "pictureStr=" + picturename.toString();
+                    let pictureStr = "pictureStr=" + picturename.toString();
                     console.log(pictureStr);
                     $.ajax({
                         url: '/recoverRow',
@@ -430,7 +430,7 @@
         });
     });
 
-    var queryAndDisplay = function (querystr) {
+    let queryAndDisplay = function (querystr) {
         console.log(querystr);
         $.ajax({
             url: 'AddData',
@@ -438,7 +438,7 @@
             data: querystr,
             success: function (results) {
                 console.log(results);
-                for (var i = 0; i < results.length; i++) {
+                for (let i = 0; i < results.length; i++) {
                     if (results[i].Current_Status === "Deleted") {
                         if (UserRole === "Regular") {
                             if (results[i].UID === username) {

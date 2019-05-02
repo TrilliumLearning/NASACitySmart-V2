@@ -42,7 +42,6 @@ define([
          * @classdesc Provides elevations for Earth. Elevations are drawn from the NASA WorldWind elevation service.
          */
 
-        console.log(WWConf);
         let AsterV2ElevationCoverage = function () {
             TiledElevationCoverage.call(this, {
                 coverageSector: new Sector(-83.0001, 83.0001, -180, 180),

@@ -10,7 +10,7 @@
     <link rel="stylesheet" type="text/css" href="//cdn.datatables.net/buttons/1.4.2/css/buttons.dataTables.min.css">
     <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <!--<link rel="stylesheet" href="//unpkg.com/flatpickr/dist/flatpickr.min.css">-->
-    <script src="../Backup2/src/jquery-3.3.1.min.js"></script>
+    <script src="../3rdPartyLibs/jquery-3.3.1.min.js"></script>
     <script src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
     <script src="//cdn.datatables.net/buttons/1.4.2/js/dataTables.buttons.min.js"></script>
     <script src="//maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
@@ -299,14 +299,14 @@
     </div>
 </div>
 <script type='text/javascript'>
-    var username = "<%= user.username %>";
+    let username = "<%= user.username %>";
     // console.log(username);
-    var scoutingRowSelected, DropMenu, transactionpicturename;
-    var table = $("#dataDisplay").DataTable();
-    var UserRole = "<%= user.userrole %>";
-    var scoutingTransactionID = [];
-    var trapTransactionID = [];
-    var LayerNameStr = [];
+    let scoutingRowSelected, DropMenu, transactionpicturename;
+    let table = $("#dataDisplay").DataTable();
+    let UserRole = "<%= user.userrole %>";
+    let scoutingTransactionID = [];
+    let trapTransactionID = [];
+    let LayerNameStr = [];
 
     $(document).ready(function() {
 
@@ -337,7 +337,7 @@
             //     thArray.push($(this).text())
             // })
 
-            for (var i = 0; i < scoutingRowSelected.length; i++) {
+            for (let i = 0; i < scoutingRowSelected.length; i++) {
 //                console.log("rowSelected[" + i + "][0]: " + rowSelected[i][0]);
                 scoutingTransactionID.push(scoutingRowSelected[i][2]); //object variable / push means insert this value into ScoutingID
                 //i means row selected from table and 2 represents the column (count starting from zero)
@@ -356,15 +356,15 @@
         // });
 
         $("#editButton").on("click", function () {
-            var transactionID = scoutingTransactionID.concat(trapTransactionID);
+            let transactionID = scoutingTransactionID.concat(trapTransactionID);
             // console.log(transactionID);
             if (transactionID.length >= 2) {
                 confirm("Please make sure to only select ONE of the users to edit.")
             } else if (transactionID.length === 0) {
                 confirm("No rows have been selected ---- please choose ONE.")
             } else {
-                // var transactionIDStr = "transactionIDStr=" + transactionID.toString();
-                var getvalue = table.rows('.selected').data();
+                // let transactionIDStr = "transactionIDStr=" + transactionID.toString();
+                let getvalue = table.rows('.selected').data();
                 console.log(getvalue);
                 localStorage.setItem("getvalue", JSON.stringify(getvalue[0]));
                 window.location.replace('/editdata');
@@ -377,11 +377,11 @@
                 console.log(trapTransactionID);
                 console.log(scoutingTransactionID); //provides the associated values of the element(record) in the array
 
-                var transactionIDStr = "transactionIDStr=" + scoutingTransactionID.concat(trapTransactionID).toString(); //combines Souting ID with the trapID
+                let transactionIDStr = "transactionIDStr=" + scoutingTransactionID.concat(trapTransactionID).toString(); //combines Souting ID with the trapID
 //what are scouting and trap IDs and where did they come from
                 console.log(transactionIDStr);
-                var pictureStr = "pictureStr=" + transactionpicturename.toString();
-                var LayerName = "LayerName=" + LayerNameStr.toString();
+                let pictureStr = "pictureStr=" + transactionpicturename.toString();
+                let LayerName = "LayerName=" + LayerNameStr.toString();
                 $.ajax({
                     url: 'deleteData',
                     type: "GET",
@@ -417,9 +417,9 @@
     }
     window.onclick = function(event) {
         if (!event.target.matches('.dropbutton')) {
-            var dropdowns = document.getElementsByClassName("dropdown-content");
-            for (var i = 0; i < dropdowns.length; i++) {
-                var openDropdown = dropdowns[i];
+            let dropdowns = document.getElementsByClassName("dropdown-content");
+            for (let i = 0; i < dropdowns.length; i++) {
+                let openDropdown = dropdowns[i];
                 if (openDropdown.classList.contains('show')) {
                     openDropdown.classList.remove('show');
                 }
@@ -428,12 +428,12 @@
     }
 
     function query() {
-        var firstName = document.getElementById("firstName").value;
-        var lastName = document.getElementById("lastName").value;
-        var startDate = document.getElementsByClassName("date")[0].value;
-        var endDate = document.getElementsByClassName("date")[1].value;
+        let firstName = document.getElementById("firstName").value;
+        let lastName = document.getElementById("lastName").value;
+        let startDate = document.getElementsByClassName("date")[0].value;
+        let endDate = document.getElementsByClassName("date")[1].value;
 
-        var queryStr = "firstName=" + firstName + "&lastName=" + lastName + "&startDate=" + startDate + "&endDate=" + endDate;
+        let queryStr = "firstName=" + firstName + "&lastName=" + lastName + "&startDate=" + startDate + "&endDate=" + endDate;
 
         table.clear();
         table.draw();
@@ -443,7 +443,7 @@
     }
 
 
-    var queryAndDisplay = function (querystr) { //bring this back!!
+    let queryAndDisplay = function (querystr) { //bring this back!!
 
 
         $.ajax({
@@ -454,7 +454,7 @@
             data: querystr, //status="active or pending" & username=@ after deleting records, you reload table which shows a new output not including the deleted records - it's still an instance of filtering
             success: function (results) {
                 // console.log(results);
-                for (var i = 0; i < results.length; i++) {
+                for (let i = 0; i < results.length; i++) {
                     if (UserRole === "Regular") {
                         if (results[i].UID === username) {
                             table.row.add([
