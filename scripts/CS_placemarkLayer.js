@@ -15,147 +15,29 @@
 */
 
 requirejs([
-        './newGlobe',
-        '../config/mainconf'
-        ], function (newGlobe) {
+    './newGlobe',
+    './customPK',
+    './layerMenuAll'
+], function (newGlobe, customPK, menuL) {
 
     "use strict";
-    let infobox;
 
-    //preload placemark
-    $.ajax({
-        url: '/csPK',
-        dataType: 'json',
-        success: function(result) {
-            if (!result.err) {
-                infobox = result.data;
+    menuL.arrCS.forEach(function (e) {
+        let csPK = new customPK(e.Color, e.Row.Latitude, e.Row.Longitude);
+        csPK.placemark.userProperties.layerType = e.Row.LayerType;
+        csPK.placemark.userProperties.layerName = e.Row.LayerName;
+        csPK.placemark.userProperties.siteDesc = e.Row.Site_Description;
+        csPK.placemark.userProperties.picLocation = e.Row.Picture_Location;
+        csPK.placemark.userProperties.url = e.Row.Link_to_site_location;
+        csPK.placemark.userProperties.copyright = e.Row.Copyright;
 
-                for (let k = 0; k < infobox.length; k++) {
+        //add placemark onto placemark layer
+        e.wLayer.addRenderable(csPK.placemark);
 
-                    let colorAttribute = infobox[k].Color;
-                    let cAtwo = colorAttribute.split(" ");
-                    let coLat = infobox[k].Latitude;
-                    let coLong = infobox[k].Longitude;
-                    let PK = infobox[k].PK;
-                    let LayerName = infobox[k].LayerName;
+        // add placemark layer onto worldwind layer obj
+        e.wLayer.enabled = false;
+        e.wLayer.layerType = 'CS_PKLayer';
+        newGlobe.addLayer(e.wLayer);
 
-                    Placemark_Creation(cAtwo, PK, coLat, coLong, LayerName);
-                }
-            }
-        }
-    });
-
-    function Placemark_Creation (RGB,PKValue, coLat, coLong, LayerName) {
-        let placemark;
-        let highlightAttributes;
-        let placemarkLayer = new WorldWind.RenderableLayer(LayerName);
-        let placemarkAttributes = new WorldWind.PlacemarkAttributes(null);
-
-        // Create the custom image for the placemark.
-        let canvas = document.createElement("canvas"),
-            ctx2d = canvas.getContext("2d"),
-            size = 60, c = size / 2, innerRadius = 12, outerRadius = 20;
-
-        canvas.width = size;
-        canvas.height = size;
-        //This is the color of the placeholder and appearance (Most likely)
-
-        let gradient = ctx2d.createRadialGradient(c, c, innerRadius, c, c, outerRadius);
-        gradient.addColorStop(0, RGB[0]);
-        gradient.addColorStop(0.5, RGB[1]);
-        gradient.addColorStop(1, RGB[2]);
-
-
-        ctx2d.fillStyle = gradient;
-        ctx2d.arc(c, c, outerRadius, 0, 2 * Math.PI, false);
-        ctx2d.fill();
-
-        // Set up the common placemark attributes.
-        placemarkAttributes.imageScale = 0.75; //placemark size!
-        placemarkAttributes.imageOffset = new WorldWind.Offset(
-            WorldWind.OFFSET_FRACTION, 0.5,
-            WorldWind.OFFSET_FRACTION, 0.5);
-        placemarkAttributes.imageColor = WorldWind.Color.WHITE;
-
-        placemark = new WorldWind.Placemark(new WorldWind.Position(coLat, coLong, 1e2), true, null);
-
-        // placemark.displayName = LayerName;
-
-        placemark.altitudeMode = WorldWind.RELATIVE_TO_GROUND;
-
-        // Create the placemark attributes for this placemark. Note that the attributes differ only by their
-        // image URL.
-        placemarkAttributes = new WorldWind.PlacemarkAttributes(placemarkAttributes);
-        placemarkAttributes.imageSource = new WorldWind.ImageSource(canvas);
-        placemark.attributes = placemarkAttributes;
-
-        // Create the highlight attributes for this placemark. Note that the normal attributes are specified as
-        // the default highlight attributes so that all properties are identical except the image scale.
-        highlightAttributes = new WorldWind.PlacemarkAttributes(placemarkAttributes);
-        highlightAttributes.imageScale = 1.2;
-        placemark.highlightAttributes = highlightAttributes;
-        placemark.primarykeyAttributes = PKValue;
-
-        // Add the placemark to the layer.
-        placemarkLayer.addRenderable(placemark);
-        placemarkLayer.enabled = false;
-        newGlobe.addLayer(placemarkLayer);
-    }
-
-    function handleMouseCLK (a)   {
-        let x = a.clientX,
-            y = a.clientY;
-        let pickListCLK = newGlobe.pick(newGlobe.canvasCoordinates(x, y));
-        for (let m = 0; m < pickListCLK.objects.length; m++) {
-
-            let pickedPM = pickListCLK.objects[m].userObject;
-            if (pickedPM instanceof WorldWind.Placemark && !pickedPM.userProperties.p_name) {
-                sitePopUp(pickedPM.primarykeyAttributes);
-            }
-        }
-    }
-
-    function sitePopUp (PKValue) {
-        let popupBodyItem = $("#popupBody");
-
-        for (let k = 0, lengths = infobox.length; k < lengths; k++) {
-            if (infobox[k].PK === PKValue) {
-                popupBodyItem.children().remove();
-
-                let popupBodyName = $('<p class="site-name"><h4>' + infobox[k].LayerName + '</h4></p>');
-                let popupBodyDesc = $('<p class="site-description">' + infobox[k].Site_Description + '</p><br>');
-                let fillerImages = $('<img style="width:100%; height:110%;" src="../images/Pics/' + infobox[k].Picture_Location + '"/>');
-                let imageLinks = $('<p class="site-link" <h6>Site Link: </h6></p><a href="' + infobox[k].Link_to_site_location + '">Click here to navigate to the site&#8217;s website </a>');
-                let copyrightStatus = $('<p  class="copyright" <h6>Copyright Status: </h6>' + infobox[k].Copyright + '</p><br>');
-                let coordinates = $('<p class="coordinate" <h6>Latitude and Longitude: </h6>'+ infobox[k].Latitude + infobox[k].Longitude + '</p><br>');
-
-                popupBodyItem.append(popupBodyName);
-                popupBodyItem.append(popupBodyDesc);
-                popupBodyItem.append(fillerImages);
-                popupBodyItem.append(imageLinks);
-                popupBodyItem.append(copyrightStatus);
-                popupBodyItem.append(coordinates);
-                break
-            }
-        }
-
-        let modal = document.getElementById('popupBox');
-        let span = document.getElementById('closeIt');
-
-        modal.style.display = "block";
-
-        span.onclick = function () {
-            modal.style.display = "none";
-
-            window.onclick = function (event) {
-                if (event.target === modal) {
-                    modal.style.display = "none";
-                }
-            }
-        }
-    }
-
-    $(document).ready(function() {
-        newGlobe.addEventListener("click", handleMouseCLK);
     });
 });

@@ -4,7 +4,7 @@
 
 const LocalStrategy   = require('passport-local').Strategy;
 const mysql = require('mysql');
-const config = require('../config/mainconf');
+const config = require('../config/serverConfig');
 const bcrypt = require('bcrypt-nodejs');
 const con_CS = mysql.createConnection(config.commondb_connection);
 

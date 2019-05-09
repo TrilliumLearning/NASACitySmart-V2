@@ -34,7 +34,7 @@ $(document).ready(function() {
 
         let panelGroup1 = document.createElement("div");
         panelGroup1.className = "panel-group " + firstL;
-        // panelGroup1.id = "nested" + i;
+        panelGroup1.id = "nested-" + firstL;
 
         collapsed1.appendChild(firstLayerName);
         panelTitle1.appendChild(collapsed1);
@@ -76,6 +76,7 @@ $(document).ready(function() {
 
         let panelBody3 = document.createElement("div");
         panelBody3.className = "panel-body " + secondL;
+        panelBody3.id = firstL + "--" + secondL;
 
         collapsed2.appendChild(secondLayerName);
         panelTitle2.appendChild(collapsed2);
@@ -85,9 +86,10 @@ $(document).ready(function() {
 
         nested1c1.appendChild(panelBody3);
 
-        secondLayers.push(secondL);
+        secondLayers.push(panelBody3.id);
 
-        document.getElementsByClassName("panel-group " + firstL)[0].appendChild(panelDefault2);
+        // document.getElementsByClassName("panel-group " + firstL)[0].appendChild(panelDefault2);
+        document.getElementById("nested-" + firstL).appendChild(panelDefault2);
     }
 
     function createThirdLayer(element) {
@@ -122,8 +124,8 @@ $(document).ready(function() {
         checkboxH5.appendChild(checkboxLabel);
         checkboxDiv.appendChild(checkboxH5);
 
-        document.getElementsByClassName("panel-body " + element.SecondLayer)[0].appendChild(checkboxDiv);
-
+        // document.getElementsByClassName("panel-body " + element.SecondLayer)[0].appendChild(checkboxDiv);
+        document.getElementById(element.FirstLayer + "--" + element.SecondLayer).appendChild(checkboxDiv);
     }
 
     //get data from database table using routes(ajax)
@@ -134,12 +136,13 @@ $(document).ready(function() {
         success: function (res) {
             // draw the first layer
             for ( let element of res) {
+                let secondIndex = element.FirstLayer + '--' + element.SecondLayer;
 
                 if (!firstLayers.includes(element.FirstLayer)) {
                     createFirstLayer(element.FirstLayer);
                 }
 
-                if (!secondLayers.includes(element.SecondLayer)) {
+                if (!secondLayers.includes(secondIndex)) {
                     createSecondLayer(element.FirstLayer, element.SecondLayer);
                 }
 

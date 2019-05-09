@@ -1,14 +1,14 @@
 
 requirejs([
         './newGlobe',
-        '../config/mainconf'
+        '../config/clientConfig'
     ], function (newGlobe) {
 
     "use strict";
 
     // Web Map Service information from NASA's Near Earth Observations WMS
-    let serviceAddress1 = config.Download_To;
-    let serviceAddress2 = config.Download_From;
+    let serviceAddress1 = config.serviceAddress1;
+    let serviceAddress2 = config.serviceAddress2;
     let secondDownload = false;
     let preloadWmsLayers = [];//preload entire layer name
 
@@ -51,6 +51,7 @@ requirejs([
 
         if (secondDownload) {
             $.get(serviceAddress2).done(createWMSLayer).fail(logError);
+            $.get('/reDownload');
         } else {
             $.get(serviceAddress1).done(createWMSLayer).fail(logError);
         }

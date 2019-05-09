@@ -2,7 +2,7 @@
 // get all the tools we need
 const express  = require('express');
 const app      = express();
-const config = require('./config/mainconf');
+const config = require('./config/serverConfig');
 
 const session  = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);

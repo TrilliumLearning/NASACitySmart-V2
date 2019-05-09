@@ -1,7 +1,8 @@
 // exports the globe to at top-level
 
-define(['./WorldWindShim'],function (WorldWind) {
+define(['../src/WorldWind'],function (WorldWind) {
     "use strict";
+
     // Load Globe
     let globe = new WorldWind.WorldWindow('canvasOne');
 
